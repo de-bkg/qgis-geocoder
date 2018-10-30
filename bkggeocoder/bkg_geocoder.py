@@ -30,8 +30,6 @@ from qgis.core import (QgsProject, QgsField, QgsVectorLayer, QgsMapLayer,
                        QgsPointXY, QgsGeometry, QgsFeature, QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform)
-from shapely.geometry.multipolygon import MultiPolygon
-from shapely import wkt
 import processing
 import os.path
 import re
@@ -408,6 +406,20 @@ class BKGGeocoderPlugin:
                 area_layer, selected=True, target_crs=target_crs)
             g_wkts = [g.asWkt() for g in geometries]
             if len(geometries) > 1:
+                # shapely seems to be installed under windows by default but is missing in linux
+                try:
+                    from shapely.geometry.multipolygon import MultiPolygon
+                    from shapely import wkt
+                except:
+                    QMessageBox.information(
+                        self.dlg, 'Fehler',
+                        (u'Die Bibliothek die Python Bibliothek "shapely" ist '
+                         u'nicht installiert. Die wird für die Zusammenführung '
+                         u'der selektierten Polygone (Regionssuche) benötigt.'
+                         u'Installieren Sie sie manuell oder wählen Sie nur ein'
+                         u' einzelnes Polygon aus.\n\n'
+                         u'Start abgebrochen...'))
+                    return
                 p = [wkt.loads(w) for w in g_wkts]
                 multi = MultiPolygon(p)
                 area_wkt = multi.wkt
