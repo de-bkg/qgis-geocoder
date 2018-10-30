@@ -413,9 +413,9 @@ class BKGGeocoderPlugin:
                 except:
                     QMessageBox.information(
                         self.dlg, 'Fehler',
-                        (u'Die Bibliothek die Python Bibliothek "shapely" ist '
-                         u'nicht installiert. Die wird für die Zusammenführung '
-                         u'der selektierten Polygone (Regionssuche) benötigt.'
+                        (u'Die Python Bibliothek "shapely" ist '
+                         u'nicht installiert. Sie wird für die Zusammenführung '
+                         u'der selektierten Polygone (Suchgebiet) benötigt. '
                          u'Installieren Sie sie manuell oder wählen Sie nur ein'
                          u' einzelnes Polygon aus.\n\n'
                          u'Start abgebrochen...'))
