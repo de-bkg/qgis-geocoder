@@ -190,7 +190,7 @@ class BKGGeocoderPlugin:
         self.add_action(
             icon_path,
             text=self.tr(u'BKG Geocoder'),
-            callback=self.run,
+            callback=lambda: self.run(),
             parent=self.iface.mainWindow()
         )
         # open dialog on right click feature in legend
@@ -208,7 +208,14 @@ class BKGGeocoderPlugin:
             self.legendAction, "", QgsMapLayer.VectorLayer, True)
 
         # dock for feature picking
-        self.picker_dock = PickerDock(self.canvas, self.results_cache)
+        self.picker_dock = PickerDock(self.canvas,
+                                      self.results_cache)
+        # Geocode button clicked in picker dock
+        def on_geocode():
+            layer = self.picker_dock.active_layer
+            feature = self.picker_dock.active_feature
+            self.run(layer=layer, feature=feature)
+        self.picker_dock.dlg.geocode_button.clicked.connect(on_geocode)
         #, parent=self.iface.mainWindow())
         self.picker_dock.result_set.connect(
             lambda l, f, r: self.set_result(l, f, r, focus=True))
@@ -245,13 +252,23 @@ class BKGGeocoderPlugin:
         # remove the toolbar
         del self.toolbar
 
-    def run(self, layer=None):
+    def run(self, layer=None, feature=None):
         """Run method that performs all the real work"""
         # show the dialog
         self.dlg.close()
         self.fill_layer_combo(active=layer)
-        self.dlg.show()
+        # disable layer selection if layer is passed
+        print(layer)
+        self.dlg.layer_combo.setEnabled(layer is None)
+        self.dlg.selected_only_check.setEnabled(feature is None)
+        # if feature is passed -> select it in QGIS
+        # and force geocoding selected only
+        if feature:
+            self.dlg.selected_only_check.setChecked(True)
+            layer.removeSelection()
+            layer.select(feature.id())
         self.picker_dock.show()
+        self.dlg.show()
 
     def load_config(self):
         '''
@@ -469,6 +486,7 @@ class BKGGeocoderPlugin:
         new_fields = [
             ('bkg_feature_id', QVariant.Int, 'int4'),
             ('bkg_n_results', QVariant.Int, 'int2'),
+            ('bkg_i', QVariant.Double, 'int2'),
             ('bkg_typ', QVariant.String, 'text'),
             ('bkg_text', QVariant.String, 'text'),
             ('bkg_score', QVariant.Double, 'float8')
@@ -482,7 +500,9 @@ class BKGGeocoderPlugin:
             self.results_cache.add(layer, feature, results)
             feature.setAttribute('bkg_feature_id', feat_id)
             feature.setAttribute('bkg_n_results', results.count())
-            self.set_result(layer, feature, results.best())
+            best, idx = results.best()
+            feature.setAttribute('bkg_i', idx)
+            self.set_result(layer, feature, best)
         def on_done():
             layer.commitChanges()
             self.canvas.setExtent(layer.extent())

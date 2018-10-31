@@ -70,6 +70,16 @@
    <item>
     <widget class="QListWidget" name="result_list"/>
    </item>
+   <item>
+    <widget class="QPushButton" name="geocode_button">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Geokodierung</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

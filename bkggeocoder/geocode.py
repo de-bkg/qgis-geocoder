@@ -41,10 +41,10 @@ class Results:
 
     def best(self):
         if len(self.results) == 0:
-            return None
+            return None, -1
         scores = np.array([res.score for res in self.results])
         best_idx = scores.argmax()
-        return self.results[best_idx]
+        return self.results[best_idx], best_idx
 
     def count(self):
         return len(self)
@@ -128,7 +128,8 @@ class GeocodeWorker(Worker):
                 message = 'Feature {id} -> <b>{c}</b> Ergebnis(se)'.format(
                     id=id, c=results.count())
                 if results.count() > 0:
-                    message += '- bestes E.: {res}'.format(res=str(results.best()))
+                    best, idx = results.best()
+                    message += '- bestes E.: {res}'.format(res=str(best))
                 self.message.emit(message)
             except Exception as e:
                 self.error.emit(str(e))

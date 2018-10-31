@@ -31,6 +31,7 @@ class PickerDock(QDockWidget):
     def clear(self):
         self.dlg.feature_edit.setText('')
         self.dlg.result_list.clear()
+        self.dlg.geocode_button.setEnabled(False)
 
     def select(self):
         self.canvas.setMapTool(self.featurePicker)
@@ -39,23 +40,32 @@ class PickerDock(QDockWidget):
 
     def result_changed(self, item):
         idx = self.dlg.result_list.currentRow()
+        self.active_feature.setAttribute('bkg_i', idx)
         result = self.active_results[idx]
         self.result_set.emit(self.active_layer, self.active_feature, result)
 
     def featurePicked(self, layer, feature):
+        self.dlg.geocode_button.setEnabled(True)
         self.active_feature = feature
         self.active_layer = layer
         layer.removeSelection()
         layer.select(feature.id())
         attr = []
         attributes = feature.attributes()
+        res_idx = 0
         for field in layer.fields():
-            if not field.name().startswith('bkg_'):
-                idx = feature.fieldNameIndex(field.name())
+            field_name = field.name()
+            if not field_name.startswith('bkg_'):
+                idx = feature.fieldNameIndex(field_name)
                 value = attributes[idx]
                 attr.append(value)
-        self.dlg.feature_edit.setText('Feature {id} - {a}'.format(
-            id=feature.id(), a=', '.join(map(str, attr))))
+            if field_name == 'bkg_i':
+                idx = feature.fieldNameIndex(field_name)
+                res_idx = attributes[idx]
+        feat_repr = '({l}) Feature {id} - {a}'.format(
+            id=feature.id(), a=', '.join(map(str, attr)), l=layer.name())
+        self.dlg.feature_edit.setText(feat_repr)
+        self.dlg.feature_edit.setToolTip(feat_repr)
         self.dlg.result_list.clear()
         self.results_cache.get(layer, feature)
         results = self.results_cache.get(layer, feature)
@@ -63,6 +73,7 @@ class PickerDock(QDockWidget):
             self.active_results = results
             for result in results:
                 self.dlg.result_list.addItem(str(result))
+            self.dlg.result_list.setCurrentRow(res_idx)
 
 
 class PickerUI(QWidget, FORM_CLASS):
