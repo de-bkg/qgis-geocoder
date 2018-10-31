@@ -229,12 +229,12 @@ class BKGGeocoder(Geocoder):
         # all letters and '-', rejoin them with spaces
         re_city = '([a-zA-ZäöüßÄÖÜ\-]+)'
         f = re.findall(re_city, value)
-        res['ort'] = ' '.join(f)
         if f:
-            re_code = '([0-9]{5})'
+            res['ort'] = ' '.join(f)
+        re_code = '([0-9]{5})'
         f = re.findall(re_code, value)
         if f:
-            res['plz'] = m[0]
+            res['plz'] = f[0]
         return res
 
     # special keywords are keywords that are not supported by API but
