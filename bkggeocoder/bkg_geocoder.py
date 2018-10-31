@@ -347,7 +347,7 @@ class BKGGeocoderPlugin:
             checkbox = QCheckBox()
             checkbox.setText(field.name())
             combo = QComboBox()
-            combo.addItem('unspezifisches oder kombiniertes Adressfeld', None)
+            combo.addItem('unspezifisch oder nicht aufgeführte Kombination', None)
             for key, text in self.geocoder.keywords.items():
                 combo.addItem(text, key)
 
