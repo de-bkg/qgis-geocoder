@@ -48,6 +48,15 @@ config = Config()
 WKBTYPES = dict([(v, k) for k, v in QgsWkbTypes.__dict__.items()
                  if isinstance(v, int)])
 
+BKG_FIELDS = [
+    ('bkg_feature_id', QVariant.Int, 'int4'),
+    ('bkg_n_results', QVariant.Int, 'int2'),
+    ('bkg_i', QVariant.Double, 'int2'),
+    ('bkg_typ', QVariant.String, 'text'),
+    ('bkg_text', QVariant.String, 'text'),
+    ('bkg_score', QVariant.Double, 'float8')
+]
+
 
 class BKGGeocoderPlugin:
     """QGIS Plugin Implementation."""
@@ -258,7 +267,6 @@ class BKGGeocoderPlugin:
         self.dlg.close()
         self.fill_layer_combo(active=layer)
         # disable layer selection if layer is passed
-        print(layer)
         self.dlg.layer_combo.setEnabled(layer is None)
         self.dlg.selected_only_check.setEnabled(feature is None)
         # if feature is passed -> select it in QGIS
@@ -342,7 +350,11 @@ class BKGGeocoderPlugin:
         field_map = self.field_mapping.get(layer.id())
         if not field_map:
             field_map = self.field_mapping[layer.id()] = FieldMap(layer)
+        bkg_f = [f[0] for f in BKG_FIELDS]
         for field in fields:
+            # ignore the added bkg fields
+            if field.name() in bkg_f:
+                continue
             layout = QHBoxLayout()
             checkbox = QCheckBox()
             checkbox.setText(field.name())
@@ -374,7 +386,8 @@ class BKGGeocoderPlugin:
                 combo.setCurrentIndex(combo_idx)
             combo.setVisible(checked)
         n_selected = layer.selectedFeatureCount()
-        self.dlg.n_selected_label.setText('({} Feature(s) selektiert)'.format(n_selected))
+        self.dlg.n_selected_label.setText(
+            '({} Feature(s) selektiert)'.format(n_selected))
 
     def geocode(self, layer):
         '''
@@ -483,15 +496,7 @@ class BKGGeocoderPlugin:
         if not layer.isEditable():
             layer.startEditing()
 
-        new_fields = [
-            ('bkg_feature_id', QVariant.Int, 'int4'),
-            ('bkg_n_results', QVariant.Int, 'int2'),
-            ('bkg_i', QVariant.Double, 'int2'),
-            ('bkg_typ', QVariant.String, 'text'),
-            ('bkg_text', QVariant.String, 'text'),
-            ('bkg_score', QVariant.Double, 'float8')
-        ]
-        for name, qtype, dbtype in new_fields:
+        for name, qtype, dbtype in BKG_FIELDS:
             if name not in layer.fields().names():
                 layer.addAttribute(QgsField(name, qtype, dbtype))
 
@@ -501,7 +506,8 @@ class BKGGeocoderPlugin:
             feature.setAttribute('bkg_feature_id', feat_id)
             feature.setAttribute('bkg_n_results', results.count())
             best, idx = results.best()
-            feature.setAttribute('bkg_i', idx)
+            feature.setAttribute('bkg_i', idx or 0)
+            layer.updateFeature(feature)
             self.set_result(layer, feature, best)
         def on_done():
             layer.commitChanges()

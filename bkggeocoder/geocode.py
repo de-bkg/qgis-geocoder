@@ -143,6 +143,9 @@ class FieldMap:
     map fields of layer to parameters for geocoders
     '''
     def __init__(self, layer):
+        # key: field name, value: (active, keyword)
+        # active means, if the field should be used for geocoding
+        # keyword maps the field to an argument of the geocoder
         self.mapping = {}
         for field in layer.fields():
             self.mapping[field.name()] = [False, None]
@@ -171,6 +174,9 @@ class FieldMap:
             value = attributes[idx]
             if not value:
                 continue
+            if isinstance(value, float):
+                value = int(value)
+            value = str(value)
             if key is None:
                 split = re.findall(r"[\w'\-]+", value)
                 args.extend(split)
@@ -261,7 +267,7 @@ class BKGGeocoder(Geocoder):
         for k in special:
             value = kwargs.pop(k)
             kwargs.update(self.special_kw[k].__func__(value))
-        query += logic.join(('{k}:{v}{s}'.format(k=k, v=v, s=suffix)
+        query += logic.join(('{k}:"{v}"{s}'.format(k=k, v=v, s=suffix)
                              for k, v in kwargs.items()
                              if v))
         return query

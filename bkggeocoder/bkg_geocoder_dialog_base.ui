@@ -350,10 +350,10 @@
           <item>
            <widget class="QCheckBox" name="fuzzy_check">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
-             <string>fuzzy Suche (DEAKTIVIERT)</string>
+             <string>fuzzy Suche</string>
             </property>
            </widget>
           </item>
