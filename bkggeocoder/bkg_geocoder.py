@@ -30,6 +30,7 @@ from qgis.core import (QgsProject, QgsField, QgsVectorLayer, QgsMapLayer,
                        QgsPointXY, QgsGeometry, QgsFeature, QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform)
+import copy
 import processing
 import os.path
 import re
@@ -479,7 +480,12 @@ class BKGGeocoderPlugin:
                 text=get_unique_layer_name(layer.name()))
             if not ok:
                 return
+            # clone layer and copy the selections of fields
+            orig_map = self.field_mapping[layer.id()]
             layer = clone(layer, name=name, features=selected, srs=srs)
+            new_map = FieldMap(layer)
+            new_map.mapping = copy.deepcopy(orig_map.mapping)
+            self.field_mapping[layer.id()] = new_map
         else:
             if layer.wkbType() != QgsWkbTypes.Point:
                 QMessageBox.information(
@@ -512,6 +518,7 @@ class BKGGeocoderPlugin:
         def on_done():
             layer.commitChanges()
             self.canvas.setExtent(layer.extent())
+            self.fill_layer_combo(active=layer)
 
         # pass selected features to geocoding
         # cloned layers are already reduced to selection

@@ -224,7 +224,7 @@ class BKGGeocoder(Geocoder):
         if f:
             # take the last number found (e.g. bkg doesn't understand '6-8')
             res['haus'] = f[-1].replace('-', '').replace(' ', '')
-        re_street = '([a-zA-ZäöüßÄÖÜ\\s]+[0-9]*[.\\]*[a-zA-ZäöüßÄÖÜ]+)'
+        re_street = '([a-zA-ZäöüßÄÖÜ\\s\-\.]+[0-9]*[.\\]*[a-zA-ZäöüßÄÖÜ]+)'
         m = re.match(re_street, value)
         if m:
             res['strasse'] = m[0]
