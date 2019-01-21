@@ -236,6 +236,7 @@ class BKGGeocoderPlugin:
         self.layers = None
 
         self.dlg.save_settings_button.clicked.connect(self.save_config)
+        self.dlg.refresh_button.clicked.connect(lambda: self.run())
         self.dlg.start_button.clicked.connect(self.geocode)
 
         def index_changed(idx):
