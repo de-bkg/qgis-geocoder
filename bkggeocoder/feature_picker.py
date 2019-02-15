@@ -67,8 +67,7 @@ class PickerDock(QDockWidget):
         self.dlg.feature_edit.setText(feat_repr)
         self.dlg.feature_edit.setToolTip(feat_repr)
         self.dlg.result_list.clear()
-        self.results_cache.get(layer, feature)
-        results = self.results_cache.get(layer, feature)
+        results = self.results_cache.get(layer, feature.id())
         if results:
             self.active_results = results
             for result in results:

@@ -228,7 +228,7 @@ class BKGGeocoderPlugin:
         self.picker_dock.dlg.geocode_button.clicked.connect(on_geocode)
         #, parent=self.iface.mainWindow())
         self.picker_dock.result_set.connect(
-            lambda l, f, r: self.set_result(l, f, r, focus=True))
+            lambda l, f, r: self.set_result(l, f.id(), r, focus=True))
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.picker_dock)
 
         # available layers are stored in here
@@ -508,14 +508,18 @@ class BKGGeocoderPlugin:
                 layer.addAttribute(QgsField(name, qtype, dbtype))
 
         def on_progress(feat_id, results):
-            feature = layer.getFeature(feat_id)
-            self.results_cache.add(layer, feature, results)
-            feature.setAttribute('bkg_feature_id', feat_id)
-            feature.setAttribute('bkg_n_results', results.count())
+            self.results_cache.add(layer, feat_id, results)
+            fidx = layer.fields().indexFromName
             best, idx = results.best()
-            feature.setAttribute('bkg_i', idx or 0)
-            layer.updateFeature(feature)
-            self.set_result(layer, feature, best)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_feature_id'), feat_id)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_n_results'), results.count())
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_i'),  idx or 0)
+            #layer.updateFeature(feature)
+            self.set_result(layer, feat_id, best)
+
         def on_done():
             layer.commitChanges()
             self.canvas.setExtent(layer.extent())
@@ -536,27 +540,33 @@ class BKGGeocoderPlugin:
         dialog.exec_()
         self.picker_dock.clear()
 
-    def set_result(self, layer, feature, result, focus=False):
+    def set_result(self, layer, feat_id, result, focus=False):
         '''
         set result to feature of given layer
         focus map canvas on feature if requested
         '''
         if not layer.isEditable():
             layer.startEditing()
+        fidx = layer.fields().indexFromName
         if result:
             coords = result.coordinates
             geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
-            feature.setGeometry(geom)
-            feature.setAttribute('bkg_typ', result.typ)
-            feature.setAttribute('bkg_text', result.text)
-            feature.setAttribute('bkg_score', result.score)
+            layer.changeGeometry(feat_id, geom)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_typ'), result.typ)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_text'), result.text)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_score'), result.score)
         else:
-            feature.setAttribute('bkg_typ', '')
-            feature.setAttribute('bkg_score', 0)
-        layer.updateFeature(feature)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_typ'), '')
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_score'), 0)
+        #layer.updateFeature(feature)
         if focus:
             layer.removeSelection()
-            layer.select(feature.id())
+            layer.select(feat_id)
             self.canvas.zoomToSelected(layer)
         #layer.commitChanges()
 

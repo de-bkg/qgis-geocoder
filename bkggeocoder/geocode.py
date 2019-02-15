@@ -16,16 +16,16 @@ class ResultCache:
     def __init__(self):
         self.results = {}
 
-    def add(self, layer, feature, results):
+    def add(self, layer, feat_id, results):
         res_feat_store = self.results.get(layer.id())
         if not res_feat_store:
             res_feat_store = self.results[layer.id()] = {}
-        self.results[layer.id()][feature.id()] = results
+        self.results[layer.id()][feat_id] = results
 
-    def get(self, layer, feature):
+    def get(self, layer, feat_id):
         res_layer = self.results.get(layer.id())
         if res_layer:
-            return res_layer.get(feature.id())
+            return res_layer.get(feat_id)
         return None
 
 
