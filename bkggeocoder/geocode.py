@@ -123,7 +123,7 @@ class GeocodeWorker(Worker):
                 break
             try:
                 results = self.geocoder.query(*args, **kwargs)
-                self.message.emit(self.geocoder.r.url)
+                #self.message.emit(self.geocoder.r.url)
                 self.feature_done.emit(id, results)
                 message = 'Feature {id} -> <b>{c}</b> Ergebnis(se)'.format(
                     id=id, c=results.count())

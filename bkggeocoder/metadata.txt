@@ -10,7 +10,7 @@
 name=BKG Geocoder
 qgisMinimumVersion=3.0
 description=Geokodierung mit der BKG API
-version=0.9.4
+version=0.9.5
 author=GGR
 email=franke@ggr-planung.de
 

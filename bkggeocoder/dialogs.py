@@ -66,8 +66,10 @@ class ProgressDialog(QDialog, FORM_CLASS):
             self.close()
 
     def show_status(self, text):
-        self.log_edit.insertHtml(text + '<br>')
-        self.log_edit.moveCursor(QTextCursor.End)
+        self.log_edit.appendHtml(text)
+        #self.log_edit.moveCursor(QTextCursor.Down)
+        scrollbar = self.log_edit.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum());
 
     def progress(self, progress, obj=None):
         if isinstance(progress, QVariant):
@@ -81,7 +83,6 @@ class ProgressDialog(QDialog, FORM_CLASS):
     # task needs to be overridden
     def run(self):
         self.start_timer()
-
         self.stop_button.setVisible(True)
         self.start_button.setVisible(False)
         self.thread.start()
@@ -89,7 +90,7 @@ class ProgressDialog(QDialog, FORM_CLASS):
     def stop(self):
         self.timer.stop()
         self.worker.kill()
-        self.log_edit.insertHtml('<b> Vorgang abgebrochen </b> <br>')
+        self.log_edit.appendHtml('<b> Vorgang abgebrochen </b> <br>')
         self.log_edit.moveCursor(QTextCursor.End)
         self.finished()
 
