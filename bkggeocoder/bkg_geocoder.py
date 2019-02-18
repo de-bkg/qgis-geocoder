@@ -236,7 +236,13 @@ class BKGGeocoderPlugin:
         self.layers = None
 
         self.dlg.save_settings_button.clicked.connect(self.save_config)
-        self.dlg.refresh_button.clicked.connect(lambda: self.run())
+        def refresh():
+            idx = self.dlg.layer_combo.currentIndex()
+            if (idx == -1):
+                return
+            layer = self.layer_list[idx]
+            self.run(layer=layer)
+        self.dlg.refresh_button.clicked.connect(refresh)
         self.dlg.start_button.clicked.connect(self.geocode)
 
         def index_changed(idx):
@@ -269,7 +275,7 @@ class BKGGeocoderPlugin:
         self.dlg.close()
         self.fill_layer_combo(active=layer)
         # disable layer selection if layer is passed
-        self.dlg.layer_combo.setEnabled(layer is None)
+        #self.dlg.layer_combo.setEnabled(layer is None)
         self.dlg.selected_only_check.setEnabled(feature is None)
         # if feature is passed -> select it in QGIS
         # and force geocoding selected only
@@ -521,7 +527,7 @@ class BKGGeocoderPlugin:
             self.set_result(layer, feat_id, best)
 
         def on_done():
-            layer.commitChanges()
+            #layer.commitChanges()
             self.canvas.setExtent(layer.extent())
             self.fill_layer_combo(active=layer)
 
@@ -568,7 +574,6 @@ class BKGGeocoderPlugin:
             layer.removeSelection()
             layer.select(feat_id)
             self.canvas.zoomToSelected(layer)
-        #layer.commitChanges()
 
 def clone(layer, srs='4326', name=None, features=None):
     '''
