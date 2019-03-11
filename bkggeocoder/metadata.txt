@@ -16,8 +16,8 @@ email=franke@ggr-planung.de
 
 about=Plugin für die Geokodierung von Adressen mit Hilfe Schnittstelle des Bundesamtes für Kartographie und Geodäsie.
 
-tracker=https://github.com/ChrFr/bkg-geocoder-plugin/issues
-repository=https://github.com/ChrFr/bkg-geocoder-plugin
+tracker=https://github.com/ChrFr/qgis-geocoder/issues
+repository=https://github.com/ChrFr/qgis-geocoder
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=https://github.com/ChrFr/bkg-geocoder-plugin
 # Tags are comma separated with spaces allowed
 tags=geocode bkg
 
-homepage=https://github.com/ChrFr/bkg-geocoder-plugin
+homepage=http://www.ggr-planung.de
 category=Plugins
 icon=icon.png
 # experimental flag

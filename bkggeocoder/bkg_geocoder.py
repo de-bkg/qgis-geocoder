@@ -356,8 +356,9 @@ class BKGGeocoderPlugin:
             for i in reversed(range(layout.count())):
                 layout.itemAt(i).widget().deleteLater()
         field_map = self.field_mapping.get(layer.id())
-        if not field_map:
+        if not field_map or not field_map.valid(layer):
             field_map = self.field_mapping[layer.id()] = FieldMap(layer)
+
         bkg_f = [f[0] for f in BKG_FIELDS]
         for field in fields:
             # ignore the added bkg fields
@@ -444,7 +445,8 @@ class BKGGeocoderPlugin:
                 area_layer, selected=True, target_crs=target_crs)
             g_wkts = [g.asWkt() for g in geometries]
             if len(geometries) > 1:
-                # shapely seems to be installed under windows by default but is missing in linux
+                # shapely seems to be installed under windows by default but
+                # is missing in linux
                 try:
                     from shapely.geometry.multipolygon import MultiPolygon
                     from shapely import wkt

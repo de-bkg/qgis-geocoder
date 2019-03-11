@@ -11,7 +11,7 @@ import math
 class ResultCache:
     '''
     cache for storing result collections intermediately
-    ToDo: filebased caching (might use too much mem in current state)
+    ToDo: filebased caching (might use too much memory in current state)
     '''
     def __init__(self):
         self.results = {}
@@ -64,7 +64,7 @@ class Results:
 
 class Result:
     '''
-    geocoding result
+    result of single geocoding
     '''
     def __init__(self, coordinates=[0, 0], text='', score=0, typ=None):
         self.coordinates = coordinates
@@ -150,6 +150,12 @@ class FieldMap:
         for field in layer.fields():
             self.mapping[field.name()] = [False, None]
 
+    def valid(self, layer):
+        for field in layer.fields():
+            if field.name() not in self.mapping:
+                return False
+        return True
+
     def set_active(self, field_name, active=True):
         self.mapping[field_name][0] = active
 
@@ -194,6 +200,9 @@ class FieldMap:
 
 class Geocoder:
 
+    # keywords used in  and their display name for the ui
+    keywords = {}
+
     def __init__(self, url='', srs='EPSG:4326'):
         self.url = url
         self.srs = srs
@@ -201,7 +210,7 @@ class Geocoder:
 
 class BKGGeocoder(Geocoder):
     '''
-    geocoder using the BKG API
+    Geocoder using the BKG API
     '''
     # API keywords (label/key pairs)
     keywords = {
