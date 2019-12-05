@@ -24,20 +24,27 @@
 
 import os
 
-from PyQt5 import uic
-from PyQt5 import QtWidgets
+from qgis.PyQt import uic, QtWidgets
+from qgis.PyQt.QtCore import pyqtSignal, Qt
+from qgis import utils
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'bkg_geocoder_dialog_base.ui'))
+    os.path.dirname(__file__), 'ui', 'main_dockwidget.ui'))
 
 
-class BKGGeocoderDialog(QtWidgets.QDialog, FORM_CLASS):
+class MainWidget(QtWidgets.QDockWidget, FORM_CLASS):
+    closingWidget = pyqtSignal()
     def __init__(self, parent=None):
         """Constructor."""
-        super(BKGGeocoderDialog, self).__init__(parent)
-        # Set up the user interface from Designer.
-        # After setupUI you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
+        super(MainWidget, self).__init__(parent)
+
+        self.iface = utils.iface
+        self.canvas = self.iface.mapCanvas()
+        self.setAllowedAreas(
+            Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
+        )
         self.setupUi(self)
+
+    def closeEvent(self, event):
+        self.closingWidget.emit()
+        event.accept()
