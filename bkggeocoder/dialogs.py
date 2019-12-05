@@ -34,7 +34,7 @@ class ProgressDialog(QDialog, FORM_CLASS):
         self.worker.finished.connect(self.finished)
         self.worker.error.connect(self.show_status)
         self.worker.message.connect(self.show_status)
-        self.worker.progress.connect(self.progress)
+        self.worker.counter.connect(self.progress)
 
         self.start_button.clicked.connect(self.run)
         self.stop_button.clicked.connect(self.stop)

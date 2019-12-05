@@ -511,9 +511,9 @@ class BKGGeocoderPlugin:
         if not layer.isEditable():
             layer.startEditing()
 
-        for name, qtype, dbtype in BKG_FIELDS:
+        for name, qtype, dbtype, length in BKG_FIELDS:
             if name not in layer.fields().names():
-                layer.addAttribute(QgsField(name, qtype, dbtype))
+                layer.addAttribute(QgsField(name, qtype, dbtype, len=length))
 
         def on_progress(feat_id, results):
             self.results_cache.add(layer, feat_id, results)
