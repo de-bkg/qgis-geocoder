@@ -28,23 +28,66 @@ from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis import utils
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'main_dockwidget.ui'))
+from .dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
+                      ReverseGeocodingDialog, FeaturePickerDialog)
+
+UI_PATH = os.path.join(os.path.dirname(__file__), 'ui')
 
 
-class MainWidget(QtWidgets.QDockWidget, FORM_CLASS):
+class MainWidget(QtWidgets.QDockWidget):
+    ui_file = 'main_dockwidget.ui'
     closingWidget = pyqtSignal()
+
     def __init__(self, parent=None):
         """Constructor."""
         super(MainWidget, self).__init__(parent)
 
         self.iface = utils.iface
         self.canvas = self.iface.mapCanvas()
+        ui_file = self.ui_file if os.path.exists(self.ui_file) \
+            else os.path.join(UI_PATH, self.ui_file)
+        uic.loadUi(ui_file, self)
         self.setAllowedAreas(
             Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
         )
-        self.setupUi(self)
+        self.setupUi()
+
+    def setupUi(self):
+        self.importcsv_button.clicked.connect(self.import_csv)
+        self.exportcsv_button.clicked.connect(self.export_csv)
+        self.request_button.clicked.connect(self.geocode)
+        self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
+        self.featurepicker_button.clicked.connect(self.feature_picker)
+
+    def feature_picker(self):
+        dialog = FeaturePickerDialog(parent=self)
+        dialog.show()
+
+    def reverse_geocode(self):
+        dialog = ReverseGeocodingDialog(parent=self)
+        dialog.show()
+
+    def geocode(self):
+        dialog = ProgressDialog(parent=self)
+        dialog.show()
+
+    def import_csv(self):
+        dialog = OpenCSVDialog(parent=self)
+        dialog.show()
+
+    def export_csv(self):
+        dialog = SaveCSVDialog(parent=self)
+        dialog.show()
 
     def closeEvent(self, event):
         self.closingWidget.emit()
         event.accept()
+
+    def show(self):
+        self.iface.addDockWidget(
+            Qt.LeftDockWidgetArea,
+            self
+        )
+        self.setFloating(True);
+        self.resize(self.sizeHint().width(),
+                    self.sizeHint().height())

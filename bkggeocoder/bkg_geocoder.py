@@ -38,7 +38,7 @@ import re
 from .resources import *
 
 from .main_widget import MainWidget
-from .dialogs import GeocodeProgressDialog
+#from .dialogs import GeocodeProgressDialog
 from .geocode import BKGGeocoder, FieldMap, ResultCache
 from .config import Config
 from .feature_picker import PickerDock
@@ -298,14 +298,7 @@ class BKGGeocoderPlugin:
         # connect to provide cleanup on closing of dockwidget
         self.mainwidget.closingWidget.connect(self.onClosePlugin)
 
-        # show the dockwidget
-        self.iface.addDockWidget(
-            Qt.TopDockWidgetArea,
-            self.mainwidget
-        )
-        self.mainwidget.setFloating(True);
-        self.mainwidget.resize(self.mainwidget.sizeHint().width(),
-                               self.mainwidget.sizeHint().height())
+        self.mainwidget.show()
 
         ## show the dialog
         #self.dlg.close()
