@@ -24,12 +24,13 @@
 
 import os
 
-from qgis.PyQt import uic, QtWidgets
+from qgis.PyQt import uic, QtWidgets, QtGui
 from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis import utils
 
 from .dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
                       ReverseGeocodingDialog, FeaturePickerDialog)
+from .node_editor import NodeView
 
 UI_PATH = os.path.join(os.path.dirname(__file__), 'ui')
 
@@ -58,6 +59,18 @@ class MainWidget(QtWidgets.QDockWidget):
         self.request_button.clicked.connect(self.geocode)
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.featurepicker_button.clicked.connect(self.feature_picker)
+
+        self.draw_nodes()
+
+    def draw_nodes(self):
+        self.scene = QtWidgets.QGraphicsScene()
+        self.scene.setObjectName('Scene')
+        self.scene.setSceneRect(0, 0, 400, 400)
+        self.nodeview = NodeView(self.scene, self)
+        self.node_area.layout().addWidget(self.nodeview)
+
+        self.nodeview.add_node('Straße', 100, 100)
+        self.nodeview.add_node('Hausnummer', 100, 200)
 
     def feature_picker(self):
         dialog = FeaturePickerDialog(parent=self)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>586</height>
+    <width>411</width>
+    <height>610</height>
    </rect>
   </property>
   <property name="layoutDirection">
@@ -164,7 +164,7 @@ padding: 2px;
          </widget>
         </item>
         <item>
-         <widget class="QScrollArea" name="scrollArea">
+         <widget class="QScrollArea" name="scroll_area">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -174,36 +174,16 @@ padding: 2px;
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
+          <widget class="QWidget" name="node_area">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>368</width>
-             <height>328</height>
+             <width>379</width>
+             <height>352</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="toolTip">
-               <string>Just an example image. Yet to be programmed. </string>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>images/Zuordnung_Zeichenfläche_1_Zeichenfläche.png</pixmap>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignHCenter|Qt::AlignTop</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <layout class="QVBoxLayout" name="verticalLayout_6"/>
           </widget>
          </widget>
         </item>
