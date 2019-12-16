@@ -1,2 +1,3 @@
-*.wpu
 *.wpr
+*.wpu
+__pycache__
