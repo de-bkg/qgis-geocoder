@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>298</width>
-    <height>258</height>
+    <width>400</width>
+    <height>316</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,22 +15,81 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>weitere Treffer für Eingabedaten</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame">
+    <widget class="QFrame" name="actual_values_frame">
      <property name="frameShape">
-      <enum>QFrame::Panel</enum>
+      <enum>QFrame::Box</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Sunken</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QRadioButton" name="addressone_radiobutton_2">
+          <property name="text">
+           <string>742 Evergreen Terrace, Springfield</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addressone_mapsymbol_button_2">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>icons/20190619_iconset_mob_wborders_one.png</normaloff>icons/20190619_iconset_mob_wborders_one.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>18</width>
+            <height>18</height>
+           </size>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>weitere Ergebnisse für Eingabedaten</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="alternative_features_frame">
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="topMargin">
          <number>0</number>
@@ -77,7 +136,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <property name="topMargin">
          <number>0</number>
@@ -124,7 +183,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <property name="topMargin">
          <number>0</number>
@@ -171,7 +230,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="3" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <property name="topMargin">
          <number>0</number>
@@ -218,7 +277,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="4" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <property name="topMargin">
          <number>0</number>

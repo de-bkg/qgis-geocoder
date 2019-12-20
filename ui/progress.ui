@@ -22,25 +22,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="progresstextoutput_textedit"/>
-   </item>
-   <item>
-    <widget class="QProgressBar" name="geocodingprogress_progressbar">
-     <property name="value">
-      <number>42</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="invertedAppearance">
-      <bool>false</bool>
-     </property>
-     <property name="textDirection">
-      <enum>QProgressBar::TopToBottom</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -59,13 +40,6 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="elapsed_time_label">
-       <property name="text">
-        <string>00:29:24</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -79,16 +53,22 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="cancel_button">
-       <property name="text">
-        <string>Abbrechen</string>
+      <widget class="QPushButton" name="request_button">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="close_button">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
        <property name="text">
-        <string>Schließen</string>
+        <string>Anfrage stoppen</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>icons/20190619_iconset_mob_wborders_stop_1.png</normaloff>icons/20190619_iconset_mob_wborders_stop_1.png</iconset>
        </property>
       </widget>
      </item>
