@@ -65,6 +65,9 @@ padding: 2px;
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="toolTip">
+       <string/>
+      </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
@@ -75,7 +78,7 @@ padding: 2px;
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -117,6 +120,9 @@ padding: 2px;
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wählen Sie hier aus den geöffneten Layern die zu geokodierenden Daten aus. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="editable">
              <bool>false</bool>
             </property>
@@ -149,6 +155,9 @@ padding: 2px;
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fügen Sie weitere Daten der QGIS-Layerliste hinzu.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>Daten laden</string>
             </property>
@@ -172,6 +181,9 @@ padding: 2px;
         </item>
         <item>
          <widget class="QLabel" name="label_6">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ordnen Sie an dieser Stelle den bestehenden Feldern der Eingabedaten per Drop-Down-Menü den entsprechenden Geokodierungs-Parametern zu. &lt;/p&gt;&lt;p&gt;Sollten in Ihrer Ausgangsdatei der Straßenname und die Hausnummer in einem Feld strukturiert sein, so können Sie dieses Feld mit dem Geokodierungs-Parameter &amp;quot;Straße + Hausnummer&amp;quot; verbinden. Stehen die Werte für Hausnummer und Hausnummernzusatz (z.B. 49a) in der Ausgangsdatei in einem Feld, so ist diese mit dem Geokodierungs-Parameter &amp;quot;Hausnummer&amp;quot; zu verbinden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Zuordnung der Geokodierungs-Parameter</string>
           </property>
@@ -179,6 +191,9 @@ padding: 2px;
         </item>
         <item>
          <widget class="QFrame" name="frame_2">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ordnen Sie an dieser Stelle den bestehenden Feldern der Eingabedaten per Drop-Down-Menü den entsprechenden Geokodierungs-Parametern zu. &lt;/p&gt;&lt;p&gt;Sollten in Ihrer Ausgangsdatei der Straßenname und die Hausnummer in einem Feld strukturiert sein, so können Sie dieses Feld mit dem Geokodierungs-Parameter &amp;quot;Straße + Hausnummer&amp;quot; verbinden. Stehen die Werte für Hausnummer und Hausnummernzusatz (z.B. 49a) in der Ausgangsdatei in einem Feld, so ist diese mit dem Geokodierungs-Parameter &amp;quot;Hausnummer&amp;quot; zu verbinden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="autoFillBackground">
            <bool>true</bool>
           </property>
@@ -325,6 +340,9 @@ padding: 2px;
                <height>16777215</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Hier können Sie das gewünschte Ziel-Koordinatensystem angeben, in welches geokodiert werden soll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -368,6 +386,9 @@ padding: 2px;
                  <height>0</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In diesem Feld kann der Regionalschlüssel* als Filter zur regionalen Eingrenzung des Suchgebietes eingegeben werden.&lt;/p&gt;&lt;p&gt;Dies führt in der Folge dazu, dass nur Treffer innerhalb des gewählten Verwaltungsgebietes (z.B. Bundesland, Kreis, Gemeinde) gefunden werden können.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="clearButtonEnabled">
                 <bool>false</bool>
                </property>
@@ -392,6 +413,9 @@ padding: 2px;
                  <width>16777215</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtern Sie die Suche nach Bundesländern. &lt;/p&gt;&lt;p&gt;Die Auswahl fügt die Kennzahl des gewählten Bundeslandes in nebenstehendes Textfeld ein.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="editable">
                 <bool>false</bool>
@@ -503,6 +527,9 @@ padding: 2px;
                  <height>24</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Präzise Informationen zur Suche mit Regionalschlüsseln.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -553,6 +580,9 @@ padding: 2px;
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wählen Sie einen Polygonlayer, auf dessen Grenzen die Suche beschränkt werden soll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="frame">
                 <bool>true</bool>
                </property>
@@ -563,6 +593,9 @@ padding: 2px;
              </item>
              <item>
               <widget class="QCheckBox" name="onlyselectedpolygons_checkbox">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beschränken Sie die Suche weiter auf lediglich die selektierten Objekte des gewählten Layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>nur selektierte Objekte nutzen</string>
                </property>
@@ -575,6 +608,9 @@ padding: 2px;
         </item>
         <item>
          <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="title">
            <string>Zugangsdaten</string>
           </property>
@@ -593,13 +629,20 @@ padding: 2px;
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit"/>
+            <widget class="QLineEdit" name="lineEdit">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nehmen Sie hier erweiterte Einstellungen vor.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
@@ -629,6 +672,9 @@ padding: 2px;
                  <height>0</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Geokodieren Sie lediglich die ausgewählten Objekte des Quelllayers&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="layoutDirection">
                 <enum>Qt::LeftToRight</enum>
                </property>
@@ -657,6 +703,9 @@ padding: 2px;
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Eine unscharfe Suche erlaubt eine tolerante Suche basierend auf dem Levenshtein (Edit) Distanz Algorithmus.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>unscharfe Suche</string>
@@ -691,6 +740,9 @@ padding: 2px;
                  <height>0</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="layoutDirection">
                 <enum>Qt::LeftToRight</enum>
                </property>
@@ -713,6 +765,9 @@ padding: 2px;
                  <width>180</width>
                  <height>0</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>Verknüpfung der Suchterme:</string>
@@ -740,6 +795,9 @@ padding: 2px;
                  <height>0</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>AND</string>
                </property>
@@ -752,6 +810,9 @@ padding: 2px;
                  <width>47</width>
                  <height>0</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>OR</string>
@@ -865,6 +926,9 @@ padding: 2px;
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lassen Sie sich eine Tabelle mit den entsprechenden Geokodierungsergebnissen und Eingangswerten anzeigen (Attributtabelle des Ergebnislayers).&lt;/p&gt;&lt;p&gt;In der Tabelle haben Sie die Möglichkeit die Informationen zu sortieren, nach Informationen zu suchen, Informationen zu bearbeiten und Informationen zu markieren und auf deren Position in der Karte zu springen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Ergebnistabelle anzeigen</string>
           </property>
@@ -881,6 +945,9 @@ padding: 2px;
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mit diesem Tool können Sie die vom BKGGeocoder automatisch ermittelte Position bzw. zugewiesenen Adressangaben manuell verändern. &lt;/p&gt;&lt;p&gt;Nach dem manuellen Verschieben eines Objektes, wird Ihnen ein PopUp-Fenster mit den fünf nächstgelegenen Adressen und die dazugehörige Symbole in der Kartenansicht angezeigt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>Nachbaradresssuche</string>
@@ -912,6 +979,9 @@ padding: 2px;
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gibt es für ein Objekt mehrere Treffer, so können Sie sich hier die Treffer mit geringerer Güte anzeigen lassen und ggf. einen der Treffer übernehmen. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>Ergebnisse inspizieren</string>
@@ -952,6 +1022,9 @@ padding: 2px;
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sichern Sie Ihre Ergebnisse in Ihrem gewünschten Dateiformat.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
@@ -961,6 +1034,12 @@ padding: 2px;
             <property name="icon">
              <iconset>
               <normaloff>icons/20190619_iconset_mob_wborders_save_1.png</normaloff>icons/20190619_iconset_mob_wborders_save_1.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -991,6 +1070,9 @@ padding: 2px;
           <width>0</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>Zeigt die Hilfe an.</string>
         </property>
         <property name="text">
          <string>Hilfe</string>
@@ -1051,6 +1133,9 @@ padding: 2px;
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starten Sie die Anfrage mit den getroffenen Konfigurationen. &lt;/p&gt;&lt;p&gt;Ihre ausgewählten Daten werden hierbei dem BKG übermittelt. Bitte beachten Sie, dass diese – abhängig von Ihrer Auswahl – auch personenbezogene Daten umfassen können.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
         </property>
@@ -1070,6 +1155,9 @@ padding: 2px;
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stoppen Sie die Anfrage.&lt;/p&gt;&lt;p&gt;Bereits erzielte Ergebnisse bleiben dabei erhalten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
