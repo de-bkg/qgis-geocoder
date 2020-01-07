@@ -78,7 +78,7 @@ padding: 2px;
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -387,7 +387,7 @@ padding: 2px;
                 </size>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In diesem Feld kann der Regionalschlüssel* als Filter zur regionalen Eingrenzung des Suchgebietes eingegeben werden.&lt;/p&gt;&lt;p&gt;Dies führt in der Folge dazu, dass nur Treffer innerhalb des gewählten Verwaltungsgebietes (z.B. Bundesland, Kreis, Gemeinde) gefunden werden können.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In diesem Feld kann der Regionalschlüssel als Filter zur regionalen Eingrenzung des Suchgebietes eingegeben werden.&lt;/p&gt;&lt;p&gt;Dies führt in der Folge dazu, dass nur Treffer innerhalb des gewählten Verwaltungsgebietes (z.B. Bundesland, Kreis, Gemeinde) gefunden werden können.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="clearButtonEnabled">
                 <bool>false</bool>
