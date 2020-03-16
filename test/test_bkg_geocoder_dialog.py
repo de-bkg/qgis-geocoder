@@ -16,9 +16,9 @@ import unittest
 
 from PyQt5.QtGui import QDialogButtonBox, QDialog
 
-from bkg_geocoder_dialog import BKGGeocoderDialog
+from .bkg_geocoder_dialog import BKGGeocoderDialog
 
-from utilities import get_qgis_app
+from .utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 
 

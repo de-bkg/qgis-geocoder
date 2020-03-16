@@ -16,7 +16,7 @@ import unittest
 import csv
 import re
 
-from ..geocode import BKGGeocoder
+from ..geocoder.geocode import BKGGeocoder
 
 
 UUID = "" # Key, welcher vom BKG ausgegeben wird

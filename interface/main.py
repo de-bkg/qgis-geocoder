@@ -90,3 +90,6 @@ class MainWidget(QtWidgets.QDockWidget):
         self.setFloating(True);
         self.resize(self.sizeHint().width(),
                     self.sizeHint().height())
+        geometry = self.geometry()
+        self.setGeometry(500, 500,
+                         geometry.width(), geometry.height())

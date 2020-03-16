@@ -919,102 +919,28 @@ padding: 2px;
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="showattributtable_button">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lassen Sie sich eine Tabelle mit den entsprechenden Geokodierungsergebnissen und Eingangswerten anzeigen (Attributtabelle des Ergebnislayers).&lt;/p&gt;&lt;p&gt;In der Tabelle haben Sie die Möglichkeit die Informationen zu sortieren, nach Informationen zu suchen, Informationen zu bearbeiten und Informationen zu markieren und auf deren Position in der Karte zu springen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Ergebnistabelle anzeigen</string>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/20190619_iconset_mob_wborders_specify_2.png</normaloff>icons/20190619_iconset_mob_wborders_specify_2.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="reversegeocoding_button">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mit diesem Tool können Sie die vom BKGGeocoder automatisch ermittelte Position bzw. zugewiesenen Adressangaben manuell verändern. &lt;/p&gt;&lt;p&gt;Nach dem manuellen Verschieben eines Objektes, wird Ihnen ein PopUp-Fenster mit den fünf nächstgelegenen Adressen und die dazugehörige Symbole in der Kartenansicht angezeigt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Nachbaradresssuche</string>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</iconset>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="autoRepeat">
-           <bool>false</bool>
-          </property>
-          <property name="autoExclusive">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QPushButton" name="featurepicker_button">
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="showattributtable_button">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gibt es für ein Objekt mehrere Treffer, so können Sie sich hier die Treffer mit geringerer Güte anzeigen lassen und ggf. einen der Treffer übernehmen. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lassen Sie sich eine Tabelle mit den entsprechenden Geokodierungsergebnissen und Eingangswerten anzeigen (Attributtabelle des Ergebnislayers).&lt;/p&gt;&lt;p&gt;In der Tabelle haben Sie die Möglichkeit die Informationen zu sortieren, nach Informationen zu suchen, Informationen zu bearbeiten und Informationen zu markieren und auf deren Position in der Karte zu springen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Ergebnisse inspizieren</string>
+             <string>Ergebnistabelle anzeigen</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</iconset>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="autoRepeat">
-             <bool>false</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>true</bool>
+              <normaloff>icons/20190619_iconset_mob_wborders_specify_2.png</normaloff>icons/20190619_iconset_mob_wborders_specify_2.png</iconset>
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
+          <item row="2" column="2">
            <widget class="QPushButton" name="exportcsv_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1043,6 +969,93 @@ padding: 2px;
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="featurepicker_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gibt es für ein Objekt mehrere Treffer, so können Sie sich hier die Treffer mit geringerer Güte anzeigen lassen und ggf. einen der Treffer übernehmen. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">text-align:left;</string>
+            </property>
+            <property name="text">
+             <string>Ergebnisse inspizieren</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</iconset>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="reversegeocoding_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mit diesem Tool können Sie die vom BKGGeocoder automatisch ermittelte Position bzw. zugewiesenen Adressangaben manuell verändern. &lt;/p&gt;&lt;p&gt;Nach dem manuellen Verschieben eines Objektes, wird Ihnen ein PopUp-Fenster mit den fünf nächstgelegenen Adressen und die dazugehörige Symbole in der Kartenansicht angezeigt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">text-align:left;</string>
+            </property>
+            <property name="text">
+             <string>Nachbaradresssuche</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</iconset>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
          </layout>
         </item>
        </layout>
