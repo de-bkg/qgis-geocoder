@@ -55,7 +55,6 @@ class MainWidget(QtWidgets.QDockWidget):
     def setupUi(self):
         self.importcsv_button.clicked.connect(self.import_csv)
         self.exportcsv_button.clicked.connect(self.export_csv)
-        self.request_button.clicked.connect(self.geocode)
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.featurepicker_button.clicked.connect(self.feature_picker)
 

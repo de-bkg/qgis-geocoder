@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>374</height>
+    <height>401</height>
    </rect>
   </property>
   <property name="layoutDirection">
@@ -248,8 +248,8 @@ padding: 2px;
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>373</width>
-                <height>140</height>
+                <width>391</width>
+                <height>216</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -650,7 +650,7 @@ padding: 2px;
            <string>Expertenmodus</string>
           </property>
           <property name="collapsed">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>

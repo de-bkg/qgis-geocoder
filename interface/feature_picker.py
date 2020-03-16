@@ -6,10 +6,11 @@ from qgis.gui import QgsMapToolIdentify
 from qgis.PyQt import uic
 import os
 
-from .geocode import Result
+from ..geocoder.geocode import Result
+from ..config import UI_PATH
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'picker_dock.ui'))
+    UI_PATH, 'featurepicker.ui'))
 
 
 class PickerDock(QDockWidget):

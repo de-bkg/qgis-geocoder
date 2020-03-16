@@ -37,11 +37,11 @@ import re
 # Initialize Qt resources from file resources.py
 from .resources import *
 
-from .main_widget import MainWidget
+from .interface.main import MainWidget
 #from .dialogs import GeocodeProgressDialog
-from .geocode import BKGGeocoder, FieldMap, ResultCache
+from .geocoder.geocode import BKGGeocoder, FieldMap, ResultCache
 from .config import Config
-from .feature_picker import PickerDock
+#from .feature_picker import PickerDock
 
 config = Config()
 

@@ -5,9 +5,9 @@ from qgis.PyQt.QtGui import QTextCursor
 from qgis.PyQt import uic
 import os
 import datetime
-from .geocode import GeocodeWorker, Results
 
-UI_PATH = os.path.join(os.path.dirname(__file__), 'ui')
+from ..geocoder.geocode import GeocodeWorker, Results
+from ..config import UI_PATH
 
 
 class Dialog(QDialog):
