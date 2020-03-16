@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>401</height>
+    <height>501</height>
    </rect>
   </property>
   <property name="layoutDirection">
@@ -249,7 +249,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>391</width>
-                <height>216</height>
+                <height>316</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">

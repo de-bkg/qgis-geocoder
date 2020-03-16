@@ -37,7 +37,7 @@ import re
 # Initialize Qt resources from file resources.py
 from .resources import *
 
-from .interface.main import MainWidget
+from .interface.main_widget import MainWidget
 #from .dialogs import GeocodeProgressDialog
 from .geocoder.geocode import BKGGeocoder, FieldMap, ResultCache
 from .config import Config
