@@ -14,13 +14,19 @@ __copyright__ = 'Copyright 2018, GGR'
 
 import unittest
 import csv
-import re
+import sys
+import os
+from qgis.core import QgsVectorLayer
 
-from ..geocoder.geocode import BKGGeocoder
+sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
+from geocoder.bkg_geocoder import BKGGeocoder
+from geocoder.geocoder import Geocoding
+from utilities import get_qgis_app
 
+QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
 
-UUID = "" # Key, welcher vom BKG ausgegeben wird
-URL = "http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch".format(key=UUID)
+# bkg key from environment variable (security reasons)
+UUID = os.environ.get('BKG_UUID')
 
 
 class BKGAPITest(unittest.TestCase):
@@ -28,45 +34,25 @@ class BKGAPITest(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test."""
-        self.geocoder = BKGGeocoder(URL)
+        self.geocoder = BKGGeocoder(UUID)
 
     def tearDown(self):
         """Runs after each test."""
         pass
 
-    def test_special_kw(self):
-        kwargs = {
-            'plz_ort': '91541 Rothenburg ob der Tauber',
-            'strasse': 'Spitalgasse',
-            'haus': 43
-        }
-        self.geocoder.query(**kwargs)
-        kwargs = {
-            'ort': 'Berlin',
-            'strasse_hnr': 'Straße des 17.Juni 134-135'
-        }
-        self.geocoder.query(**kwargs)
-
     def test_keys(self):
-        with open('test.csv', newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=';')
-            header = next(reader, None)
-            for row in reader:
-                kwargs = {}
-                for i, h in enumerate(header):
-                    kwargs[h] = row[i]
-                results = self.geocoder.query(**kwargs)
+        fn = os.path.join('A2-T1_adressen_mit-header_utf8.csv')
+        fp = os.path.join(os.path.dirname(__file__), 'test_data', fn)
+        uri = f'file:/{fp}?delimiter=";"'
+        vlayer = QgsVectorLayer(uri, "test", "delimitedtext")
+        geocoding = Geocoding(vlayer, self.geocoder)
+        geocoding.set_field('Straße', keyword='strasse', active=True)
+        geocoding.set_field('Hausnummer', keyword='haus', active=True)
+        geocoding.set_field('Postleitzahl', keyword='plz', active=True)
+        geocoding.set_field('Ort', keyword='ort', active=True)
 
-    def test_wo_keys(self):
-        with open('test2.csv', newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=';')
-            header = next(reader, None)
-            for row in reader:
-                args = []
-                for a in row:
-                    split = re.findall(r"[\w'\-]+", a)
-                    args.extend(split)
-                results = self.geocoder.query(*args)
+        # not threaded
+        geocoding.work()
 
 
 if __name__ == "__main__":

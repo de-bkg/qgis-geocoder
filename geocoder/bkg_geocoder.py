@@ -3,6 +3,8 @@ import re
 
 from .geocoder import Geocoder, Results, Result
 
+URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
+
 
 class BKGGeocoder(Geocoder):
     '''
@@ -17,13 +19,6 @@ class BKGGeocoder(Geocoder):
         'plz': 'Postleitzahl',
         'strasse_hnr': 'Straße + Hausnummer',
         'plz_ort': 'Postleitzahl + Ort',
-    }
-
-    # special keywords are keywords that are not supported by API but
-    # its values are to be further processed into seperate keywords
-    special_kw = {
-        'strasse_hnr': split_street_nr,
-        'plz_ort': split_code_city,
     }
 
     logic_link = 'AND'
@@ -58,6 +53,17 @@ class BKGGeocoder(Geocoder):
         if f:
             res['plz'] = f[0]
         return res
+
+    # special keywords are keywords that are not supported by API but
+    # its values are to be further processed into seperate keywords
+    special_kw = {
+        'strasse_hnr': split_street_nr,
+        'plz_ort': split_code_city,
+    }
+
+    def __init__(self, key, srs: str='EPSG:4326'):
+        url = URL.format(key=key)
+        super().__init__(url=url, srs=srs)
 
     def _build_params(self, args, kwargs):
         suffix = '~' if self.fuzzy else ''

@@ -1,10 +1,20 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-from PyQt5.QtCore import pyqtSignal, QObject
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 import numpy as np
 import re
 import math
+
+
+class Geocoder:
+
+    # keywords used in  and their display name for the ui
+    keywords = {}
+
+    def __init__(self, url='', srs='EPSG:4326'):
+        self.url = url
+        self.srs = srs
 
 
 class ResultCache:
@@ -84,7 +94,7 @@ class Worker(QObject):
     '''
 
     # available signals to be used in the concrete worker
-    finished = pyqtSignal()
+    finished = pyqtSignal(bool)
     error = pyqtSignal(str)
     message = pyqtSignal(str)
     progress = pyqtSignal(float)
@@ -94,8 +104,8 @@ class Worker(QObject):
         self.is_killed = False
 
     def run(self):
-        result = self.work()
-        self.finished.emit()
+        success = self.work()
+        self.finished.emit(success)
 
     def work(self):
         raise NotImplementedError
@@ -104,22 +114,30 @@ class Worker(QObject):
         self.is_killed = True
 
 
-class GeocodeWorker(Worker):
-    '''
-    worker for threaded geocoding
-    '''
+class Geocoding(Worker):
     feature_done = pyqtSignal(int, Results)
 
-    def __init__(self, geocoder, queries):
+    def __init__(self, layer, geocoder: Geocoder):
         super().__init__()
         self.geocoder = geocoder
-        self.queries = queries
+        self.field_map = FieldMap(layer)
+        self.layer = layer
+
+    def set_field(self, field_name: str, keyword: str=None, active: bool=None):
+        if keyword is not None:
+            self.field_map.set_keyword(field_name, keyword)
+        if active is not None:
+            self.field_map.set_active(field_name, active=active)
 
     def work(self):
-        count = len(self.queries)
-        for i, (id, (args, kwargs)) in enumerate(self.queries):
+        success = True
+        features = self.layer.getFeatures()
+        count = self.layer.featureCount()
+        for i, feature in enumerate(features):
             if self.is_killed:
+                success = False
                 break
+            args, kwargs = self.field_map.to_args(feature)
             try:
                 results = self.geocoder.query(*args, **kwargs)
                 #self.message.emit(self.geocoder.r.url)
@@ -131,10 +149,13 @@ class GeocodeWorker(Worker):
                     message += '- bestes E.: {res}'.format(res=str(best))
                 self.message.emit(message)
             except Exception as e:
+                success = False
                 self.error.emit(str(e))
             finally:
                 progress = math.floor(100 * (i + 1) / count)
                 self.progress.emit(progress)
+
+        return success
 
 
 class FieldMap:
@@ -196,12 +217,3 @@ class FieldMap:
                 i += 1
         return i
 
-
-class Geocoder:
-
-    # keywords used in  and their display name for the ui
-    keywords = {}
-
-    def __init__(self, url='', srs='EPSG:4326'):
-        self.url = url
-        self.srs = srs

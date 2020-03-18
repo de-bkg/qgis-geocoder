@@ -6,7 +6,7 @@ from qgis.PyQt import uic
 import os
 import datetime
 
-from ..geocoder.geocode import GeocodeWorker, Results
+from ..geocoder.geocoder import GeocodeWorker, Results
 from ..config import UI_PATH
 
 

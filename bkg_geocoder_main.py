@@ -39,7 +39,8 @@ from .resources import *
 
 from .interface.main_widget import MainWidget
 #from .dialogs import GeocodeProgressDialog
-from .geocoder.geocode import BKGGeocoder, FieldMap, ResultCache
+from .geocoder.geocoder import FieldMap, ResultCache
+from .geocoder.bkg_geocoder import BKGGeocoder
 from .config import Config
 #from .feature_picker import PickerDock
 
