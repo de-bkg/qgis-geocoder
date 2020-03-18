@@ -1,7 +1,7 @@
 import requests
 import re
 
-from .geocoder import Geocoder, Results, Result
+from .geocoder import Geocoder
 
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
 
@@ -94,20 +94,6 @@ class BKGGeocoder(Geocoder):
         # ToDo raise specific errors
         if self.r.status_code != 200:
             raise Exception(self.r.text)
-        results = self._postprocess(self.r.json())
-        return results
-
-    def _postprocess(self, json):
-        results = Results()
-        for feature in json['features']:
-            geom = feature['geometry']
-            properties = feature['properties']
-            results.add(Result(
-                coordinates=geom['coordinates'],
-                text=properties['text'],
-                score=properties['score'],
-                typ=properties['typ']
-            ))
-        return results
+        return self.r.json()['features']
 
 

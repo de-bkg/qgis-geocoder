@@ -2,6 +2,7 @@
 #coding:utf-8
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.core import QgsFeature
 import numpy as np
 import re
 import math
@@ -37,57 +38,6 @@ class ResultCache:
             return res_layer.get(feat_id)
         return None
 
-
-class Results:
-    '''
-    collection of geocoding results
-    '''
-    def __init__(self):
-        self.results = []
-
-    def add(self, result):
-        self.results.append(result)
-
-    def best(self):
-        if len(self.results) == 0:
-            return None, -1
-        scores = np.array([res.score for res in self.results])
-        best_idx = scores.argmax()
-        return self.results[best_idx], best_idx
-
-    def count(self):
-        return len(self)
-
-    def __len__(self):
-        return len(self.results)
-
-    def __repr__(self):
-        return '\n'.join(str(r) for r in self.results)
-
-    def __iter__(self):
-        return self.results.__iter__()
-
-    def __getitem__(self, i):
-        return self.results[i]
-
-
-class Result:
-    '''
-    result of single geocoding
-    '''
-    def __init__(self, coordinates=[0, 0], text='', score=0, typ=None):
-        self.coordinates = coordinates
-        self.text = text
-        self.score = score
-        self.typ = typ
-
-    def __repr__(self):
-        return 'Typ: {typ} | Score: {score} | {text} @ {coords} '.format(
-            typ=self.typ, coords=self.coordinates,
-            text=self.text, score=self.score
-        )
-
-
 class Worker(QObject):
     '''
     abstract worker
@@ -115,7 +65,7 @@ class Worker(QObject):
 
 
 class Geocoding(Worker):
-    feature_done = pyqtSignal(int, Results)
+    feature_done = pyqtSignal(QgsFeature, list)
 
     def __init__(self, layer, geocoder: Geocoder):
         super().__init__()
@@ -141,9 +91,9 @@ class Geocoding(Worker):
             try:
                 results = self.geocoder.query(*args, **kwargs)
                 #self.message.emit(self.geocoder.r.url)
-                self.feature_done.emit(id, results)
-                message = 'Feature {id} -> <b>{c}</b> Ergebnis(se)'.format(
-                    id=id, c=results.count())
+                self.feature_done.emit(feature, results)
+                message = (f'Feature {feature} -> '
+                           f'<b>{results.count()} </b> Ergebnis(se)')
                 if results.count() > 0:
                     best, idx = results.best()
                     message += '- bestes E.: {res}'.format(res=str(best))
