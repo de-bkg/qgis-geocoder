@@ -9,13 +9,15 @@
 """
 
 __author__ = 'franke@ggr-planung.de'
-__date__ = '2018-10-19'
+__date__ = '2020-03-24'
 __copyright__ = 'Copyright 2018, GGR'
 
 import unittest
 import sys
 import os
 from qgis.core import QgsVectorLayer
+from unittest.mock import Mock, patch
+import json
 
 sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
 from geocoder.bkg_geocoder import BKGGeocoder
@@ -28,7 +30,20 @@ QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
 UUID = os.environ.get('BKG_UUID')
 
 
-class BKGAPITest(unittest.TestCase):
+class MockedResponse:
+    responses = {}
+    def __init__(self, query):
+        self.status_code = 200
+        self.__query = query
+
+    def json(self):
+        return {'features': self.responses[self.__query]}
+
+def mocked_get(*args, **kwargs):
+    return MockedResponse(kwargs['params']['query'])
+
+
+class BKGGeocodingTest(unittest.TestCase):
     """Test dialog works."""
 
     def setUp(self):
@@ -39,9 +54,15 @@ class BKGAPITest(unittest.TestCase):
         """Runs after each test."""
         pass
 
-    def test_keys(self):
-        fn = os.path.join('A2-T1_adressen_mit-header_utf8.csv')
+    @patch('requests.get', side_effect=mocked_get)
+    def test_keys(self, mock_get):
+        fn = 'A2-T1_adressen_mit-header_utf8.csv'
         fp = os.path.join(os.path.dirname(__file__), 'test_data', fn)
+        f_mock = f'{fp}.results.json'
+        with open(f_mock, 'r') as response_file:
+            res = json.load(response_file)
+            MockedResponse.responses = res
+
         uri = f'file:/{fp}?delimiter=";"'
         vlayer = QgsVectorLayer(uri, "test", "delimitedtext")
         geocoding = Geocoding(vlayer, self.geocoder)
@@ -49,13 +70,12 @@ class BKGAPITest(unittest.TestCase):
         geocoding.set_field('Hausnummer', keyword='haus', active=True)
         geocoding.set_field('Postleitzahl', keyword='plz', active=True)
         geocoding.set_field('Ort', keyword='ort', active=True)
-
         # not threaded
         geocoding.work()
 
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(BKGAPITest)
+    suite = unittest.makeSuite(BKGGeocodingTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
 

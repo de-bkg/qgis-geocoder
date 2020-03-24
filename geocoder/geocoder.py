@@ -93,10 +93,10 @@ class Geocoding(Worker):
                 #self.message.emit(self.geocoder.r.url)
                 self.feature_done.emit(feature, results)
                 message = (f'Feature {feature} -> '
-                           f'<b>{results.count()} </b> Ergebnis(se)')
-                if results.count() > 0:
-                    best, idx = results.best()
-                    message += '- bestes E.: {res}'.format(res=str(best))
+                           f'<b>{len(results)} </b> Ergebnis(se)')
+                #if results.count() > 0:
+                    #best, idx = results.best()
+                    #message += '- bestes E.: {res}'.format(res=str(best))
                 self.message.emit(message)
             except Exception as e:
                 success = False

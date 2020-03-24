@@ -84,13 +84,13 @@ class BKGGeocoder(Geocoder):
         return query
 
     def query(self, *args, **kwargs):
-        params = {}
+        self.params = {}
         if ('geometry') in kwargs:
             params['geometry'] = kwargs.pop('geometry')
         query = self._build_params(args, kwargs)
-        params['query'] = query
-        params['srsname'] = self.srs
-        self.r = requests.get(self.url, params=params)
+        self.params['query'] = query
+        self.params['srsname'] = self.srs
+        self.r = requests.get(self.url, params=self.params)
         # ToDo raise specific errors
         if self.r.status_code != 200:
             raise Exception(self.r.text)

@@ -2,6 +2,7 @@ import csv
 import sys
 import os
 from qgis.core import QgsVectorLayer
+import json
 
 FP = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(FP, '..'))
@@ -24,36 +25,22 @@ FILES = {
 
 
 if __name__ == "__main__":
+
     geocoder = BKGGeocoder(UUID)
     for fn, fields in FILES.items():
         fp = os.path.join(os.path.dirname(__file__), fn)
-        out_fp = f'{os.path.splitext(fp)[0]}_results.csv'
+        out_fp = f'{fp}.results.json'
         uri = f'file:/{fp}?delimiter=";"'
         layer = QgsVectorLayer(uri, "test", "delimitedtext")
         geocoding = Geocoding(layer, geocoder)
+        res = {}
         for field_name, keyword in fields.items():
             geocoding.set_field(field_name, keyword=keyword, active=True)
-        with open(out_fp, 'w', newline='', encoding='utf-8') as outcsv:
-            global writer
-            writer = None
 
-            def feature_done(feature, results):
-                global writer
-                if not results:
-                    return
-                fid = feature.attribute(0)
-                for result in results:
-                    x, y = result['geometry']['coordinates']
-                    properties = result['properties']
-                    if not writer:
-                        fieldnames = ['ID', 'x', 'y'] + list(properties.keys())
-                        writer = csv.DictWriter(outcsv, fieldnames=fieldnames,
-                                                delimiter=';')
-                        writer.writeheader()
-                    properties['ID'] = fid
-                    properties['x'] = x
-                    properties['y'] = y
-                    writer.writerow(properties)
+        def feature_done(feature, results):
+            res[geocoder.params['query']] = results
 
-            geocoding.feature_done.connect(feature_done)
-            geocoding.work()
+        geocoding.feature_done.connect(feature_done)
+        geocoding.work()
+        with open(out_fp, 'w') as res_file:
+            json.dump(res, res_file)
