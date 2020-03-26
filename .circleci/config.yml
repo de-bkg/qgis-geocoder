@@ -10,12 +10,11 @@ jobs:
     steps:
 
       - checkout
+
       - run:
-          name: Download and start X
-          command: |
-            sudo apt-get install -y x11vnc
-            x11vnc -forever -nopw
-          #background: true
+          name: "Starting Xvfb"
+          command: Xvfb :99 -screen 0 1280x1024x24
+          background: true
 
       - run:
           name: "Setup QGIS Testing Environment"
