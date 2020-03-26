@@ -22,7 +22,8 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
-
+import sys
+import os
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
@@ -32,5 +33,6 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from .bkg_geocoder_main import BKGGeocoderPlugin
     return BKGGeocoderPlugin(iface)
