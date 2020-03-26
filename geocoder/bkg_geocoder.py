@@ -86,7 +86,7 @@ class BKGGeocoder(Geocoder):
     def query(self, *args, **kwargs):
         self.params = {}
         if ('geometry') in kwargs:
-            params['geometry'] = kwargs.pop('geometry')
+            self.params['geometry'] = kwargs.pop('geometry')
         query = self._build_params(args, kwargs)
         self.params['query'] = query
         self.params['srsname'] = self.srs

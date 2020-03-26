@@ -16,13 +16,16 @@ import unittest
 import sys
 import os
 from qgis.core import QgsVectorLayer
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import json
 
 sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding
-from utilities import get_qgis_app
+if __name__ == "__main__":
+    from test.utilities import get_qgis_app
+else:
+    from ..test.utilities import get_qgis_app
 
 QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
 
@@ -32,8 +35,8 @@ UUID = os.environ.get('BKG_UUID')
 
 class MockedResponse:
     responses = {}
-    def __init__(self, query):
-        self.status_code = 200
+    def __init__(self, query, status_code=200):
+        self.status_code = status_code
         self.__query = query
 
     def json(self):
@@ -55,7 +58,7 @@ class BKGGeocodingTest(unittest.TestCase):
         pass
 
     @patch('requests.get', side_effect=mocked_get)
-    def test_keys(self, mock_get):
+    def test_geocoding(self, mock_get):
         fn = 'A2-T1_adressen_mit-header_utf8.csv'
         fp = os.path.join(os.path.dirname(__file__), 'test_data', fn)
         f_mock = f'{fp}.results.json'
@@ -72,7 +75,6 @@ class BKGGeocodingTest(unittest.TestCase):
         geocoding.set_field('Ort', keyword='ort', active=True)
         # not threaded
         geocoding.work()
-
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(BKGGeocodingTest)
