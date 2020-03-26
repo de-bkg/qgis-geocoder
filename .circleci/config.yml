@@ -19,7 +19,7 @@ jobs:
       - run:
           name: "Setup QGIS Testing Environment"
           command: |
-            docker run -d --name qgis-testing-environment -v /root/project:/tests_directory elpaso/qgis-testing-environment
+            docker run -d --name qgis-testing-environment -v /root/project:/tests_directory -e DISPLAY=:99 elpaso/qgis-testing-environment
             docker exec -it qgis-testing-environment sh -c "qgis_setup.sh bkg-geocoder"
 
       - run:
