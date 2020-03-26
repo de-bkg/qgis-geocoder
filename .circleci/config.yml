@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+
+    docker:
+      - image: circleci/buildpack-deps:bionic
+
+    steps:
+
+      - checkout
+
+      - setup_remote_docker
+
+      - run:
+          name: "Pull QGIS Testing Environment"
+          command: |
+            docker pull elpaso/qgis-testing-environment:latest
+
+      - run:
+          name: "Setup QGIS Testing Environment"
+          command: |
+            docker run -d --name qgis-testing-environment -v /root/project:/tests_directory -e DISPLAY=:99 elpaso/qgis-testing-environment
+            docker exec -it qgis-testing-environment sh -c "qgis_setup.sh bkg-geocoder"
+
+      - run:
+          name: "Run Unittests"
+          command: |
+            docker exec -it qgis-testing-environment sh -c "qgis_testrunner.sh bkg-geocoder.test.ci_tests"

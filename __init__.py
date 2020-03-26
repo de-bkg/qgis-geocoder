@@ -32,5 +32,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .bkg_geocoder import BKGGeocoderPlugin
+    from .bkg_geocoder_main import BKGGeocoderPlugin
     return BKGGeocoderPlugin(iface)

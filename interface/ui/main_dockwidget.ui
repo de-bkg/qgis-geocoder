@@ -1,0 +1,1212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DockWidget</class>
+ <widget class="QDockWidget" name="DockWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>435</width>
+    <height>501</height>
+   </rect>
+  </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QToolBox:tab {
+	font: bold 10pt ;
+    color: Grey;
+}
+QToolBox:tab:selected {
+	font: bold 10pt ;
+    color: black;
+}
+QGroupBox::title {
+	font: bold italic 8pt ;
+    color: black;
+}
+QPushButton::flat{
+background-color: none;
+border: 0;
+border-style:none;
+border-color: blue;
+border-width: 0px;
+border-radius: 0px;
+padding:2px;
+}
+QPushButton::flat:hover{
+background-color: azure;
+border-style:solid;
+border-color: royalblue;
+border-width: 1px;
+border-radius: 0px;
+padding: 2px;
+}
+QPushButton::flat:pressed{
+background-color: powderblue;
+border-style:solid;
+border-color: royalblue;
+border-width: 1px;
+border-radius: 0px;
+padding: 2px;
+}</string>
+  </property>
+  <property name="features">
+   <set>QDockWidget::AllDockWidgetFeatures</set>
+  </property>
+  <property name="allowedAreas">
+   <set>Qt::AllDockWidgetAreas</set>
+  </property>
+  <property name="windowTitle">
+   <string>BKG Geocoder</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="elideMode">
+       <enum>Qt::ElideNone</enum>
+      </property>
+      <widget class="QWidget" name="inputdata_tab">
+       <attribute name="title">
+        <string>Eingabedaten</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Layer:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QgsMapLayerComboBox" name="maplayer_combo">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>256</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wählen Sie hier aus den geöffneten Layern die zu geokodierenden Daten aus. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="editable">
+             <bool>false</bool>
+            </property>
+            <property name="currentText">
+             <string/>
+            </property>
+            <property name="showCrs">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="importcsv_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fügen Sie weitere Daten der QGIS-Layerliste hinzu.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Daten laden</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/20190619_iconset_mob_wborders_load_1.png</normaloff>icons/20190619_iconset_mob_wborders_load_1.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_4">
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ordnen Sie an dieser Stelle den bestehenden Feldern der Eingabedaten per Drop-Down-Menü den entsprechenden Geokodierungs-Parametern zu. &lt;/p&gt;&lt;p&gt;Sollten in Ihrer Ausgangsdatei der Straßenname und die Hausnummer in einem Feld strukturiert sein, so können Sie dieses Feld mit dem Geokodierungs-Parameter &amp;quot;Straße + Hausnummer&amp;quot; verbinden. Stehen die Werte für Hausnummer und Hausnummernzusatz (z.B. 49a) in der Ausgangsdatei in einem Feld, so ist diese mit dem Geokodierungs-Parameter &amp;quot;Hausnummer&amp;quot; zu verbinden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Zuordnung der Geokodierungs-Parameter</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame_2">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ordnen Sie an dieser Stelle den bestehenden Feldern der Eingabedaten per Drop-Down-Menü den entsprechenden Geokodierungs-Parametern zu. &lt;/p&gt;&lt;p&gt;Sollten in Ihrer Ausgangsdatei der Straßenname und die Hausnummer in einem Feld strukturiert sein, so können Sie dieses Feld mit dem Geokodierungs-Parameter &amp;quot;Straße + Hausnummer&amp;quot; verbinden. Stehen die Werte für Hausnummer und Hausnummernzusatz (z.B. 49a) in der Ausgangsdatei in einem Feld, so ist diese mit dem Geokodierungs-Parameter &amp;quot;Hausnummer&amp;quot; zu verbinden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="autoFillBackground">
+           <bool>true</bool>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Feldname</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Zuordnung Geocoder</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QScrollArea" name="scrollArea">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>391</width>
+                <height>316</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <property name="spacing">
+                <number>6</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <layout class="QGridLayout" name="zuuordnung_parameter_grid">
+                 <property name="bottomMargin">
+                  <number>12</number>
+                 </property>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="config_request_output_tab">
+       <attribute name="title">
+        <string>Anfrage/Ausgabe konfigurieren</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="title">
+           <string>Koordinatenbezugssystem:</string>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QgsProjectionSelectionWidget" name="outputprojection_projectionselectionwidget">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Hier können Sie das gewünschte Ziel-Koordinatensystem angeben, in welches geokodiert werden soll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Filter</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Regionalschlüssel:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLineEdit" name="rs_lineedit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In diesem Feld kann der Regionalschlüssel als Filter zur regionalen Eingrenzung des Suchgebietes eingegeben werden.&lt;/p&gt;&lt;p&gt;Dies führt in der Folge dazu, dass nur Treffer innerhalb des gewählten Verwaltungsgebietes (z.B. Bundesland, Kreis, Gemeinde) gefunden werden können.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="clearButtonEnabled">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="rsinputaid_combobox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>140</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtern Sie die Suche nach Bundesländern. &lt;/p&gt;&lt;p&gt;Die Auswahl fügt die Kennzahl des gewählten Bundeslandes in nebenstehendes Textfeld ein.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="editable">
+                <bool>false</bool>
+               </property>
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <property name="maxVisibleItems">
+                <number>17</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Eingabehilfe Bundesländer</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string comment="01">Schleswig-Holstein</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string comment="02">Freie und Hansestadt Hamburg</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string comment="03">Niedersachsen</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string comment="04">Freie Hansestadt Bremen</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Nordrhein-Westfalen</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Hessen</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Rheinland-Pfalz</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Baden-Württemberg</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Freistaat Bayern</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Saarland</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Berlin</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Brandenburg</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Mecklenburg-Vorpommern</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Freistaat Sachsen</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Sachsen-Anhalt</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Freistaat Thüringen</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="rsinfo_button">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>28</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Präzise Informationen zur Suche mit Regionalschlüsseln.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>icons/20190619_iconset_mob_wborders_info_2.png</normaloff>icons/20190619_iconset_mob_wborders_info_2.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Räumlicher Filter:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QgsMapLayerComboBox" name="restrictgeom_maplayercombobox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wählen Sie einen Polygonlayer, auf dessen Grenzen die Suche beschränkt werden soll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+               <property name="showCrs">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="onlyselectedpolygons_checkbox">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beschränken Sie die Suche weiter auf lediglich die selektierten Objekte des gewählten Layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>nur selektierte Objekte nutzen</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="title">
+           <string>Zugangsdaten</string>
+          </property>
+          <property name="collapsed">
+           <bool>true</bool>
+          </property>
+          <property name="saveCollapsedState">
+           <bool>false</bool>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Geokodierungsdienst</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nehmen Sie hier erweiterte Einstellungen vor.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="title">
+           <string>Expertenmodus</string>
+          </property>
+          <property name="collapsed">
+           <bool>false</bool>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="onlyselected_checkbox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>180</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Geokodieren Sie lediglich die ausgewählten Objekte des Quelllayers&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="text">
+                <string>nur selektierte Features nutzen</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="fuzzysearch_checkbox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Eine unscharfe Suche erlaubt eine tolerante Suche basierend auf dem Levenshtein (Edit) Distanz Algorithmus.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>unscharfe Suche</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="updateinputlayer_checkbox">
+               <property name="minimumSize">
+                <size>
+                 <width>180</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="text">
+                <string>Ausgangslayer aktualisieren</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_14">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_8">
+               <property name="minimumSize">
+                <size>
+                 <width>180</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Verknüpfung der Suchterme:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radioButton">
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>AND</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radioButton_2">
+               <property name="minimumSize">
+                <size>
+                 <width>47</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>OR</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="useraccess_tab">
+       <attribute name="title">
+        <string>Ergebnis</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="autoFillBackground">
+           <bool>true</bool>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QPlainTextEdit" name="progresstextoutput_textedit">
+             <property name="documentTitle">
+              <string/>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="backgroundVisible">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="elapsed_time_label">
+               <property name="text">
+                <string>00:29:24</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QProgressBar" name="geocodingprogress_progressbar">
+               <property name="value">
+                <number>42</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="invertedAppearance">
+                <bool>false</bool>
+               </property>
+               <property name="textDirection">
+                <enum>QProgressBar::TopToBottom</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="showattributtable_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lassen Sie sich eine Tabelle mit den entsprechenden Geokodierungsergebnissen und Eingangswerten anzeigen (Attributtabelle des Ergebnislayers).&lt;/p&gt;&lt;p&gt;In der Tabelle haben Sie die Möglichkeit die Informationen zu sortieren, nach Informationen zu suchen, Informationen zu bearbeiten und Informationen zu markieren und auf deren Position in der Karte zu springen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Ergebnistabelle anzeigen</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/20190619_iconset_mob_wborders_specify_2.png</normaloff>icons/20190619_iconset_mob_wborders_specify_2.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="exportcsv_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sichern Sie Ihre Ergebnisse in Ihrem gewünschten Dateiformat.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Ergebnisse speichern</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/20190619_iconset_mob_wborders_save_1.png</normaloff>icons/20190619_iconset_mob_wborders_save_1.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="featurepicker_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gibt es für ein Objekt mehrere Treffer, so können Sie sich hier die Treffer mit geringerer Güte anzeigen lassen und ggf. einen der Treffer übernehmen. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">text-align:left;</string>
+            </property>
+            <property name="text">
+             <string>Ergebnisse inspizieren</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</iconset>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="reversegeocoding_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mit diesem Tool können Sie die vom BKGGeocoder automatisch ermittelte Position bzw. zugewiesenen Adressangaben manuell verändern. &lt;/p&gt;&lt;p&gt;Nach dem manuellen Verschieben eines Objektes, wird Ihnen ein PopUp-Fenster mit den fünf nächstgelegenen Adressen und die dazugehörige Symbole in der Kartenansicht angezeigt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">text-align:left;</string>
+            </property>
+            <property name="text">
+             <string>Nachbaradresssuche</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</normaloff>icons/20190619_iconset_mob_wborders_reverse_geocoding_1.png</iconset>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_11">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="help_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Zeigt die Hilfe an.</string>
+        </property>
+        <property name="text">
+         <string>Hilfe</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/20190619_iconset_mob_wborders_help_1.png</normaloff>icons/20190619_iconset_mob_wborders_help_1.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="about_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Über</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/20190619_iconset_mob_wborders_info_2.png</normaloff>icons/20190619_iconset_mob_wborders_info_2.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_13">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="request_start_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starten Sie die Anfrage mit den getroffenen Konfigurationen. &lt;/p&gt;&lt;p&gt;Ihre ausgewählten Daten werden hierbei dem BKG übermittelt. Bitte beachten Sie, dass diese – abhängig von Ihrer Auswahl – auch personenbezogene Daten umfassen können.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Anfrage starten</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/20190619_iconset_mob_wborders_start_1.png</normaloff>icons/20190619_iconset_mob_wborders_start_1.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="request_stop_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stoppen Sie die Anfrage.&lt;/p&gt;&lt;p&gt;Bereits erzielte Ergebnisse bleiben dabei erhalten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Anfrage stoppen</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/20190619_iconset_mob_wborders_stop_1.png</normaloff>icons/20190619_iconset_mob_wborders_stop_1.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>qgscollapsiblegroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsProjectionSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsprojectionselectionwidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
