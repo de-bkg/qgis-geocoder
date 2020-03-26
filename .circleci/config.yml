@@ -11,10 +11,11 @@ jobs:
 
       - checkout
 
+
       - run:
-          name: "Starting Xvfb"
-          command: Xvfb :99 -screen 0 1280x1024x24
-          background: true
+          name: "Setup Environment Variables"
+          command: |
+            echo 'export DISPLAY=":99"' >> $BASH_ENV
 
       - run:
           name: "Setup QGIS Testing Environment"
