@@ -28,6 +28,7 @@ jobs:
 
       - run:
           name: "Run Unittests"
+          user: root
           command: |
             export DISPLAY=":99"
-            python test/ci_tests.py
+            python3 test/ci_tests.py
