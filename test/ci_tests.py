@@ -8,7 +8,8 @@ import test_bkg_geocoder
 import test_init
 
 if __name__ == "__main__":
-    print(f'Display: {os.environ["DISPLAY"]}')
+    display = os.environ.get('DISPLAY')
+    print(f'Display: {display}')
     loader = unittest.TestLoader()
     suite  = unittest.TestSuite()
 
