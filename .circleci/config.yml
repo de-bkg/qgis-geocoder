@@ -25,4 +25,4 @@ jobs:
       - run:
           name: "Run Unittests"
           command: |
-            qgis_testrunner.sh bkg-geocoder.test.ci_tests
+            python test/ci_tests.py
