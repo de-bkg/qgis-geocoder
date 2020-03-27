@@ -11,6 +11,10 @@ jobs:
 
       - checkout
 
+      - run:
+          name: Running X virtual framebuffer
+          command: Xvfb :99 -screen 0 1280x1024x24
+          background: true
 
       - run:
           name: "Setup Environment Variables"
