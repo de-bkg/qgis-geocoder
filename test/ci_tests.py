@@ -3,13 +3,12 @@ import os
 import sys
 
 sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
+
+import test_bkg_geocoder
+import test_init
+
 if __name__ == "__main__":
-    from test import test_bkg_geocoder, test_init, qgis_interface
-else:
-    from ..test import test_bkg_geocoder, test_init, qgis_interface
-
-def run_all():
-
+    print(f'Display: {os.environ["DISPLAY"]}')
     loader = unittest.TestLoader()
     suite  = unittest.TestSuite()
 
@@ -18,6 +17,3 @@ def run_all():
     suite.addTests(loader.loadTestsFromModule(test_bkg_geocoder))
     runner = unittest.TextTestRunner(verbosity=3)
     result = runner.run(suite)
-
-if __name__ == "__main__":
-    run_all()
