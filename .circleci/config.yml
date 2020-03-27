@@ -16,10 +16,10 @@ jobs:
           command: Xvfb :99 -screen 0 1280x1024x24
           background: true
 
-      - run:
-          name: "Setup Environment Variables"
-          command: |
-            echo 'export DISPLAY=":99"' >> $BASH_ENV
+      #- run:
+          #name: "Setup Environment Variables"
+          #command: |
+            #echo 'export DISPLAY=":99"' >> $BASH_ENV
 
       - run:
           name: "Setup QGIS Testing Environment"
@@ -29,4 +29,5 @@ jobs:
       - run:
           name: "Run Unittests"
           command: |
+            export DISPLAY=":99"
             python test/ci_tests.py
