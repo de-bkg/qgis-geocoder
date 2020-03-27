@@ -9,7 +9,7 @@ import test_init
 
 if __name__ == "__main__":
     display = os.environ.get('DISPLAY')
-    print(f'Display: {display}')
+    print('Display: {display}'.format(display=display))
     loader = unittest.TestLoader()
     suite  = unittest.TestSuite()
 
