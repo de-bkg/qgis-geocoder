@@ -6,8 +6,8 @@ from qgis.PyQt import uic
 import os
 import datetime
 
-from ..geocoder.geocoder import Geocoding
-from ..config import UI_PATH
+from geocoder.geocoder import Geocoding
+from config import UI_PATH
 
 
 class Dialog(QDialog):

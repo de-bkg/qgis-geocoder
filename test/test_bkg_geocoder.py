@@ -25,7 +25,6 @@ from geocoder.geocoder import Geocoding
 from utilities import get_qgis_app
 
 QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
-print(QGIS_APP)
 
 # bkg key from environment variable (security reasons)
 UUID = os.environ.get('BKG_UUID')

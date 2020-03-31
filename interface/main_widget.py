@@ -27,10 +27,14 @@ import os
 from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis import utils
+from qgis.core import QgsCoordinateReferenceSystem
+from qgis.gui import QgsProjectionSelectionWidget
 
-from .dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
-                      ReverseGeocodingDialog, FeaturePickerDialog)
+from interface.dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
+                               ReverseGeocodingDialog, FeaturePickerDialog)
+from config import Config
 
+config = Config()
 UI_PATH = os.path.join(os.path.dirname(__file__), 'ui')
 
 
@@ -57,6 +61,29 @@ class MainWidget(QtWidgets.QDockWidget):
         self.exportcsv_button.clicked.connect(self.export_csv)
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.featurepicker_button.clicked.connect(self.feature_picker)
+        self.setup_config()
+
+    def setup_config(self):
+        self.search_and_check.setChecked(config.logic_link == 'AND')
+        self.search_and_check.toggled.connect(
+            lambda: setattr(config, 'logic_link', 'AND'))
+        self.search_or_check.toggled.connect(
+            lambda: setattr(config, 'logic_link', 'OR'))
+
+        self.api_key_edit.setText(config.api_key)
+        self.api_key_edit.editingFinished.connect(
+            lambda: setattr(config, 'api_key', self.api_key_edit.text()))
+        crs = QgsCoordinateReferenceSystem(config.projection)
+        self.output_projection_select.setCrs(crs)
+
+        self.output_projection_select.crsChanged.connect(
+            lambda crs: setattr(config, 'projection', crs.authid()))
+
+        self.selected_features_only_check.setChecked(
+            config.selected_features_only)
+        self.selected_features_only_check.toggled.connect(
+            lambda: setattr(config, 'selected_features_only',
+                            self.selected_features_only_check.isChecked()))
 
     def feature_picker(self):
         dialog = FeaturePickerDialog(parent=self)

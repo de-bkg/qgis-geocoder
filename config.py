@@ -22,7 +22,10 @@ class Config(object):
 
     _default = {
         'url': DEFAULT_URL,
-        'api_key': ''
+        'api_key': '',
+        'logic_link': 'OR',
+        'selected_features_only': False,
+        'projection': 'EPSG:4326',
     }
 
     _config = {}
@@ -96,6 +99,6 @@ class Config(object):
             self._callbacks[attribute] = []
         self._callbacks[attribute].append(callback)
 
-    def remove_listeners(attribute):
+    def remove_listeners(self, attribute):
         if attribute in self._callbacks:
             self._callbacks.pop(attribute)
