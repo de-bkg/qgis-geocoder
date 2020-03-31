@@ -38,6 +38,7 @@ class ResultCache:
             return res_layer.get(feat_id)
         return None
 
+
 class Worker(QObject):
     '''
     abstract worker
@@ -67,17 +68,29 @@ class Worker(QObject):
 class Geocoding(Worker):
     feature_done = pyqtSignal(QgsFeature, list)
 
-    def __init__(self, layer, geocoder: Geocoder):
+    def __init__(self, layer, geocoder: Geocoder, ignore: list=[]):
         super().__init__()
         self.geocoder = geocoder
-        self.field_map = FieldMap(layer)
+        # ToDo: what if fields are removed by user later? events
+        self.field_mapping = {}
+        for field in layer.fields():
+            name = field.name()
+            if name in ignore:
+                continue
+            self.field_mapping[name] = [False, None]
         self.layer = layer
+
+    def fields(self):
+        return self.mapping.keys()
+
+    def active(self, field_name: str):
+        return self.active(field_name)
 
     def set_field(self, field_name: str, keyword: str=None, active: bool=None):
         if keyword is not None:
-            self.field_map.set_keyword(field_name, keyword)
+            self.set_keyword(field_name, keyword)
         if active is not None:
-            self.field_map.set_active(field_name, active=active)
+            self.set_active(field_name, active=active)
 
     def work(self):
         success = True
@@ -87,7 +100,7 @@ class Geocoding(Worker):
             if self.is_killed:
                 success = False
                 break
-            args, kwargs = self.field_map.to_args(feature)
+            args, kwargs = self.to_args(feature)
             try:
                 results = self.geocoder.query(*args, **kwargs)
                 #self.message.emit(self.geocoder.r.url)
@@ -107,42 +120,29 @@ class Geocoding(Worker):
 
         return success
 
-
-class FieldMap:
-    '''
-    map fields of layer to parameters for geocoders
-    '''
-    def __init__(self, layer):
-        # key: field name, value: (active, keyword)
-        # active means, if the field should be used for geocoding
-        # keyword maps the field to an argument of the geocoder
-        self.mapping = {}
-        for field in layer.fields():
-            self.mapping[field.name()] = [False, None]
-
-    def valid(self, layer):
-        for field in layer.fields():
-            if field.name() not in self.mapping:
-                return False
-        return True
+    #def valid(self, layer):
+        #for field in layer.fields():
+            #if field.name() not in self.field_mapping:
+                #return False
+        #return True
 
     def set_active(self, field_name, active=True):
-        self.mapping[field_name][0] = active
+        self.field_mapping[field_name][0] = active
 
     def set_keyword(self, field_name, keyword):
-        self.mapping[field_name][1] = keyword
+        self.field_mapping[field_name][1] = keyword
 
     def active(self, field_name):
-        return self.mapping[field_name][0]
+        return self.field_mapping[field_name][0]
 
     def keyword(self, field_name):
-        return self.mapping[field_name][1]
+        return self.field_mapping[field_name][1]
 
     def to_args(self, feature):
         kwargs = {}
         args = []
         attributes = feature.attributes()
-        for field_name, (active, key) in self.mapping.items():
+        for field_name, (active, key) in self.field_mapping.items():
             if not active:
                 continue
             attributes = feature.attributes()
@@ -162,8 +162,9 @@ class FieldMap:
 
     def count_active(self):
         i = 0
-        for field_name, (active, key) in self.mapping.items():
+        for field_name, (active, key) in self.field_mapping.items():
             if active:
                 i += 1
         return i
+
 
