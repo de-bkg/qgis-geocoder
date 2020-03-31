@@ -25,17 +25,40 @@
 import os
 
 from qgis.PyQt import uic, QtWidgets
-from qgis.PyQt.QtCore import pyqtSignal, Qt
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import QgsCoordinateReferenceSystem
-from qgis.gui import QgsProjectionSelectionWidget
+from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
+                                 QCheckBox, QLineEdit, QInputDialog,
+                                 QMessageBox)
 
 from interface.dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
                                ReverseGeocodingDialog, FeaturePickerDialog)
+from geocoder.bkg_geocoder import BKGGeocoder
+from geocoder.geocoder import Geocoding
 from config import Config
 
 config = Config()
 UI_PATH = os.path.join(os.path.dirname(__file__), 'ui')
+
+BKG_FIELDS = [
+    ('bkg_feature_id', QVariant.Int, 'int4'),
+    ('bkg_n_results', QVariant.Int, 'int2'),
+    ('bkg_i', QVariant.Double, 'int2'),
+    ('bkg_typ', QVariant.String, 'text'),
+    ('bkg_text', QVariant.String, 'text'),
+    ('bkg_score', QVariant.Double, 'float8')
+]
+
+def clear_layout(layout):
+    while layout.count():
+        child = layout.takeAt(0)
+        if not child:
+            continue
+        if child.widget():
+            child.widget().deleteLater()
+        elif child.layout() is not None:
+            clear_layout(child.layout())
 
 
 class MainWidget(QtWidgets.QDockWidget):
@@ -54,6 +77,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.setAllowedAreas(
             Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
         )
+        self.geocoder = BKGGeocoder(config.api_key, srs=config.projection)
         self.setupUi()
 
     def setupUi(self):
@@ -61,6 +85,10 @@ class MainWidget(QtWidgets.QDockWidget):
         self.exportcsv_button.clicked.connect(self.export_csv)
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.featurepicker_button.clicked.connect(self.feature_picker)
+        self.request_start_button.clicked.connect(self.geocode)
+        # ToDo: set filters
+        self.layer_combo.layerChanged.connect(self.layer_changed)
+
         self.setup_config()
 
     def setup_config(self):
@@ -120,3 +148,68 @@ class MainWidget(QtWidgets.QDockWidget):
         geometry = self.geometry()
         self.setGeometry(500, 500,
                          geometry.width(), geometry.height())
+
+    def layer_changed(self, layer):
+        '''
+        add field checks depending on given layer to UI and preset
+        layer related UI elements
+        '''
+        bkg_f = [f[0] for f in BKG_FIELDS]
+        self.geocoding = Geocoding(layer, self.geocoder, ignore=bkg_f)
+        #fields = layer.fields()
+
+        #wkb = layer.wkbType()
+        #self.dlg.geometry_label.setText(WKBTYPES[wkb])
+        # preset option to join results to layer depending on if it is
+        # possible or not
+        #self.dlg.join_source_check.setChecked(wkb == QgsWkbTypes.Point)
+
+        #crs = layer.crs().authid() if (wkb != 100) else ''
+        #self.dlg.crs_label.setText(crs)
+        #epsg_prefix = 'EPSG:'
+        #if crs.startswith(epsg_prefix):
+            #epsg_id = int(crs.replace(epsg_prefix, ''))
+        #else:
+            #epsg_id = 4326
+        #self.dlg.epsg_spin.setValue(epsg_id)
+
+        # remove old widgets
+        clear_layout(self.parameter_grid)
+
+        for i, field_name in enumerate(self.geocoding.fields()):
+            checkbox = QCheckBox()
+            checkbox.setText(field_name)
+            combo = QComboBox()
+            combo.addItem('unspezifisch oder nicht aufgeführte Kombination', None)
+            for key, text in self.geocoder.keywords.items():
+                combo.addItem(text, key)
+
+            def checkbox_changed(state, combo, field_name):
+                checked = state != 0
+                self.geocoding.set_active(field_name, checked)
+                combo.setVisible(checked)
+            checkbox.stateChanged.connect(
+                lambda s, c=combo, f=field_name : checkbox_changed(s, c, f))
+            checkbox_changed(self.geocoding.active(field_name), combo,
+                             field_name)
+
+            def combo_changed(idx, combo, field_name):
+                self.geocoding.set_keyword(field_name, combo.itemData(idx))
+            combo.currentIndexChanged.connect(
+                lambda i, c=combo, f=field_name : combo_changed(i, c, f))
+
+            self.parameter_grid.addWidget(checkbox, i, 0)
+            self.parameter_grid.addWidget(combo, i, 1)
+            checked = self.geocoding.active(field_name)
+            keyword = self.geocoding.keyword(field_name)
+            checkbox.setChecked(checked)
+            if keyword is not None:
+                combo_idx = combo.findData(keyword)
+                combo.setCurrentIndex(combo_idx)
+                combo.setVisible(checked)
+        n_selected = layer.selectedFeatureCount()
+        #self.n_selected_label.setText(
+            #'({} Feature(s) selektiert)'.format(n_selected))
+
+    def geocode(self):
+        pass

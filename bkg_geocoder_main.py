@@ -24,8 +24,7 @@
 from qgis.PyQt.QtCore import (QSettings, QTranslator, qVersion,
                               QCoreApplication, QVariant, Qt, pyqtSignal)
 from qgis.PyQt.QtGui import QIcon, QPixmap
-from qgis.PyQt.QtWidgets import (QAction, QHBoxLayout, QLabel, QComboBox, QCheckBox,
-                             QLineEdit, QInputDialog, QMessageBox)
+from qgis.PyQt.QtWidgets import (QAction)
 from qgis.core import (QgsProject, QgsField, QgsVectorLayer, QgsMapLayer,
                        QgsPointXY, QgsGeometry, QgsFeature, QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
@@ -39,7 +38,7 @@ from .resources import *
 
 from .interface.main_widget import MainWidget
 #from .dialogs import GeocodeProgressDialog
-from geocoder.geocoder import FieldMap, ResultCache
+from geocoder.geocoder import ResultCache
 from geocoder.bkg_geocoder import BKGGeocoder
 from .config import Config
 #from .feature_picker import PickerDock
@@ -48,15 +47,6 @@ config = Config()
 
 WKBTYPES = dict([(v, k) for k, v in QgsWkbTypes.__dict__.items()
                  if isinstance(v, int)])
-
-BKG_FIELDS = [
-    ('bkg_feature_id', QVariant.Int, 'int4'),
-    ('bkg_n_results', QVariant.Int, 'int2'),
-    ('bkg_i', QVariant.Double, 'int2'),
-    ('bkg_typ', QVariant.String, 'text'),
-    ('bkg_text', QVariant.String, 'text'),
-    ('bkg_score', QVariant.Double, 'float8')
-]
 
 
 class BKGGeocoderPlugin:

@@ -81,7 +81,7 @@ class Geocoding(Worker):
         self.layer = layer
 
     def fields(self):
-        return self.mapping.keys()
+        return self.field_mapping.keys()
 
     def active(self, field_name: str):
         return self.active(field_name)

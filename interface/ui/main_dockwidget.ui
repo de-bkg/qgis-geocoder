@@ -78,7 +78,7 @@ padding: 2px;
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -101,7 +101,7 @@ padding: 2px;
            </widget>
           </item>
           <item>
-           <widget class="QgsMapLayerComboBox" name="maplayer_combo">
+           <widget class="QgsMapLayerComboBox" name="layer_combo">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -269,7 +269,7 @@ padding: 2px;
                 <number>0</number>
                </property>
                <item>
-                <layout class="QGridLayout" name="zuuordnung_parameter_grid">
+                <layout class="QGridLayout" name="parameter_grid">
                  <property name="bottomMargin">
                   <number>12</number>
                  </property>
