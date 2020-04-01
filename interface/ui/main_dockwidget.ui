@@ -64,7 +64,7 @@ padding: 2px;
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tab_widget">
       <property name="toolTip">
        <string/>
       </property>
@@ -855,7 +855,7 @@ padding: 2px;
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="useraccess_tab">
+      <widget class="QWidget" name="results_tab">
        <attribute name="title">
         <string>Ergebnis</string>
        </attribute>
@@ -873,17 +873,7 @@ padding: 2px;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <widget class="QPlainTextEdit" name="progresstextoutput_textedit">
-             <property name="documentTitle">
-              <string/>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-             <property name="backgroundVisible">
-              <bool>false</bool>
-             </property>
-            </widget>
+            <widget class="QTextEdit" name="log_edit"/>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -898,9 +888,9 @@ padding: 2px;
               </widget>
              </item>
              <item>
-              <widget class="QProgressBar" name="geocodingprogress_progressbar">
+              <widget class="QProgressBar" name="progress_bar">
                <property name="value">
-                <number>42</number>
+                <number>0</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>

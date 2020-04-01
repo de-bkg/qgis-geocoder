@@ -48,7 +48,7 @@ class Worker(QObject):
     finished = pyqtSignal(bool)
     error = pyqtSignal(str)
     message = pyqtSignal(str)
-    progress = pyqtSignal(float)
+    progress = pyqtSignal(int)
 
     def __init__(self):
         QObject.__init__(self)
@@ -97,6 +97,7 @@ class Geocoding(Worker):
         features = self.layer.getFeatures()
         count = self.layer.featureCount()
         for i, feature in enumerate(features):
+            print(i)
             if self.is_killed:
                 success = False
                 break

@@ -27,7 +27,7 @@ import os
 from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
-from qgis.core import QgsCoordinateReferenceSystem
+from qgis.core import QgsCoordinateReferenceSystem, QgsField
 from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
                                  QCheckBox, QLineEdit, QInputDialog,
                                  QMessageBox)
@@ -87,7 +87,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.featurepicker_button.clicked.connect(self.feature_picker)
         self.request_start_button.clicked.connect(self.geocode)
         # ToDo: set filters
-        self.layer_combo.layerChanged.connect(self.layer_changed)
+        self.layer_combo.layerChanged.connect(self.register_layer)
 
         self.setup_config()
 
@@ -138,40 +138,35 @@ class MainWidget(QtWidgets.QDockWidget):
         event.accept()
 
     def show(self):
-        self.iface.addDockWidget(
-            Qt.LeftDockWidgetArea,
-            self
-        )
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
         self.setFloating(True);
-        self.resize(self.sizeHint().width(),
-                    self.sizeHint().height())
+        self.resize(self.sizeHint().width(), self.sizeHint().height())
         geometry = self.geometry()
-        self.setGeometry(500, 500,
-                         geometry.width(), geometry.height())
+        self.setGeometry(500, 500, geometry.width(), geometry.height())
 
-    def layer_changed(self, layer):
+    def log(self, text, color='black'):
+        self.log_edit.insertHtml(
+            f'<span style="color: {color}">{text}</span><br>')
+        scrollbar = self.log_edit.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
+    def set_result(self, feature, results):
+        print(results)
+
+    def register_layer(self, layer):
         '''
         add field checks depending on given layer to UI and preset
         layer related UI elements
         '''
         bkg_f = [f[0] for f in BKG_FIELDS]
+        if not layer:
+            return
         self.geocoding = Geocoding(layer, self.geocoder, ignore=bkg_f)
-        #fields = layer.fields()
-
-        #wkb = layer.wkbType()
-        #self.dlg.geometry_label.setText(WKBTYPES[wkb])
-        # preset option to join results to layer depending on if it is
-        # possible or not
-        #self.dlg.join_source_check.setChecked(wkb == QgsWkbTypes.Point)
-
-        #crs = layer.crs().authid() if (wkb != 100) else ''
-        #self.dlg.crs_label.setText(crs)
-        #epsg_prefix = 'EPSG:'
-        #if crs.startswith(epsg_prefix):
-            #epsg_id = int(crs.replace(epsg_prefix, ''))
-        #else:
-            #epsg_id = 4326
-        #self.dlg.epsg_spin.setValue(epsg_id)
+        self.geocoding.message.connect(self.log)
+        self.geocoding.progress.connect(self.progress_bar.setValue)
+        self.geocoding.feature_done.connect(self.set_result)
+        self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
+        #self.geocoding.finished.connect(lambda success: self.progress_bar)
 
         # remove old widgets
         clear_layout(self.parameter_grid)
@@ -212,4 +207,21 @@ class MainWidget(QtWidgets.QDockWidget):
             #'({} Feature(s) selektiert)'.format(n_selected))
 
     def geocode(self):
-        pass
+        layer = self.layer_combo.currentLayer()
+        if not layer:
+            return
+        self.tab_widget.setCurrentIndex(2)
+        active_count = self.geocoding.count_active()
+
+        if active_count == 0:
+            QMessageBox.information(
+                self, 'Fehler',
+                (u'Es sind keine Adressfelder ausgewählt.\n\n'
+                 u'Start abgebrochen...'))
+            return
+
+        #for name, qtype, dbtype, length in BKG_FIELDS:
+            #if name not in layer.fields().names():
+                #layer.addAttribute(QgsField(name, qtype, dbtype, len=length))
+
+        self.geocoding.run()
