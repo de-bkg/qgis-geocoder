@@ -27,13 +27,14 @@ import os
 from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
-from qgis.core import QgsCoordinateReferenceSystem, QgsField
+from qgis.core import (QgsCoordinateReferenceSystem, QgsField)
 from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
                                  QCheckBox, QLineEdit, QInputDialog,
                                  QMessageBox)
 
 from interface.dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
                                ReverseGeocodingDialog, FeaturePickerDialog)
+from interface.utils import clone_layer
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding
 from config import Config
@@ -77,7 +78,6 @@ class MainWidget(QtWidgets.QDockWidget):
         self.setAllowedAreas(
             Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
         )
-        self.geocoder = BKGGeocoder(config.api_key, srs=config.projection)
         self.setupUi()
 
     def setupUi(self):
@@ -150,9 +150,6 @@ class MainWidget(QtWidgets.QDockWidget):
         scrollbar = self.log_edit.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
-    def set_result(self, feature, results):
-        print(results)
-
     def register_layer(self, layer):
         '''
         add field checks depending on given layer to UI and preset
@@ -161,7 +158,7 @@ class MainWidget(QtWidgets.QDockWidget):
         bkg_f = [f[0] for f in BKG_FIELDS]
         if not layer:
             return
-        self.geocoding = Geocoding(layer, self.geocoder, ignore=bkg_f)
+        self.geocoding = Geocoding(layer, ignore=bkg_f)
         self.geocoding.message.connect(self.log)
         self.geocoding.progress.connect(self.progress_bar.setValue)
         self.geocoding.feature_done.connect(self.set_result)
@@ -175,8 +172,9 @@ class MainWidget(QtWidgets.QDockWidget):
             checkbox = QCheckBox()
             checkbox.setText(field_name)
             combo = QComboBox()
-            combo.addItem('unspezifisch oder nicht aufgeführte Kombination', None)
-            for key, text in self.geocoder.keywords.items():
+            combo.addItem('unspezifisch oder nicht aufgeführte Kombination',
+                          None)
+            for key, text in BKGGeocoder.keywords.items():
                 combo.addItem(text, key)
 
             def checkbox_changed(state, combo, field_name):
@@ -210,6 +208,16 @@ class MainWidget(QtWidgets.QDockWidget):
         layer = self.layer_combo.currentLayer()
         if not layer:
             return
+
+        cloned = clone_layer(layer, srs=config.projection,
+                             name=None, features=None)
+        self.output_layer = cloned
+
+        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
+                                   logic_link=config.logic_link)
+
+        self.geocoding.set_geocoder(bkg_geocoder)
+
         self.tab_widget.setCurrentIndex(2)
         active_count = self.geocoding.count_active()
 

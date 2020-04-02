@@ -21,9 +21,6 @@ class BKGGeocoder(Geocoder):
         'plz_ort': 'Postleitzahl + Ort',
     }
 
-    logic_link = 'AND'
-    fuzzy = False
-
     @staticmethod
     def split_street_nr(value):
         res = {}
@@ -61,9 +58,12 @@ class BKGGeocoder(Geocoder):
         'plz_ort': split_code_city,
     }
 
-    def __init__(self, key, srs: str='EPSG:4326'):
+    def __init__(self, key, srs: str='EPSG:4326', logic_link='AND',
+                 fuzzy=False):
         url = URL.format(key=key)
-        super().__init__(url=url, srs=srs)
+        self.logic_link = logic_link
+        self.fuzzy = fuzzy
+        super().__init__(url=url)
 
     def _build_params(self, args, kwargs):
         suffix = '~' if self.fuzzy else ''

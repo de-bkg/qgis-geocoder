@@ -17,6 +17,9 @@ class Geocoder:
         self.url = url
         self.srs = srs
 
+    def query(self, *args, **kwargs):
+        raise NotImplementedError
+
 
 class ResultCache:
     '''
@@ -68,7 +71,7 @@ class Worker(QObject):
 class Geocoding(Worker):
     feature_done = pyqtSignal(QgsFeature, list)
 
-    def __init__(self, layer, geocoder: Geocoder, ignore: list=[]):
+    def __init__(self, layer, geocoder: Geocoder=None, ignore: list=[]):
         super().__init__()
         self.geocoder = geocoder
         # ToDo: what if fields are removed by user later? events
@@ -79,6 +82,13 @@ class Geocoding(Worker):
                 continue
             self.field_mapping[name] = [False, None]
         self.layer = layer
+        self.output = None
+
+    def set_output(self, layer):
+        self.output = layer
+
+    def set_geocoder(self, geocoder):
+        self.geocoder = geocoder
 
     def fields(self):
         return self.field_mapping.keys()
@@ -93,6 +103,9 @@ class Geocoding(Worker):
             self.set_active(field_name, active=active)
 
     def work(self):
+        if not self.geocoder:
+            self.error('no geocoder set')
+            return False
         success = True
         features = self.layer.getFeatures()
         count = self.layer.featureCount()
@@ -112,6 +125,7 @@ class Geocoding(Worker):
                     #best, idx = results.best()
                     #message += '- bestes E.: {res}'.format(res=str(best))
                 self.message.emit(message)
+                self.set_result(self.output, feature.id(), results)
             except Exception as e:
                 success = False
                 self.error.emit(str(e))
@@ -167,5 +181,36 @@ class Geocoding(Worker):
             if active:
                 i += 1
         return i
+
+    def set_result(self, layer, feature_id, result):
+        print(results)
+        #def set_result(self, layer, feat_id, result, focus=False):
+        #'''
+        #set result to feature of given layer
+        #focus map canvas on feature if requested
+        #'''
+        #if not layer.isEditable():
+            #layer.startEditing()
+        #fidx = layer.fields().indexFromName
+        #if result:
+            #coords = result.coordinates
+            #geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
+            #layer.changeGeometry(feat_id, geom)
+            #layer.changeAttributeValue(
+                #feat_id, fidx('bkg_typ'), result.typ)
+            #layer.changeAttributeValue(
+                #feat_id, fidx('bkg_text'), result.text)
+            #layer.changeAttributeValue(
+                #feat_id, fidx('bkg_score'), result.score)
+        #else:
+            #layer.changeAttributeValue(
+                #feat_id, fidx('bkg_typ'), '')
+            #layer.changeAttributeValue(
+                #feat_id, fidx('bkg_score'), 0)
+        ##layer.updateFeature(feature)
+        #if focus:
+            #layer.removeSelection()
+            #layer.select(feat_id)
+            #self.canvas.zoomToSelected(layer)
 
 
