@@ -21,7 +21,7 @@ import json
 
 sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
 from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding
+from geocoder.geocoder import Geocoding, FieldMap
 from utilities import get_qgis_app
 
 QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
@@ -70,11 +70,12 @@ class BKGGeocodingTest(unittest.TestCase):
         uri = f'{prefix}{fp}?delimiter=";"'
         vlayer = QgsVectorLayer(uri, "test", "delimitedtext")
         assert vlayer.isValid(), "Input layer is not valid"
-        geocoding = Geocoding(vlayer, self.geocoder)
-        geocoding.set_field('Straße', keyword='strasse', active=True)
-        geocoding.set_field('Hausnummer', keyword='haus', active=True)
-        geocoding.set_field('Postleitzahl', keyword='plz', active=True)
-        geocoding.set_field('Ort', keyword='ort', active=True)
+        layer_map = FieldMap(vlayer)
+        layer_map.set_field('Straße', keyword='strasse', active=True)
+        layer_map.set_field('Hausnummer', keyword='haus', active=True)
+        layer_map.set_field('Postleitzahl', keyword='plz', active=True)
+        layer_map.set_field('Ort', keyword='ort', active=True)
+        geocoding = Geocoding(self.geocoder, layer_map)
         # not threaded
         geocoding.work()
 

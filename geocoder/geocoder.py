@@ -2,10 +2,90 @@
 #coding:utf-8
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
-from qgis.core import QgsFeature
-import numpy as np
+from qgis.core import QgsFeature, QgsFeatureIterator
+from typing import Union
 import re
 import math
+
+
+class FieldMap:
+    '''
+    map fields of layer to parameters for geocoders
+    '''
+    def __init__(self, layer, ignore=[], keywords={}):
+        # key: field name, value: (active, keyword)
+        # active means, if the field should be used for geocoding
+        # keyword maps the field to an argument of the geocoder
+        self._mapping = {}
+        self.layer = layer
+        items = keywords.items()
+        keys = [i[0] for i in items]
+        kv_flat = [item.lower() for sublist in items for item in sublist]
+        for field in layer.fields():
+            name = field.name()
+            if name in ignore:
+                continue
+            idx = kv_flat.index(name.lower()) // 2 if name.lower() in kv_flat \
+                else -1
+            keyword = keys[idx] if idx >= 0 else None
+            active = True if idx >= 0 else False
+            self._mapping[name] = [active, keyword]
+
+    def valid(self, layer):
+        for field in layer.fields():
+            if field.name() not in self._mapping:
+                return False
+        return True
+
+    def fields(self):
+        return self._mapping.keys()
+
+    def set_field(self, field_name: str, keyword: str=None, active: bool=None):
+        if keyword is not None:
+            self.set_keyword(field_name, keyword)
+        if active is not None:
+            self.set_active(field_name, active=active)
+
+    def set_active(self, field_name, active=True):
+        self._mapping[field_name][0] = active
+
+    def set_keyword(self, field_name, keyword):
+        self._mapping[field_name][1] = keyword
+
+    def active(self, field_name):
+        return self._mapping[field_name][0]
+
+    def keyword(self, field_name):
+        return self._mapping[field_name][1]
+
+    def to_args(self, feature):
+        kwargs = {}
+        args = []
+        attributes = feature.attributes()
+        for field_name, (active, key) in self._mapping.items():
+            if not active:
+                continue
+            attributes = feature.attributes()
+            idx = feature.fieldNameIndex(field_name)
+            value = attributes[idx]
+            if not value:
+                continue
+            if isinstance(value, float):
+                value = int(value)
+            value = str(value)
+            if key is None:
+                split = re.findall(r"[\w'\-]+", value)
+                args.extend(split)
+            else:
+                kwargs[key] = value
+        return args, kwargs
+
+    def count_active(self):
+        i = 0
+        for field_name, (active, key) in self._mapping.items():
+            if active:
+                i += 1
+        return i
 
 
 class Geocoder:
@@ -71,61 +151,32 @@ class Worker(QObject):
 class Geocoding(Worker):
     feature_done = pyqtSignal(QgsFeature, list)
 
-    def __init__(self, layer, geocoder: Geocoder=None, ignore: list=[]):
+    def __init__(self, geocoder: Geocoder, layer_map: FieldMap,
+                 features: Union[QgsFeatureIterator, list]=None):
         super().__init__()
         self.geocoder = geocoder
-        # ToDo: what if fields are removed by user later? events
-        self.field_mapping = {}
-        for field in layer.fields():
-            name = field.name()
-            if name in ignore:
-                continue
-            self.field_mapping[name] = [False, None]
-        self.layer = layer
-        self.output = None
-
-    def set_output(self, layer):
-        self.output = layer
-
-    def set_geocoder(self, geocoder):
-        self.geocoder = geocoder
-
-    def fields(self):
-        return self.field_mapping.keys()
-
-    def active(self, field_name: str):
-        return self.active(field_name)
-
-    def set_field(self, field_name: str, keyword: str=None, active: bool=None):
-        if keyword is not None:
-            self.set_keyword(field_name, keyword)
-        if active is not None:
-            self.set_active(field_name, active=active)
+        self.layer_map = layer_map
+        features = features or layer_map.layer.getFeatures()
+        self.features = [f for f in features]
 
     def work(self):
         if not self.geocoder:
             self.error('no geocoder set')
             return False
         success = True
-        features = self.layer.getFeatures()
-        count = self.layer.featureCount()
+        features = [f for f in self.features]
+        count = len(features)
         for i, feature in enumerate(features):
-            print(i)
             if self.is_killed:
                 success = False
                 break
-            args, kwargs = self.to_args(feature)
+            args, kwargs = self.layer_map.to_args(feature)
             try:
-                results = self.geocoder.query(*args, **kwargs)
-                #self.message.emit(self.geocoder.r.url)
-                self.feature_done.emit(feature, results)
+                res = self.geocoder.query(*args, **kwargs)
+                self.feature_done.emit(feature, res)
                 message = (f'Feature {feature} -> '
                            f'<b>{len(results)} </b> Ergebnis(se)')
-                #if results.count() > 0:
-                    #best, idx = results.best()
-                    #message += '- bestes E.: {res}'.format(res=str(best))
                 self.message.emit(message)
-                self.set_result(self.output, feature.id(), results)
             except Exception as e:
                 success = False
                 self.error.emit(str(e))
@@ -134,83 +185,5 @@ class Geocoding(Worker):
                 self.progress.emit(progress)
 
         return success
-
-    #def valid(self, layer):
-        #for field in layer.fields():
-            #if field.name() not in self.field_mapping:
-                #return False
-        #return True
-
-    def set_active(self, field_name, active=True):
-        self.field_mapping[field_name][0] = active
-
-    def set_keyword(self, field_name, keyword):
-        self.field_mapping[field_name][1] = keyword
-
-    def active(self, field_name):
-        return self.field_mapping[field_name][0]
-
-    def keyword(self, field_name):
-        return self.field_mapping[field_name][1]
-
-    def to_args(self, feature):
-        kwargs = {}
-        args = []
-        attributes = feature.attributes()
-        for field_name, (active, key) in self.field_mapping.items():
-            if not active:
-                continue
-            attributes = feature.attributes()
-            idx = feature.fieldNameIndex(field_name)
-            value = attributes[idx]
-            if not value:
-                continue
-            if isinstance(value, float):
-                value = int(value)
-            value = str(value)
-            if key is None:
-                split = re.findall(r"[\w'\-]+", value)
-                args.extend(split)
-            else:
-                kwargs[key] = value
-        return args, kwargs
-
-    def count_active(self):
-        i = 0
-        for field_name, (active, key) in self.field_mapping.items():
-            if active:
-                i += 1
-        return i
-
-    def set_result(self, layer, feature_id, result):
-        print(results)
-        #def set_result(self, layer, feat_id, result, focus=False):
-        #'''
-        #set result to feature of given layer
-        #focus map canvas on feature if requested
-        #'''
-        #if not layer.isEditable():
-            #layer.startEditing()
-        #fidx = layer.fields().indexFromName
-        #if result:
-            #coords = result.coordinates
-            #geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
-            #layer.changeGeometry(feat_id, geom)
-            #layer.changeAttributeValue(
-                #feat_id, fidx('bkg_typ'), result.typ)
-            #layer.changeAttributeValue(
-                #feat_id, fidx('bkg_text'), result.text)
-            #layer.changeAttributeValue(
-                #feat_id, fidx('bkg_score'), result.score)
-        #else:
-            #layer.changeAttributeValue(
-                #feat_id, fidx('bkg_typ'), '')
-            #layer.changeAttributeValue(
-                #feat_id, fidx('bkg_score'), 0)
-        ##layer.updateFeature(feature)
-        #if focus:
-            #layer.removeSelection()
-            #layer.select(feat_id)
-            #self.canvas.zoomToSelected(layer)
 
 

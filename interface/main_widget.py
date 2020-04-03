@@ -36,7 +36,7 @@ from interface.dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
                                ReverseGeocodingDialog, FeaturePickerDialog)
 from interface.utils import clone_layer
 from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding
+from geocoder.geocoder import Geocoding, FieldMap
 from config import Config
 
 config = Config()
@@ -158,17 +158,12 @@ class MainWidget(QtWidgets.QDockWidget):
         bkg_f = [f[0] for f in BKG_FIELDS]
         if not layer:
             return
-        self.geocoding = Geocoding(layer, ignore=bkg_f)
-        self.geocoding.message.connect(self.log)
-        self.geocoding.progress.connect(self.progress_bar.setValue)
-        self.geocoding.feature_done.connect(self.set_result)
-        self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
-        #self.geocoding.finished.connect(lambda success: self.progress_bar)
-
+        self.field_map = FieldMap(layer, ignore=bkg_f,
+                                  keywords=BKGGeocoder.keywords)
         # remove old widgets
         clear_layout(self.parameter_grid)
 
-        for i, field_name in enumerate(self.geocoding.fields()):
+        for i, field_name in enumerate(self.field_map.fields()):
             checkbox = QCheckBox()
             checkbox.setText(field_name)
             combo = QComboBox()
@@ -179,22 +174,26 @@ class MainWidget(QtWidgets.QDockWidget):
 
             def checkbox_changed(state, combo, field_name):
                 checked = state != 0
-                self.geocoding.set_active(field_name, checked)
+                self.field_map.set_active(field_name, checked)
                 combo.setVisible(checked)
             checkbox.stateChanged.connect(
                 lambda s, c=combo, f=field_name : checkbox_changed(s, c, f))
-            checkbox_changed(self.geocoding.active(field_name), combo,
+            # set initial check state
+            checkbox_changed(self.field_map.active(field_name), combo,
                              field_name)
 
             def combo_changed(idx, combo, field_name):
-                self.geocoding.set_keyword(field_name, combo.itemData(idx))
+                self.field_map.set_keyword(field_name, combo.itemData(idx))
             combo.currentIndexChanged.connect(
                 lambda i, c=combo, f=field_name : combo_changed(i, c, f))
+            # set initial combo index
+            cur_idx = combo.findData(self.field_map.keyword(field_name))
+            combo_changed(cur_idx, combo, field_name)
 
             self.parameter_grid.addWidget(checkbox, i, 0)
             self.parameter_grid.addWidget(combo, i, 1)
-            checked = self.geocoding.active(field_name)
-            keyword = self.geocoding.keyword(field_name)
+            checked = self.field_map.active(field_name)
+            keyword = self.field_map.keyword(field_name)
             checkbox.setChecked(checked)
             if keyword is not None:
                 combo_idx = combo.findData(keyword)
@@ -209,12 +208,19 @@ class MainWidget(QtWidgets.QDockWidget):
         if not layer:
             return
 
+        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
+                                   logic_link=config.logic_link)
+        geocoding = Geocoding(bkg_geocoder, self.layer_map,
+                              features=layer.getFeatures())
+        geocoding.message.connect(self.log)
+        geocoding.progress.connect(self.progress_bar.setValue)
+        geocoding.feature_done.connect(self.set_result)
+        geocoding.error.connect(lambda msg: self.log(msg, color='red'))
+        #self.geocoding.finished.connect(lambda success: self.progress_bar)
+
         cloned = clone_layer(layer, srs=config.projection,
                              name=None, features=None)
         self.output_layer = cloned
-
-        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
-                                   logic_link=config.logic_link)
 
         self.geocoding.set_geocoder(bkg_geocoder)
 
@@ -233,3 +239,35 @@ class MainWidget(QtWidgets.QDockWidget):
                 #layer.addAttribute(QgsField(name, qtype, dbtype, len=length))
 
         self.geocoding.run()
+
+    def set_result(self, feature_id, results, focus=False):
+        '''
+        bkg specific
+        set result to feature of given layer
+        focus map canvas on feature if requested
+        '''
+        layer = self.output_layer or self.geocoding.layer
+        if not layer.isEditable():
+            layer.startEditing()
+        fidx = layer.fields().indexFromName
+        if results:
+            coords = result.coordinates
+            geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
+            layer.changeGeometry(feat_id, geom)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_typ'), result.typ)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_text'), result.text)
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_score'), result.score)
+        else:
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_typ'), '')
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_score'), 0)
+        #layer.updateFeature(feature)
+        if focus:
+            layer.removeSelection()
+            layer.select(feat_id)
+            self.canvas.zoomToSelected(layer)
+

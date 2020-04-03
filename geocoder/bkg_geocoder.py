@@ -1,7 +1,7 @@
 import requests
 import re
 
-from .geocoder import Geocoder
+from geocoder.geocoder import Geocoder
 
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
 
