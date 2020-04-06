@@ -63,7 +63,7 @@ class BKGGeocoder(Geocoder):
         url = URL.format(key=key)
         self.logic_link = logic_link
         self.fuzzy = fuzzy
-        super().__init__(url=url)
+        super().__init__(url=url, srs=srs)
 
     def _build_params(self, args, kwargs):
         suffix = '~' if self.fuzzy else ''

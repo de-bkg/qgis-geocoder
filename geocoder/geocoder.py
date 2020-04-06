@@ -174,8 +174,8 @@ class Geocoding(Worker):
             try:
                 res = self.geocoder.query(*args, **kwargs)
                 self.feature_done.emit(feature, res)
-                message = (f'Feature {feature} -> '
-                           f'<b>{len(results)} </b> Ergebnis(se)')
+                message = (f'Feature {feature.id()} -> '
+                           f'<b>{len(res)} </b> Ergebnis(se)')
                 self.message.emit(message)
             except Exception as e:
                 success = False

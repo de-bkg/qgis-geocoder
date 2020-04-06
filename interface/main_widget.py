@@ -27,14 +27,15 @@ import os
 from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
-from qgis.core import (QgsCoordinateReferenceSystem, QgsField)
+from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
+                       QgsPointXY, QgsGeometry)
 from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
                                  QCheckBox, QLineEdit, QInputDialog,
                                  QMessageBox)
 
 from interface.dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
                                ReverseGeocodingDialog, FeaturePickerDialog)
-from interface.utils import clone_layer
+from interface.utils import clone_layer, TerrestrisBackgroundLayer
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap
 from config import Config
@@ -86,7 +87,8 @@ class MainWidget(QtWidgets.QDockWidget):
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.featurepicker_button.clicked.connect(self.feature_picker)
         self.request_start_button.clicked.connect(self.geocode)
-        # ToDo: set filters
+        self.request_start_button.clicked.connect(lambda: self.geocoding.kill())
+        # ToDo: set layer filters
         self.layer_combo.layerChanged.connect(self.register_layer)
 
         self.setup_config()
@@ -208,24 +210,26 @@ class MainWidget(QtWidgets.QDockWidget):
         if not layer:
             return
 
+        backgroundGrey = TerrestrisBackgroundLayer(
+            groupname='Hintergrundkarten')
+        backgroundGrey.draw()
+
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
                                    logic_link=config.logic_link)
-        geocoding = Geocoding(bkg_geocoder, self.layer_map,
+        self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                               features=layer.getFeatures())
-        geocoding.message.connect(self.log)
-        geocoding.progress.connect(self.progress_bar.setValue)
-        geocoding.feature_done.connect(self.set_result)
-        geocoding.error.connect(lambda msg: self.log(msg, color='red'))
-        #self.geocoding.finished.connect(lambda success: self.progress_bar)
+        self.geocoding.message.connect(self.log)
+        self.geocoding.progress.connect(self.progress_bar.setValue)
+        self.geocoding.feature_done.connect(self.set_result)
+        self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
+        self.geocoding.finished.connect(self.done)
 
         cloned = clone_layer(layer, srs=config.projection,
                              name=None, features=None)
         self.output_layer = cloned
 
-        self.geocoding.set_geocoder(bkg_geocoder)
-
         self.tab_widget.setCurrentIndex(2)
-        active_count = self.geocoding.count_active()
+        active_count = self.field_map.count_active()
 
         if active_count == 0:
             QMessageBox.information(
@@ -234,32 +238,49 @@ class MainWidget(QtWidgets.QDockWidget):
                  u'Start abgebrochen...'))
             return
 
-        #for name, qtype, dbtype, length in BKG_FIELDS:
-            #if name not in layer.fields().names():
-                #layer.addAttribute(QgsField(name, qtype, dbtype, len=length))
+        for name, qtype, dbtype in BKG_FIELDS:
+            if name not in cloned.fields().names():
+                cloned.addAttribute(QgsField(name, qtype, dbtype))
 
+        self.request_start_button.setEnabled(False)
+        self.request_stop_button.setEnabled(True)
+        self.log(f'Starte Geokodierung <b>{layer.name()}</b>')
         self.geocoding.run()
 
-    def set_result(self, feature_id, results, focus=False):
+    def done(self, success: bool):
+        if success:
+            self.log('Geokodierung erfolgreich abgeschlossen <br>')
+            self.output_layer.updateExtent()
+            extent = self.output_layer.extent()
+            self.canvas.setExtent(extent)
+        self.request_start_button.setEnabled(True)
+        self.request_stop_button.setEnabled(False)
+
+
+    def set_result(self, feature, results, focus=False):
         '''
         bkg specific
         set result to feature of given layer
         focus map canvas on feature if requested
         '''
-        layer = self.output_layer or self.geocoding.layer
+        layer = self.output_layer
         if not layer.isEditable():
             layer.startEditing()
         fidx = layer.fields().indexFromName
+        feat_id = feature.id()
         if results:
-            coords = result.coordinates
+            results.sort(key=lambda x: x['properties']['score'])
+            best = results[0]
+            coords = best['geometry']['coordinates']
             geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
+            properties = best['properties']
             layer.changeGeometry(feat_id, geom)
             layer.changeAttributeValue(
-                feat_id, fidx('bkg_typ'), result.typ)
+                feat_id, fidx('bkg_typ'), properties['typ'])
             layer.changeAttributeValue(
-                feat_id, fidx('bkg_text'), result.text)
+                feat_id, fidx('bkg_text'), properties['text'])
             layer.changeAttributeValue(
-                feat_id, fidx('bkg_score'), result.score)
+                feat_id, fidx('bkg_score'), properties['score'])
         else:
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_typ'), '')
