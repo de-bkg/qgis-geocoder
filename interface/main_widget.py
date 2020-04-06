@@ -25,7 +25,7 @@
 import os
 
 from qgis.PyQt import uic, QtWidgets
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QThread
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry)
@@ -87,7 +87,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.featurepicker_button.clicked.connect(self.feature_picker)
         self.request_start_button.clicked.connect(self.geocode)
-        self.request_start_button.clicked.connect(lambda: self.geocoding.kill())
+        self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         # ToDo: set layer filters
         self.layer_combo.layerChanged.connect(self.register_layer)
 
@@ -217,7 +217,8 @@ class MainWidget(QtWidgets.QDockWidget):
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
                                    logic_link=config.logic_link)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
-                              features=layer.getFeatures())
+                                   features=layer.getFeatures(), parent=self)
+
         self.geocoding.message.connect(self.log)
         self.geocoding.progress.connect(self.progress_bar.setValue)
         self.geocoding.feature_done.connect(self.set_result)
@@ -245,12 +246,11 @@ class MainWidget(QtWidgets.QDockWidget):
         self.request_start_button.setEnabled(False)
         self.request_stop_button.setEnabled(True)
         self.log(f'Starte Geokodierung <b>{layer.name()}</b>')
-        self.geocoding.run()
+        self.geocoding.start()
 
     def done(self, success: bool):
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen <br>')
-            self.output_layer.updateExtent()
             extent = self.output_layer.extent()
             self.canvas.setExtent(extent)
         self.request_start_button.setEnabled(True)

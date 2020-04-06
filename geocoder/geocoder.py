@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.PyQt.QtCore import pyqtSignal, QObject, QThread
 from qgis.core import QgsFeature, QgsFeatureIterator
 from typing import Union
 import re
@@ -122,7 +122,7 @@ class ResultCache:
         return None
 
 
-class Worker(QObject):
+class Worker(QThread):
     '''
     abstract worker
     '''
@@ -133,13 +133,21 @@ class Worker(QObject):
     message = pyqtSignal(str)
     progress = pyqtSignal(int)
 
-    def __init__(self):
-        QObject.__init__(self)
+    def __init__(self, parent=None):
+        QObject.__init__(self, parent=parent)
         self.is_killed = False
 
     def run(self):
-        success = self.work()
-        self.finished.emit(success)
+        '''
+        runs code defined in self.work
+        emits self.finished on success and self.error on exception
+        override this function if you make asynchronous calls
+        '''
+        try:
+            result = self.work()
+            self.finished.emit(result)
+        except Exception as e:
+            self.error.emit(str(e))
 
     def work(self):
         raise NotImplementedError
@@ -152,8 +160,8 @@ class Geocoding(Worker):
     feature_done = pyqtSignal(QgsFeature, list)
 
     def __init__(self, geocoder: Geocoder, layer_map: FieldMap,
-                 features: Union[QgsFeatureIterator, list]=None):
-        super().__init__()
+                 features: Union[QgsFeatureIterator, list]=None, parent=None):
+        super().__init__(parent=parent)
         self.geocoder = geocoder
         self.layer_map = layer_map
         features = features or layer_map.layer.getFeatures()
@@ -169,6 +177,7 @@ class Geocoding(Worker):
         for i, feature in enumerate(features):
             if self.is_killed:
                 success = False
+                self.log('Anfrage abgebrochen', color='red')
                 break
             args, kwargs = self.layer_map.to_args(feature)
             try:
