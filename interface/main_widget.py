@@ -25,10 +25,10 @@
 import os
 
 from qgis.PyQt import uic, QtWidgets
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QThread
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
-                       QgsPointXY, QgsGeometry)
+                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel)
 from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
                                  QCheckBox, QLineEdit, QInputDialog,
                                  QMessageBox)
@@ -89,6 +89,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.request_start_button.clicked.connect(self.geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         # ToDo: set layer filters
+        self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         self.layer_combo.layerChanged.connect(self.register_layer)
 
         self.setup_config()
