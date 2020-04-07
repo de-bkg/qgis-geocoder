@@ -34,8 +34,8 @@ from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
                                  QCheckBox, QLineEdit, QInputDialog,
                                  QMessageBox)
 
-from interface.dialogs import (OpenCSVDialog, SaveCSVDialog, ProgressDialog,
-                               ReverseGeocodingDialog, FeaturePickerDialog)
+from interface.dialogs import (ProgressDialog, ReverseGeocodingDialog,
+                               FeaturePickerDialog)
 from interface.utils import clone_layer, TerrestrisBackgroundLayer
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap
@@ -50,7 +50,8 @@ BKG_FIELDS = [
     ('bkg_i', QVariant.Double, 'int2'),
     ('bkg_typ', QVariant.String, 'text'),
     ('bkg_text', QVariant.String, 'text'),
-    ('bkg_score', QVariant.Double, 'float8')
+    ('bkg_score', QVariant.Double, 'float8'),
+    ('bkg_treffer', QVariant.String, 'text')
 ]
 
 def clear_layout(layout):
@@ -254,9 +255,11 @@ class MainWidget(QtWidgets.QDockWidget):
                  u'Start abgebrochen...'))
             return
 
-        for name, qtype, dbtype in BKG_FIELDS:
-            if name not in cloned.fields().names():
-                cloned.addAttribute(QgsField(name, qtype, dbtype))
+        field_names = cloned.fields().names()
+        add_fields = [QgsField(n, q, d) for n, q, d in BKG_FIELDS
+                      if n not in field_names]
+        cloned.dataProvider().addAttributes(add_fields)
+        cloned.updateFields()
 
         self.request_start_button.setEnabled(False)
         self.request_stop_button.setEnabled(True)
@@ -296,6 +299,8 @@ class MainWidget(QtWidgets.QDockWidget):
                 feat_id, fidx('bkg_text'), properties['text'])
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_score'), properties['score'])
+            layer.changeAttributeValue(
+                feat_id, fidx('bkg_treffer'), properties['treffer'])
         else:
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_typ'), '')

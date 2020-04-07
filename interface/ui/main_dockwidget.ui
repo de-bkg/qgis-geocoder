@@ -78,7 +78,7 @@ padding: 2px;
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -373,7 +373,7 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QLineEdit" name="rs_lineedit">
+              <widget class="QLineEdit" name="rs_input">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -395,7 +395,7 @@ padding: 2px;
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="rsinputaid_combobox">
+              <widget class="QComboBox" name="rs_combobox">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>

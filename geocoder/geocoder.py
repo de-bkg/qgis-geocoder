@@ -177,7 +177,7 @@ class Geocoding(Worker):
         for i, feature in enumerate(features):
             if self.is_killed:
                 success = False
-                self.log('Anfrage abgebrochen', color='red')
+                self.error('Anfrage abgebrochen', color='red')
                 break
             args, kwargs = self.layer_map.to_args(feature)
             try:
