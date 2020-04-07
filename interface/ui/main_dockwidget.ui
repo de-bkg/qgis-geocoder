@@ -78,7 +78,7 @@ padding: 2px;
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -148,7 +148,7 @@ padding: 2px;
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="importcsv_button">
+           <widget class="QPushButton" name="import_csv_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -911,7 +911,7 @@ padding: 2px;
         <item>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QPushButton" name="showattributtable_button">
+           <widget class="QPushButton" name="attribute_table_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -931,7 +931,7 @@ padding: 2px;
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QPushButton" name="exportcsv_button">
+           <widget class="QPushButton" name="export_csv_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>

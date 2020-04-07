@@ -28,7 +28,8 @@ from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
-                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel)
+                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
+                       QgsActionManager)
 from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
                                  QCheckBox, QLineEdit, QInputDialog,
                                  QMessageBox)
@@ -80,15 +81,21 @@ class MainWidget(QtWidgets.QDockWidget):
             Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
         )
         self.setupUi()
+        self.output_layer = None
 
     def setupUi(self):
-        self.importcsv_button.clicked.connect(self.import_csv)
-        self.exportcsv_button.clicked.connect(self.export_csv)
+        actions = self.iface.addLayerMenu().actions()
+        for action in actions:
+            if action.objectName() == 'mActionAddDelimitedText':
+                self.import_csv_action = action
+                break
+        self.import_csv_button.clicked.connect(self.import_csv_action.trigger)
+        self.export_csv_button.clicked.connect(self.export_csv)
+        self.attribute_table_button.clicked.connect(self.show_attribute_table)
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.featurepicker_button.clicked.connect(self.feature_picker)
         self.request_start_button.clicked.connect(self.geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
-        # ToDo: set layer filters
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         self.layer_combo.layerChanged.connect(self.register_layer)
 
@@ -128,13 +135,20 @@ class MainWidget(QtWidgets.QDockWidget):
         dialog = ProgressDialog(parent=self)
         dialog.show()
 
-    def import_csv(self):
-        dialog = OpenCSVDialog(parent=self)
-        dialog.show()
+    def show_attribute_table(self):
+        if not self.output_layer:
+            return
+        self.iface.showAttributeTable(self.output_layer)
 
     def export_csv(self):
-        dialog = SaveCSVDialog(parent=self)
-        dialog.show()
+        if not self.output_layer:
+            return
+        self.iface.setActiveLayer(self.output_layer)
+        actions = self.iface.layerMenu().actions()
+        for action in actions:
+            if action.objectName() == 'mActionLayerSaveAs':
+                break
+        action.trigger()
 
     def closeEvent(self, event):
         self.closingWidget.emit()
