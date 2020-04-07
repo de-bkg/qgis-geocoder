@@ -58,11 +58,12 @@ class BKGGeocoder(Geocoder):
         'plz_ort': split_code_city,
     }
 
-    def __init__(self, key, srs: str='EPSG:4326', logic_link='AND',
+    def __init__(self, key, srs: str='EPSG:4326', logic_link='AND', rs='',
                  fuzzy=False):
         url = URL.format(key=key)
         self.logic_link = logic_link
         self.fuzzy = fuzzy
+        self.rs = rs
         super().__init__(url=url, srs=srs)
 
     def _build_params(self, args, kwargs):
@@ -90,6 +91,8 @@ class BKGGeocoder(Geocoder):
         query = self._build_params(args, kwargs)
         self.params['query'] = query
         self.params['srsname'] = self.srs
+        if self.rs:
+            self.params['rs'] = self.rs
         self.r = requests.get(self.url, params=self.params)
         # ToDo raise specific errors
         if self.r.status_code != 200:

@@ -26,6 +26,7 @@ class Config(object):
         'logic_link': 'OR',
         'selected_features_only': False,
         'projection': 'EPSG:4326',
+        'rs': '',
     }
 
     _config = {}

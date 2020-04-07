@@ -78,7 +78,7 @@ padding: 2px;
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -373,7 +373,7 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QLineEdit" name="rs_input">
+              <widget class="QLineEdit" name="rs_edit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -395,7 +395,7 @@ padding: 2px;
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="rs_combobox">
+              <widget class="QComboBox" name="rs_combo">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -421,96 +421,11 @@ padding: 2px;
                 <bool>false</bool>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>-1</number>
                </property>
                <property name="maxVisibleItems">
                 <number>17</number>
                </property>
-               <item>
-                <property name="text">
-                 <string>Eingabehilfe Bundesländer</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="01">Schleswig-Holstein</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="02">Freie und Hansestadt Hamburg</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="03">Niedersachsen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="04">Freie Hansestadt Bremen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Nordrhein-Westfalen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Hessen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Rheinland-Pfalz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Baden-Württemberg</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Freistaat Bayern</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Saarland</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Berlin</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Brandenburg</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Mecklenburg-Vorpommern</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Freistaat Sachsen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Sachsen-Anhalt</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Freistaat Thüringen</string>
-                </property>
-               </item>
               </widget>
              </item>
              <item>
@@ -873,7 +788,11 @@ padding: 2px;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <widget class="QTextEdit" name="log_edit"/>
+            <widget class="QTextEdit" name="log_edit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_6">

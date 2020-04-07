@@ -54,6 +54,25 @@ BKG_FIELDS = [
     ('bkg_treffer', QVariant.String, 'text')
 ]
 
+RS_PRESETS = [
+    ('Schleswig-Holstein', '01*'),
+    ('Freie und Hansestadt Hamburg', '02*'),
+    ('Niedersachsen', '03*'),
+    ('Freie Hansestadt Bremen', '04*'),
+    ('Nordrhein-Westfalen', '05*'),
+    ('Hessen', '06*'),
+    ('Rheinland-Pfalz', '07*'),
+    ('Baden-Württemberg', '08*'),
+    ('Freistaat Bayern', '09*'),
+    ('Saarland', '10*'),
+    ('Berlin', '11*'),
+    ('Brandenburg', '12*'),
+    ('Mecklenburg-Vorpommern', '13*'),
+    ('Freistaat Sachsen', '14*'),
+    ('Sachsen-Anhalt', '15*'),
+    ('Freistaat Thüringen', '16*')
+]
+
 def clear_layout(layout):
     while layout.count():
         child = layout.takeAt(0)
@@ -100,6 +119,15 @@ class MainWidget(QtWidgets.QDockWidget):
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         self.layer_combo.layerChanged.connect(self.register_layer)
 
+        self.rs_combo.addItem('Eingabehilfe Bundesländer')
+        self.rs_combo.model().item(0).setEnabled(False)
+        for name, rs in RS_PRESETS:
+            self.rs_combo.addItem(name, rs)
+        self.rs_combo.currentIndexChanged.connect(
+            lambda: self.rs_edit.setText(self.rs_combo.currentData()))
+        self.rs_edit.editingFinished.connect(
+            lambda: self.rs_combo.setCurrentIndex(0))
+
         self.setup_config()
 
     def setup_config(self):
@@ -123,6 +151,10 @@ class MainWidget(QtWidgets.QDockWidget):
         self.selected_features_only_check.toggled.connect(
             lambda: setattr(config, 'selected_features_only',
                             self.selected_features_only_check.isChecked()))
+
+        self.rs_edit.setText(config.rs)
+        self.rs_edit.textChanged.connect(
+            lambda text: setattr(config, 'rs', text))
 
     def feature_picker(self):
         dialog = FeaturePickerDialog(parent=self)
@@ -231,7 +263,7 @@ class MainWidget(QtWidgets.QDockWidget):
         backgroundGrey.draw()
 
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
-                                   logic_link=config.logic_link)
+                                   logic_link=config.logic_link, rs=config.rs)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=layer.getFeatures(), parent=self)
 
@@ -241,8 +273,8 @@ class MainWidget(QtWidgets.QDockWidget):
         self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
         self.geocoding.finished.connect(self.done)
 
-        cloned = clone_layer(layer, srs=config.projection,
-                             name=None, features=None)
+        cloned = clone_layer(layer, name=f'{layer.name()}_ergebnisse',
+                             srs=config.projection, features=None)
         self.output_layer = cloned
 
         self.tab_widget.setCurrentIndex(2)

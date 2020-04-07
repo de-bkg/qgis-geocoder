@@ -10,7 +10,7 @@ def clone_layer(layer, srs='EPSG:4326', name=None, features=None):
     data of new layer is based on all features of origin layer or given features
     '''
     features = features or layer.getFeatures()
-    name = name or layer.name() + '__clone'
+    name = name or + f'{layer.name()}__clone'
 
     clone = QgsVectorLayer(f'Point?crs={srs}', name, 'memory')
 
