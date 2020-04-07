@@ -82,6 +82,8 @@ class BKGGeocoder(Geocoder):
         query += logic.join(('{k}:"{v}"{s}'.format(k=k, v=v, s=suffix)
                              for k, v in kwargs.items()
                              if v))
+        if self.rs:
+            query = f'({query}) AND rs:"{self.rs}"'
         return query
 
     def query(self, *args, **kwargs):
@@ -91,8 +93,6 @@ class BKGGeocoder(Geocoder):
         query = self._build_params(args, kwargs)
         self.params['query'] = query
         self.params['srsname'] = self.srs
-        if self.rs:
-            self.params['rs'] = self.rs
         self.r = requests.get(self.url, params=self.params)
         # ToDo raise specific errors
         if self.r.status_code != 200:

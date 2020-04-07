@@ -263,7 +263,8 @@ class MainWidget(QtWidgets.QDockWidget):
         backgroundGrey.draw()
 
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
-                                   logic_link=config.logic_link, rs=config.rs)
+                                   logic_link=config.logic_link,
+                                   rs=config.rs)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=layer.getFeatures(), parent=self)
 
@@ -305,7 +306,6 @@ class MainWidget(QtWidgets.QDockWidget):
             self.canvas.setExtent(extent)
         self.request_start_button.setEnabled(True)
         self.request_stop_button.setEnabled(False)
-
 
     def set_result(self, feature, results, focus=False):
         '''

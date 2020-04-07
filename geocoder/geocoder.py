@@ -62,7 +62,7 @@ class FieldMap:
         kwargs = {}
         args = []
         attributes = feature.attributes()
-        for field_name, (active, key) in self._mapping.items():
+        for field_name, (active, keyword) in self._mapping.items():
             if not active:
                 continue
             attributes = feature.attributes()
@@ -73,11 +73,11 @@ class FieldMap:
             if isinstance(value, float):
                 value = int(value)
             value = str(value)
-            if key is None:
+            if keyword is None:
                 split = re.findall(r"[\w'\-]+", value)
                 args.extend(split)
             else:
-                kwargs[key] = value
+                kwargs[keyword] = value
         return args, kwargs
 
     def count_active(self):
@@ -159,12 +159,12 @@ class Worker(QThread):
 class Geocoding(Worker):
     feature_done = pyqtSignal(QgsFeature, list)
 
-    def __init__(self, geocoder: Geocoder, layer_map: FieldMap,
+    def __init__(self, geocoder: Geocoder, field_map: FieldMap,
                  features: Union[QgsFeatureIterator, list]=None, parent=None):
         super().__init__(parent=parent)
         self.geocoder = geocoder
-        self.layer_map = layer_map
-        features = features or layer_map.layer.getFeatures()
+        self.field_map = field_map
+        features = features or field_map.layer.getFeatures()
         self.features = [f for f in features]
 
     def work(self):
@@ -179,7 +179,7 @@ class Geocoding(Worker):
                 success = False
                 self.error('Anfrage abgebrochen', color='red')
                 break
-            args, kwargs = self.layer_map.to_args(feature)
+            args, kwargs = self.field_map.to_args(feature)
             try:
                 res = self.geocoder.query(*args, **kwargs)
                 self.feature_done.emit(feature, res)
