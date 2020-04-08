@@ -149,12 +149,15 @@ class MainWidget(QtWidgets.QDockWidget):
         self.selected_features_only_check.setChecked(
             config.selected_features_only)
         self.selected_features_only_check.toggled.connect(
-            lambda: setattr(config, 'selected_features_only',
-                            self.selected_features_only_check.isChecked()))
+            lambda checked: setattr(config, 'selected_features_only', checked))
 
         self.rs_edit.setText(config.rs)
         self.rs_edit.textChanged.connect(
             lambda text: setattr(config, 'rs', text))
+
+        self.use_rs_check.setChecked(config.use_rs)
+        self.use_rs_check.toggled.connect(
+            lambda checked: setattr(config, 'use_rs', checked))
 
     def feature_picker(self):
         dialog = FeaturePickerDialog(parent=self)
@@ -217,15 +220,14 @@ class MainWidget(QtWidgets.QDockWidget):
             checkbox = QCheckBox()
             checkbox.setText(field_name)
             combo = QComboBox()
-            combo.addItem('unspezifisch oder nicht aufgeführte Kombination',
-                          None)
+            combo.addItem('Volltextsuche', None)
             for key, text in BKGGeocoder.keywords.items():
                 combo.addItem(text, key)
 
             def checkbox_changed(state, combo, field_name):
                 checked = state != 0
                 self.field_map.set_active(field_name, checked)
-                combo.setVisible(checked)
+                combo.setEnabled(checked)
             checkbox.stateChanged.connect(
                 lambda s, c=combo, f=field_name : checkbox_changed(s, c, f))
             # set initial check state
@@ -242,14 +244,16 @@ class MainWidget(QtWidgets.QDockWidget):
 
             self.parameter_grid.addWidget(checkbox, i, 0)
             self.parameter_grid.addWidget(combo, i, 1)
+            # initial state
             checked = self.field_map.active(field_name)
             keyword = self.field_map.keyword(field_name)
             checkbox.setChecked(checked)
             if keyword is not None:
                 combo_idx = combo.findData(keyword)
                 combo.setCurrentIndex(combo_idx)
-                combo.setVisible(checked)
-        n_selected = layer.selectedFeatureCount()
+                combo.setEnabled(checked)
+
+        #n_selected = layer.selectedFeatureCount()
         #self.n_selected_label.setText(
             #'({} Feature(s) selektiert)'.format(n_selected))
 
@@ -262,9 +266,9 @@ class MainWidget(QtWidgets.QDockWidget):
             groupname='Hintergrundkarten')
         backgroundGrey.draw()
 
+        rs = config.rs if self.use_rs_check.checked() else None
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
-                                   logic_link=config.logic_link,
-                                   rs=config.rs)
+                                   logic_link=config.logic_link, rs=rs)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=layer.getFeatures(), parent=self)
 

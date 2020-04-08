@@ -249,7 +249,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>391</width>
-                <height>324</height>
+                <height>316</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -355,9 +355,12 @@ padding: 2px;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QLabel" name="label_9">
+            <widget class="QCheckBox" name="use_rs_check">
              <property name="text">
               <string>Regionalschlüssel:</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -464,9 +467,12 @@ padding: 2px;
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_7">
+            <widget class="QCheckBox" name="use_spatial_filter">
              <property name="text">
               <string>Räumlicher Filter:</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -476,7 +482,10 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QgsMapLayerComboBox" name="restrictgeom_maplayercombobox">
+              <widget class="QgsMapLayerComboBox" name="spatial_filter_combo">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -508,6 +517,9 @@ padding: 2px;
              </item>
              <item>
               <widget class="QCheckBox" name="onlyselectedpolygons_checkbox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beschränken Sie die Suche weiter auf lediglich die selektierten Objekte des gewählten Layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -1120,5 +1132,70 @@ padding: 2px;
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>use_rs_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>rs_edit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>117</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>193</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>use_rs_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>rs_combo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>292</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>295</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>use_spatial_filter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spatial_filter_combo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>180</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>use_spatial_filter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>onlyselectedpolygons_checkbox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>360</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>361</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
