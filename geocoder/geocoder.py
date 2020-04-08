@@ -101,27 +101,6 @@ class Geocoder:
         raise NotImplementedError
 
 
-class ResultCache:
-    '''
-    cache for storing result collections intermediately
-    ToDo: filebased caching (might use too much memory in current state)
-    '''
-    def __init__(self):
-        self.results = {}
-
-    def add(self, layer, feat_id, results):
-        res_feat_store = self.results.get(layer.id())
-        if not res_feat_store:
-            res_feat_store = self.results[layer.id()] = {}
-        self.results[layer.id()][feat_id] = results
-
-    def get(self, layer, feat_id):
-        res_layer = self.results.get(layer.id())
-        if res_layer:
-            return res_layer.get(feat_id)
-        return None
-
-
 class Worker(QThread):
     '''
     abstract worker

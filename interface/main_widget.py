@@ -28,17 +28,15 @@ from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
-                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
-                       QgsActionManager)
-from qgis.PyQt.QtWidgets import (QHBoxLayout, QLabel, QComboBox,
-                                 QCheckBox, QLineEdit, QInputDialog,
-                                 QMessageBox)
+                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel)
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QMessageBox
 
 from interface.dialogs import (ProgressDialog, ReverseGeocodingDialog,
-                               FeaturePickerDialog)
+                               InspectResultsDialog)
+from interface.map_tools import FeaturePicker
 from interface.utils import clone_layer, TerrestrisBackgroundLayer
 from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding, FieldMap, ResultCache
+from geocoder.geocoder import Geocoding, FieldMap
 from config import Config
 
 config = Config()
@@ -102,7 +100,7 @@ class MainWidget(QtWidgets.QDockWidget):
         )
         self.setupUi()
         self.output_layer = None
-        self.result_cache = ResultCache()
+        self.result_cache = {}
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
@@ -114,7 +112,6 @@ class MainWidget(QtWidgets.QDockWidget):
         self.export_csv_button.clicked.connect(self.export_csv)
         self.attribute_table_button.clicked.connect(self.show_attribute_table)
         self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
-        self.featurepicker_button.clicked.connect(self.feature_picker)
         self.request_start_button.clicked.connect(self.geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
@@ -130,6 +127,9 @@ class MainWidget(QtWidgets.QDockWidget):
         self.rs_edit.editingFinished.connect(
             lambda: self.rs_combo.setCurrentIndex(0))
 
+        self.feature_picker = FeaturePicker(
+            self.featurepicker_button, canvas=self.canvas)
+        self.feature_picker.feature_picked.connect(self.inspect_results)
         self.setup_config()
 
     def setup_config(self):
@@ -161,8 +161,14 @@ class MainWidget(QtWidgets.QDockWidget):
         self.use_rs_check.toggled.connect(
             lambda checked: setattr(config, 'use_rs', checked))
 
-    def feature_picker(self):
-        dialog = FeaturePickerDialog(parent=self)
+    def inspect_results(self, feature):
+        results = self.result_cache.get(feature.id(), None)
+        # ToDo: warning dialog or pass it to results diag and show warning there
+        if not results:
+            return
+        self.output_layer.select(feature.id())
+        dialog = InspectResultsDialog(self.output_layer, feature, results,
+                                      self.canvas, parent=self)
         dialog.show()
 
     def reverse_geocode(self):
@@ -213,6 +219,7 @@ class MainWidget(QtWidgets.QDockWidget):
         bkg_f = [f[0] for f in BKG_FIELDS]
         if not layer:
             return
+        self.result_cache = {}
         self.field_map = FieldMap(layer, ignore=bkg_f,
                                   keywords=BKGGeocoder.keywords)
         # remove old widgets
@@ -286,6 +293,8 @@ class MainWidget(QtWidgets.QDockWidget):
         self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
         self.geocoding.finished.connect(self.done)
 
+        self.feature_picker.set_layer(self.output_layer)
+
         self.tab_widget.setCurrentIndex(2)
         active_count = self.field_map.count_active()
 
@@ -317,7 +326,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.request_stop_button.setVisible(False)
 
     def store_results(self, feature, results):
-        self.result_cache.add(self.output_layer, feature.id(), results)
+        self.result_cache[feature.id()] = results
         if results:
             results.sort(key=lambda x: x['properties']['score'])
             best = results[0]

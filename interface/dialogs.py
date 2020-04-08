@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, QThread, pyqtSignal, QTimer, QVariant, QObject
 from qgis.PyQt.QtWidgets import QDialog
-from qgis.PyQt.QtGui import QTextCursor
 from qgis.PyQt import uic
 import os
-import datetime
 
-from geocoder.geocoder import Geocoding
 from config import UI_PATH
 
 
@@ -46,131 +42,69 @@ class ReverseGeocodingDialog(Dialog):
         super().__init__('reverse_geocoding.ui', modal=False, parent=parent)
 
 
-class FeaturePickerDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('featurepicker.ui', modal=False, parent=parent)
-
-
 class ProgressDialog(Dialog):
     def __init__(self, parent=None):
         super().__init__('progress.ui', modal=True, parent=parent)
         self.close_button.clicked.connect(self.close)
 
-#class ProgressDialog(QDialog, FORM_CLASS):
-    #"""
-    #Dialog showing progress in textfield and bar after starting a certain task with run()
-    #"""
-    #def __init__(self, worker, parent=None, auto_close=False, auto_run=False):
-        #super().__init__(parent=parent)
-        #self.parent = parent
-        #self.setupUi(self)
-        #self.setAttribute(Qt.WA_DeleteOnClose)
-        #self.progress_bar.setValue(0)
-        #self.close_button.clicked.connect(self.close)
-        #self.stop_button.setVisible(False)
-        #self.close_button.setVisible(False)
-        #self.auto_close = auto_close
 
-        #self.worker = worker
-        #self.thread = QThread(self.parent)
-        #self.worker.moveToThread(self.thread)
+class InspectResultsDialog(Dialog):
+    def __init__(self, layer, feature, results, canvas, parent=None):
+        super().__init__('featurepicker.ui', modal=False, parent=parent)
+        #self.dlg = PickerUI()
+        #self.results_cache = results_cache
+        #self.canvas = canvas
+        #self.featurePicker = FeaturePicker(self.canvas)
+        #self.featurePicker.featurePicked.connect(self.featurePicked)
+        #self.setObjectName("FeaturePickerDock")
+        #self.setWidget(self.dlg)
 
-        #self.thread.started.connect(self.worker.run)
-        #self.worker.finished.connect(self.finished)
-        #self.worker.error.connect(self.show_status)
-        #self.worker.message.connect(self.show_status)
-        #self.worker.counter.connect(self.progress)
+        #self.dlg.pick_feature_button.clicked.connect(self.select)
+        #self.dlg.result_list.itemClicked.connect(self.result_changed)
 
-        #self.start_button.clicked.connect(self.run)
-        #self.stop_button.clicked.connect(self.stop)
-        #self.close_button.clicked.connect(self.close)
+    #def clear(self):
+        #self.dlg.feature_edit.setText('')
+        #self.dlg.result_list.clear()
+        #self.dlg.geocode_button.setEnabled(False)
 
-        #self.timer = QTimer(self)
-        #self.timer.timeout.connect(self.update_timer)
-        #if auto_run:
-            #self.run()
+    #def select(self):
+        #self.canvas.setMapTool(self.featurePicker)
+        #cursor = QCursor(Qt.CrossCursor)
+        #self.canvas.setCursor(cursor)
 
-    #def running(self):
-        #self.close_button.setVisible(True)
-        #self.cancelButton.setText('Stoppen')
-        #self.cancelButton.clicked.disconnect(self.close)
+    #def result_changed(self, item):
+        #idx = self.dlg.result_list.currentRow()
+        #self.active_feature.setAttribute('bkg_i', idx)
+        #result = self.active_results[idx]
+        #self.result_set.emit(self.active_layer, self.active_feature, result)
 
-    #def finished(self):
-        ## already gone if killed
-        #try:
-            #self.worker.deleteLater()
-        #except:
-            #pass
-        #self.thread.quit()
-        #self.thread.wait()
-        #self.thread.deleteLater()
-        #self.timer.stop()
-        #self.close_button.setVisible(True)
-        #self.stop_button.setVisible(False)
-        #if self.auto_close:
-            #self.close()
-
-    #def show_status(self, text):
-        #self.log_edit.appendHtml(text)
-        ##self.log_edit.moveCursor(QTextCursor.Down)
-        #scrollbar = self.log_edit.verticalScrollBar()
-        #scrollbar.setValue(scrollbar.maximum());
-
-    #def progress(self, progress, obj=None):
-        #if isinstance(progress, QVariant):
-            #progress = progress.toInt()[0]
-        #self.progress_bar.setValue(progress)
-
-    #def start_timer(self):
-        #self.start_time = datetime.datetime.now()
-        #self.timer.start(1000)
-
-    ## task needs to be overridden
-    #def run(self):
-        #self.start_timer()
-        #self.stop_button.setVisible(True)
-        #self.start_button.setVisible(False)
-        #self.thread.start()
-
-    #def stop(self):
-        #self.timer.stop()
-        #self.worker.kill()
-        #self.log_edit.appendHtml('<b> Vorgang abgebrochen </b> <br>')
-        #self.log_edit.moveCursor(QTextCursor.End)
-        #self.finished()
-
-    #def update_timer(self):
-        #delta = datetime.datetime.now() - self.start_time
-        #h, remainder = divmod(delta.seconds, 3600)
-        #m, s = divmod(remainder, 60)
-        #timer_text = '{:02d}:{:02d}:{:02d}'.format(h, m, s)
-        #self.elapsed_time_label.setText(timer_text)
-
-
-#class GeocodeProgressDialog(ProgressDialog):
-    #'''
-    #dialog showing progress on threaded geocoding
-    #'''
-    #feature_done = pyqtSignal(int, Results)
-
-    #def __init__(self, geocoder, layer, field_map, on_progress,
-                 #on_done, feature_ids=None, parent=None, area_wkt=None):
-        #queries = []
-        #features = layer.getFeatures(feature_ids) if feature_ids \
-            #else layer.getFeatures()
-
-        #for feature in features:
-            #args, kwargs = field_map.to_args(feature)
-            #if area_wkt:
-                #kwargs['geometry'] = area_wkt
-            #queries.append((feature.id(), (args, kwargs)))
-
-        #worker = GeocodeWorker(geocoder, queries)
-        #worker.feature_done.connect(on_progress)
-        #worker.finished.connect(on_done)
-        #super().__init__(worker, parent=parent, auto_run=True)
-
-
-
-
+    #def featurePicked(self, layer, feature):
+        #self.dlg.geocode_button.setEnabled(True)
+        #self.active_feature = feature
+        #self.active_layer = layer
+        #layer.removeSelection()
+        #layer.select(feature.id())
+        #attr = []
+        #attributes = feature.attributes()
+        #res_idx = 0
+        #for field in layer.fields():
+            #field_name = field.name()
+            #if not field_name.startswith('bkg_'):
+                #idx = feature.fieldNameIndex(field_name)
+                #value = attributes[idx]
+                #attr.append(value)
+            #if field_name == 'bkg_i':
+                #idx = feature.fieldNameIndex(field_name)
+                #res_idx = attributes[idx]
+        #feat_repr = '({l}) Feature {id} - {a}'.format(
+            #id=feature.id(), a=', '.join(map(str, attr)), l=layer.name())
+        #self.dlg.feature_edit.setText(feat_repr)
+        #self.dlg.feature_edit.setToolTip(feat_repr)
+        #self.dlg.result_list.clear()
+        #results = self.results_cache.get(layer, feature.id())
+        #if results:
+            #self.active_results = results
+            #for result in results:
+                #self.dlg.result_list.addItem(str(result))
+            #self.dlg.result_list.setCurrentRow(res_idx)
 

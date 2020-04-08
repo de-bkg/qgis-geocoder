@@ -11,37 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Ergebnisse inspizieren</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QFrame" name="actual_values_frame">
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <layout class="QGridLayout" name="gridLayout"/>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>weitere Ergebnisse für Eingabedaten</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="alternative_features_frame">
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2"/>
-    </widget>
+    <widget class="QTableWidget" name="results_table"/>
    </item>
    <item>
     <spacer name="verticalSpacer">
