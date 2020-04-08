@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractScrollArea
 from qgis.PyQt import uic
 import os
 
@@ -51,16 +51,31 @@ class ProgressDialog(Dialog):
 class InspectResultsDialog(Dialog):
     def __init__(self, layer, feature, results, canvas, parent=None):
         super().__init__('featurepicker.ui', modal=False, parent=parent)
-        #self.dlg = PickerUI()
-        #self.results_cache = results_cache
-        #self.canvas = canvas
-        #self.featurePicker = FeaturePicker(self.canvas)
-        #self.featurePicker.featurePicked.connect(self.featurePicked)
-        #self.setObjectName("FeaturePickerDock")
-        #self.setWidget(self.dlg)
+        self.canvas = canvas
+        self.results = results
+        self.feature = feature
+        self.layer = layer
 
-        #self.dlg.pick_feature_button.clicked.connect(self.select)
-        #self.dlg.result_list.itemClicked.connect(self.result_changed)
+        self.populate_table()
+
+    def populate_table(self):
+        columns = ['text', 'score']
+        self.results_table.setColumnCount(len(columns))
+        for i, column in enumerate(columns):
+            self.results_table.setHorizontalHeaderItem(
+                i, QTableWidgetItem(column))
+        self.results_table.setRowCount(len(self.results))
+        for i, result in enumerate(self.results):
+            properties = result['properties']
+            for j, column in enumerate(columns):
+                self.results_table.setItem(
+                    i, j, QTableWidgetItem(str(properties[column])))
+        self.results_table.setSizeAdjustPolicy(
+            QAbstractScrollArea.AdjustToContents)
+        self.results_table.resizeColumnsToContents()
+
+    def showEvent(self, e):
+        self.adjustSize()
 
     #def clear(self):
         #self.dlg.feature_edit.setText('')
