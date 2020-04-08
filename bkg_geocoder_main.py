@@ -88,7 +88,6 @@ class BKGGeocoderPlugin:
         self.canvas = self.iface.mapCanvas()
 
         self.field_mapping = {}
-        self.results_cache = ResultCache()
 
         self.pluginIsActive = False
         self.mainwidget = None

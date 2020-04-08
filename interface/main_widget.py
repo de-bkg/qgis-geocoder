@@ -38,7 +38,7 @@ from interface.dialogs import (ProgressDialog, ReverseGeocodingDialog,
                                FeaturePickerDialog)
 from interface.utils import clone_layer, TerrestrisBackgroundLayer
 from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding, FieldMap
+from geocoder.geocoder import Geocoding, FieldMap, ResultCache
 from config import Config
 
 config = Config()
@@ -102,6 +102,7 @@ class MainWidget(QtWidgets.QDockWidget):
         )
         self.setupUi()
         self.output_layer = None
+        self.result_cache = ResultCache()
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
@@ -116,6 +117,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.featurepicker_button.clicked.connect(self.feature_picker)
         self.request_start_button.clicked.connect(self.geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
+        self.request_stop_button.setVisible(False)
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         self.layer_combo.layerChanged.connect(self.register_layer)
 
@@ -266,7 +268,7 @@ class MainWidget(QtWidgets.QDockWidget):
             groupname='Hintergrundkarten')
         backgroundGrey.draw()
 
-        rs = config.rs if self.use_rs_check.checked() else None
+        rs = config.rs if self.use_rs_check.isChecked() else None
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
                                    logic_link=config.logic_link, rs=rs)
         features = layer.selectedFeatures() if config.selected_features_only \
@@ -274,15 +276,15 @@ class MainWidget(QtWidgets.QDockWidget):
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
-        self.geocoding.message.connect(self.log)
-        self.geocoding.progress.connect(self.progress_bar.setValue)
-        self.geocoding.feature_done.connect(self.set_result)
-        self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
-        self.geocoding.finished.connect(self.done)
-
         cloned = clone_layer(layer, name=f'{layer.name()}_ergebnisse',
                              srs=config.projection, features=features)
         self.output_layer = cloned
+
+        self.geocoding.message.connect(self.log)
+        self.geocoding.progress.connect(self.progress_bar.setValue)
+        self.geocoding.feature_done.connect(self.store_results)
+        self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
+        self.geocoding.finished.connect(self.done)
 
         self.tab_widget.setCurrentIndex(2)
         active_count = self.field_map.count_active()
@@ -300,20 +302,30 @@ class MainWidget(QtWidgets.QDockWidget):
         cloned.dataProvider().addAttributes(add_fields)
         cloned.updateFields()
 
-        self.request_start_button.setEnabled(False)
-        self.request_stop_button.setEnabled(True)
-        self.log(f'Starte Geokodierung <b>{layer.name()}</b>')
+        self.request_start_button.setVisible(False)
+        self.request_stop_button.setVisible(True)
+        self.log(f'<br>Starte Geokodierung <b>{layer.name()}</b>')
         self.geocoding.start()
 
     def done(self, success: bool):
         if success:
-            self.log('Geokodierung erfolgreich abgeschlossen <br>')
+            self.log('Geokodierung erfolgreich abgeschlossen')
             extent = self.output_layer.extent()
             self.canvas.setExtent(extent)
-        self.request_start_button.setEnabled(True)
-        self.request_stop_button.setEnabled(False)
+            self.canvas.refresh()
+        self.request_start_button.setVisible(True)
+        self.request_stop_button.setVisible(False)
 
-    def set_result(self, feature, results, focus=False):
+    def store_results(self, feature, results):
+        self.result_cache.add(self.output_layer, feature.id(), results)
+        if results:
+            results.sort(key=lambda x: x['properties']['score'])
+            best = results[0]
+        else:
+            best = None
+        self.set_result(feature, best)
+
+    def set_result(self, feature, result, focus=False):
         '''
         bkg specific
         set result to feature of given layer
@@ -324,12 +336,10 @@ class MainWidget(QtWidgets.QDockWidget):
             layer.startEditing()
         fidx = layer.fields().indexFromName
         feat_id = feature.id()
-        if results:
-            results.sort(key=lambda x: x['properties']['score'])
-            best = results[0]
-            coords = best['geometry']['coordinates']
+        if result:
+            coords = result['geometry']['coordinates']
             geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
-            properties = best['properties']
+            properties = result['properties']
             layer.changeGeometry(feat_id, geom)
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_typ'), properties['typ'])
