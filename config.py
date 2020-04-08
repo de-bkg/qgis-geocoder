@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
-import os, sys, copy
+import os
 from os.path import expanduser
 
 UI_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'ui')
+STYLE_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'styles')
 
 DEFAULT_FILE = os.path.join(expanduser("~"), "bkg_geocoder.cfg")
 DEFAULT_URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'

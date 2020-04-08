@@ -37,10 +37,9 @@ from interface.map_tools import FeaturePicker
 from interface.utils import clone_layer, TerrestrisBackgroundLayer
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap
-from config import Config
+from config import Config, STYLE_PATH, UI_PATH
 
 config = Config()
-UI_PATH = os.path.join(os.path.dirname(__file__), 'ui')
 
 BKG_FIELDS = [
     ('bkg_feature_id', QVariant.Int, 'int4'),
@@ -175,10 +174,6 @@ class MainWidget(QtWidgets.QDockWidget):
         dialog = ReverseGeocodingDialog(parent=self)
         dialog.show()
 
-    def geocode(self):
-        dialog = ProgressDialog(parent=self)
-        dialog.show()
-
     def show_attribute_table(self):
         if not self.output_layer:
             return
@@ -286,6 +281,8 @@ class MainWidget(QtWidgets.QDockWidget):
         cloned = clone_layer(layer, name=f'{layer.name()}_ergebnisse',
                              srs=config.projection, features=features)
         self.output_layer = cloned
+        style_file = os.path.join(STYLE_PATH, 'bkggeocoder_treffer.qml')
+        self.output_layer.loadNamedStyle(style_file)
 
         self.geocoding.message.connect(self.log)
         self.geocoding.progress.connect(self.progress_bar.setValue)
