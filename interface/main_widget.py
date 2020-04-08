@@ -269,8 +269,10 @@ class MainWidget(QtWidgets.QDockWidget):
         rs = config.rs if self.use_rs_check.checked() else None
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
                                    logic_link=config.logic_link, rs=rs)
+        features = layer.selectedFeatures() if config.selected_features_only \
+            else layer.getFeatures()
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
-                                   features=layer.getFeatures(), parent=self)
+                                   features=features, parent=self)
 
         self.geocoding.message.connect(self.log)
         self.geocoding.progress.connect(self.progress_bar.setValue)
@@ -279,7 +281,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.geocoding.finished.connect(self.done)
 
         cloned = clone_layer(layer, name=f'{layer.name()}_ergebnisse',
-                             srs=config.projection, features=None)
+                             srs=config.projection, features=features)
         self.output_layer = cloned
 
         self.tab_widget.setCurrentIndex(2)
