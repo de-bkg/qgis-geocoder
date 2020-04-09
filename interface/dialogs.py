@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractScrollArea
+from qgis.PyQt.QtWidgets import (QDialog, QTableWidgetItem, QAbstractScrollArea,
+                                 QLabel)
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt import uic
 from qgis.core import QgsPointXY, QgsGeometry
@@ -51,23 +52,31 @@ class ProgressDialog(Dialog):
 
 
 class InspectResultsDialog(Dialog):
-    def __init__(self, layer, feature, results, canvas, parent=None):
+    def __init__(self, layer, feature, results, canvas, review_fields=[],
+                 parent=None):
         super().__init__('featurepicker.ui', modal=False, parent=parent)
         self.canvas = canvas
         self.results = results
         self.feature = feature
         self.layer = layer
-
-        self.populate_table()
-        self.accept_button.clicked.connect(self.accept)
-        self.discard_button.clicked.connect(self.reject)
-
         self.init_geom = feature.geometry()
+
+        self.populate_review(review_fields)
+        self.populate_table()
 
         self.results_table.selectionModel().currentChanged.connect(
             lambda row, col: self.result_changed(row.data(Qt.UserRole)))
         i = self.feature.attribute('bkg_i')
         self.results_table.selectRow(i)
+
+        self.accept_button.clicked.connect(self.accept)
+        self.discard_button.clicked.connect(self.reject)
+
+    def populate_review(self, review_fields):
+        for i, field in enumerate(review_fields):
+            self.feature_grid.addWidget(QLabel(field), i, 0)
+            value = self.feature.attribute(field)
+            self.feature_grid.addWidget(QLabel(value), i, 1)
 
     def populate_table(self):
         columns = ['text', 'score']

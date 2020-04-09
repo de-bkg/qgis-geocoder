@@ -171,8 +171,11 @@ class MainWidget(QtWidgets.QDockWidget):
         # close dialog if there is already one opened
         if self.inspect_dialog:
             self.inspect_dialog.close()
+        review_fields = [f for f in self.field_map.fields()
+                         if self.field_map.active(f)]
         self.inspect_dialog = InspectResultsDialog(
-            self.output_layer, feature, results, self.canvas, parent=self)
+            self.output_layer, feature, results, self.canvas,
+            review_fields=review_fields, parent=self)
         accepted = self.inspect_dialog.show()
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
