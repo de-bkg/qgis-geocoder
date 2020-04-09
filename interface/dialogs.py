@@ -66,6 +66,8 @@ class InspectResultsDialog(Dialog):
 
         self.results_table.selectionModel().currentChanged.connect(
             lambda row, col: self.result_changed(row.data(Qt.UserRole)))
+        i = self.feature.attribute('bkg_i')
+        self.results_table.selectRow(i)
 
     def populate_table(self):
         columns = ['text', 'score']

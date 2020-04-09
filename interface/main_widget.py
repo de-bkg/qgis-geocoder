@@ -175,7 +175,8 @@ class MainWidget(QtWidgets.QDockWidget):
             self.output_layer, feature, results, self.canvas, parent=self)
         accepted = self.inspect_dialog.show()
         if accepted:
-            self.set_result(feature, self.inspect_dialog.result)
+            self.set_result(feature, self.inspect_dialog.result,
+                            i=self.inspect_dialog.i)
         self.output_layer.removeSelection()
         self.inspect_dialog = None
 
@@ -369,7 +370,8 @@ class MainWidget(QtWidgets.QDockWidget):
                 feat_id, fidx('bkg_treffer'), properties['treffer'])
             if n_results:
                 layer.changeAttributeValue(
-                    feat_id, fidx('bkg_n_results'), i)
+                    feat_id, fidx('bkg_n_results'), n_results)
+            layer.changeAttributeValue(feat_id, fidx('bkg_i'), i)
         else:
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_typ'), '')
