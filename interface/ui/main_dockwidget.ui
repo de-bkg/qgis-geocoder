@@ -170,6 +170,36 @@ padding: 2px;
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Encoding: </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="encoding_combo"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="Line" name="line_4">
           <property name="frameShadow">
            <enum>QFrame::Sunken</enum>
@@ -249,7 +279,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>391</width>
-                <height>316</height>
+                <height>290</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">

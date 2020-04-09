@@ -28,7 +28,8 @@ from qgis.PyQt import uic, QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
-                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel)
+                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
+                       QgsVectorDataProvider)
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QMessageBox
 
 from interface.dialogs import ReverseGeocodingDialog, InspectResultsDialog
@@ -117,6 +118,12 @@ class MainWidget(QtWidgets.QDockWidget):
         self.request_stop_button.setVisible(False)
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         self.layer_combo.layerChanged.connect(self.register_layer)
+
+        for encoding in QgsVectorDataProvider.availableEncodings():
+            self.encoding_combo.addItem(encoding)
+        self.encoding_combo.currentTextChanged.connect(self.set_encoding)
+
+        self.register_layer(self.layer_combo.currentLayer())
 
         self.rs_combo.addItem('Eingabehilfe Bundesländer')
         self.rs_combo.model().item(0).setEnabled(False)
@@ -219,15 +226,21 @@ class MainWidget(QtWidgets.QDockWidget):
         scrollbar = self.log_edit.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
-    def register_layer(self, layer):
+    def register_layer(self, layer, force_mapping=False):
         '''
         add field checks depending on given layer to UI and preset
         layer related UI elements
         '''
-        bkg_f = [f[0] for f in BKG_FIELDS]
         if not layer:
             return
+
+        encoding = layer.dataProvider().encoding()
+        self.encoding_combo.blockSignals(True)
+        self.encoding_combo.setCurrentText(encoding)
+        self.encoding_combo.blockSignals(False)
+
         self.result_cache = {}
+        bkg_f = [f[0] for f in BKG_FIELDS]
         self.field_map = FieldMap(layer, ignore=bkg_f,
                                   keywords=BKGGeocoder.keywords)
         # remove old widgets
@@ -273,6 +286,13 @@ class MainWidget(QtWidgets.QDockWidget):
         #n_selected = layer.selectedFeatureCount()
         #self.n_selected_label.setText(
             #'({} Feature(s) selektiert)'.format(n_selected))
+
+    def set_encoding(self, encoding):
+        layer = self.layer_combo.currentLayer()
+        layer.dataProvider().setEncoding(encoding)
+        layer.updateFields()
+        # repopulate fields
+        self.register_layer(layer, force_mapping=True)
 
     def geocode(self):
         layer = self.layer_combo.currentLayer()
