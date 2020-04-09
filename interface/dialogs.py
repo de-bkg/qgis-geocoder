@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractScrollArea
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt import uic
+from qgis.core import QgsPointXY, QgsGeometry
 import os
 
 from config import UI_PATH
@@ -57,6 +59,13 @@ class InspectResultsDialog(Dialog):
         self.layer = layer
 
         self.populate_table()
+        self.accept_button.clicked.connect(self.accept)
+        self.discard_button.clicked.connect(self.reject)
+
+        self.init_geom = feature.geometry()
+
+        self.results_table.selectionModel().currentChanged.connect(
+            lambda row, col: self.result_changed(row.data(Qt.UserRole)))
 
     def populate_table(self):
         columns = ['text', 'score']
@@ -68,58 +77,30 @@ class InspectResultsDialog(Dialog):
         for i, result in enumerate(self.results):
             properties = result['properties']
             for j, column in enumerate(columns):
-                self.results_table.setItem(
-                    i, j, QTableWidgetItem(str(properties[column])))
+                item = QTableWidgetItem(str(properties[column]))
+                item.setData(Qt.UserRole, i)
+                self.results_table.setItem(i, j, item)
+
         self.results_table.setSizeAdjustPolicy(
             QAbstractScrollArea.AdjustToContents)
         self.results_table.resizeColumnsToContents()
 
+    def result_changed(self, i):
+        self.result = self.results[i]
+        self.i = i
+        coords = self.result['geometry']['coordinates']
+        geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
+        self.layer.changeGeometry(self.feature.id(), geom)
+        self.canvas.refresh()
+        self.layer.removeSelection()
+        self.layer.select(self.feature.id())
+        self.canvas.zoomToSelected(self.layer)
+
+    def closeEvent(self, e):
+        # reset the geometry
+        self.layer.changeGeometry(self.feature.id(), self.init_geom)
+
     def showEvent(self, e):
+        # exec() resets the modality
+        self.setModal(False)
         self.adjustSize()
-
-    #def clear(self):
-        #self.dlg.feature_edit.setText('')
-        #self.dlg.result_list.clear()
-        #self.dlg.geocode_button.setEnabled(False)
-
-    #def select(self):
-        #self.canvas.setMapTool(self.featurePicker)
-        #cursor = QCursor(Qt.CrossCursor)
-        #self.canvas.setCursor(cursor)
-
-    #def result_changed(self, item):
-        #idx = self.dlg.result_list.currentRow()
-        #self.active_feature.setAttribute('bkg_i', idx)
-        #result = self.active_results[idx]
-        #self.result_set.emit(self.active_layer, self.active_feature, result)
-
-    #def featurePicked(self, layer, feature):
-        #self.dlg.geocode_button.setEnabled(True)
-        #self.active_feature = feature
-        #self.active_layer = layer
-        #layer.removeSelection()
-        #layer.select(feature.id())
-        #attr = []
-        #attributes = feature.attributes()
-        #res_idx = 0
-        #for field in layer.fields():
-            #field_name = field.name()
-            #if not field_name.startswith('bkg_'):
-                #idx = feature.fieldNameIndex(field_name)
-                #value = attributes[idx]
-                #attr.append(value)
-            #if field_name == 'bkg_i':
-                #idx = feature.fieldNameIndex(field_name)
-                #res_idx = attributes[idx]
-        #feat_repr = '({l}) Feature {id} - {a}'.format(
-            #id=feature.id(), a=', '.join(map(str, attr)), l=layer.name())
-        #self.dlg.feature_edit.setText(feat_repr)
-        #self.dlg.feature_edit.setToolTip(feat_repr)
-        #self.dlg.result_list.clear()
-        #results = self.results_cache.get(layer, feature.id())
-        #if results:
-            #self.active_results = results
-            #for result in results:
-                #self.dlg.result_list.addItem(str(result))
-            #self.dlg.result_list.setCurrentRow(res_idx)
-

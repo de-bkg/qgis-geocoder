@@ -31,10 +31,10 @@ from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry, QgsMapLayerProxyModel)
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QMessageBox
 
-from interface.dialogs import (ProgressDialog, ReverseGeocodingDialog,
-                               InspectResultsDialog)
+from interface.dialogs import ReverseGeocodingDialog, InspectResultsDialog
 from interface.map_tools import FeaturePicker
-from interface.utils import clone_layer, TerrestrisBackgroundLayer
+from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
+                             OSMBackgroundLayer)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap
 from config import Config, STYLE_PATH, UI_PATH
@@ -100,6 +100,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.setupUi()
         self.output_layer = None
         self.result_cache = {}
+        self.inspect_dialog = None
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
@@ -165,10 +166,18 @@ class MainWidget(QtWidgets.QDockWidget):
         # ToDo: warning dialog or pass it to results diag and show warning there
         if not results:
             return
+        self.output_layer.removeSelection()
         self.output_layer.select(feature.id())
-        dialog = InspectResultsDialog(self.output_layer, feature, results,
-                                      self.canvas, parent=self)
-        dialog.show()
+        # close dialog if there is already one opened
+        if self.inspect_dialog:
+            self.inspect_dialog.close()
+        self.inspect_dialog = InspectResultsDialog(
+            self.output_layer, feature, results, self.canvas, parent=self)
+        accepted = self.inspect_dialog.show()
+        if accepted:
+            self.set_result(feature, self.inspect_dialog.result)
+        self.output_layer.removeSelection()
+        self.inspect_dialog = None
 
     def reverse_geocode(self):
         dialog = ReverseGeocodingDialog(parent=self)
@@ -266,9 +275,12 @@ class MainWidget(QtWidgets.QDockWidget):
         if not layer:
             return
 
-        backgroundGrey = TerrestrisBackgroundLayer(
-            groupname='Hintergrundkarten')
-        backgroundGrey.draw()
+        bg_grey = TerrestrisBackgroundLayer(groupname='Hintergrundkarten',
+                                            srs=config.projection)
+        bg_grey.draw(checked=False)
+        bg_osm = OSMBackgroundLayer(groupname='Hintergrundkarten',
+                                    srs=config.projection)
+        bg_osm.draw(checked=True)
 
         rs = config.rs if self.use_rs_check.isChecked() else None
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
@@ -323,15 +335,15 @@ class MainWidget(QtWidgets.QDockWidget):
         self.request_stop_button.setVisible(False)
 
     def store_results(self, feature, results):
-        self.result_cache[feature.id()] = results
         if results:
             results.sort(key=lambda x: x['properties']['score'])
             best = results[0]
         else:
             best = None
-        self.set_result(feature, best)
+        self.result_cache[feature.id()] = results
+        self.set_result(feature, best, i=0, n_results=len(results))
 
-    def set_result(self, feature, result, focus=False):
+    def set_result(self, feature, result, i=0, n_results=None):
         '''
         bkg specific
         set result to feature of given layer
@@ -355,14 +367,11 @@ class MainWidget(QtWidgets.QDockWidget):
                 feat_id, fidx('bkg_score'), properties['score'])
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_treffer'), properties['treffer'])
+            if n_results:
+                layer.changeAttributeValue(
+                    feat_id, fidx('bkg_n_results'), i)
         else:
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_typ'), '')
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_score'), 0)
-        #layer.updateFeature(feature)
-        if focus:
-            layer.removeSelection()
-            layer.select(feat_id)
-            self.canvas.zoomToSelected(layer)
-

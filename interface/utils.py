@@ -181,3 +181,15 @@ class TerrestrisBackgroundLayer(TileLayer):
 
     def draw(self, checked=True):
         super().draw('Terrestris', checked=checked, expanded=False)
+
+
+class OSMBackgroundLayer(TileLayer):
+
+    def __init__(self, groupname='', prepend=False, srs='EPSG:4326'):
+
+        url = ('type=xyz&url=https://a.tile.openstreetmap.org//{z}/{x}/{y}.png'
+               f'&crs={srs}')
+        super().__init__(url, groupname=groupname, prepend=prepend)
+
+    def draw(self, checked=True):
+        super().draw('OpenStreetMap', checked=checked)
