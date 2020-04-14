@@ -279,7 +279,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>350</width>
-                <height>290</height>
+                <height>298</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -921,7 +921,7 @@ padding: 2px;
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QPushButton" name="featurepicker_button">
+           <widget class="QPushButton" name="inspect_picker_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -953,7 +953,7 @@ padding: 2px;
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QPushButton" name="reversegeocoding_button">
+           <widget class="QPushButton" name="reverse_picker_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>

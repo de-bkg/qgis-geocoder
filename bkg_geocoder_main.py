@@ -206,11 +206,8 @@ class BKGGeocoderPlugin:
                 action)
             self.iface.removeToolBarIcon(action)
         self.iface.removeCustomActionForLayerType(self.legendAction)
-        #self.iface.removeDockWidget(self.picker_dock)
         self.iface.actionPan().trigger()
-        #del self.picker_dock
         # remove the toolbar
-                # remove the toolbar
         if self.toolbar:
             del self.toolbar
         # remove widget

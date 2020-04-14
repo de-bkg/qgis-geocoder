@@ -32,12 +32,12 @@ from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsVectorDataProvider)
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QMessageBox
 
-from interface.dialogs import ReverseGeocodingDialog, InspectResultsDialog
+from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
 from interface.map_tools import FeaturePicker
 from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
                              OSMBackgroundLayer)
 from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding, FieldMap
+from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH
 
 config = Config()
@@ -102,6 +102,7 @@ class MainWidget(QtWidgets.QDockWidget):
         self.output_layer = None
         self.result_cache = {}
         self.inspect_dialog = None
+        self.reverse_dialog = None
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
@@ -112,7 +113,6 @@ class MainWidget(QtWidgets.QDockWidget):
         self.import_csv_button.clicked.connect(self.import_csv_action.trigger)
         self.export_csv_button.clicked.connect(self.export_csv)
         self.attribute_table_button.clicked.connect(self.show_attribute_table)
-        self.reversegeocoding_button.clicked.connect(self.reverse_geocode)
         self.request_start_button.clicked.connect(self.geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
@@ -134,9 +134,12 @@ class MainWidget(QtWidgets.QDockWidget):
         self.rs_edit.editingFinished.connect(
             lambda: self.rs_combo.setCurrentIndex(0))
 
-        self.feature_picker = FeaturePicker(
-            self.featurepicker_button, canvas=self.canvas)
-        self.feature_picker.feature_picked.connect(self.inspect_results)
+        self.inspect_picker = FeaturePicker(
+            self.inspect_picker_button, canvas=self.canvas)
+        self.inspect_picker.feature_picked.connect(self.inspect_results)
+        self.reverse_picker = FeaturePicker(
+            self.reverse_picker_button, canvas=self.canvas)
+        self.reverse_picker.feature_picked.connect(self.reverse_geocode)
         self.setup_config()
 
     def setup_config(self):
@@ -190,9 +193,38 @@ class MainWidget(QtWidgets.QDockWidget):
         self.output_layer.removeSelection()
         self.inspect_dialog = None
 
-    def reverse_geocode(self):
-        dialog = ReverseGeocodingDialog(parent=self)
-        dialog.show()
+    def reverse_geocode(self, feature):
+        self.output_layer.removeSelection()
+        self.output_layer.select(feature.id())
+        # close dialog if there is already one opened
+        if self.reverse_dialog:
+            self.reverse_dialog.close()
+
+        rs = config.rs if self.use_rs_check.isChecked() else None
+        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
+                                   logic_link=config.logic_link, rs=rs)
+        rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
+        review_fields = [f for f in self.field_map.fields()
+                         if self.field_map.active(f)]
+
+        #self.geocoding.message.connect(self.log)
+        #self.geocoding.progress.connect(self.progress_bar.setValue)
+        #self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
+
+        def done(feature, results):
+            self.reverse_dialog = ReverseResultsDialog(
+                self.output_layer, feature, results, self.canvas,
+                review_fields=review_fields, parent=self)
+            accepted = self.reverse_dialog.show()
+            #if accepted:
+                #self.set_result(feature, self.inspect_dialog.result,
+                                #i=self.inspect_dialog.i, )
+            self.output_layer.removeSelection()
+            self.reverse_dialog = None
+
+        rev_geocoding.feature_done.connect(done)
+        #self.geocoding.finished.connect(done)
+        rev_geocoding.start()
 
     def show_attribute_table(self):
         if not self.output_layer:
@@ -326,7 +358,8 @@ class MainWidget(QtWidgets.QDockWidget):
         self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
         self.geocoding.finished.connect(self.done)
 
-        self.feature_picker.set_layer(self.output_layer)
+        self.inspect_picker.set_layer(self.output_layer)
+        self.reverse_picker.set_layer(self.output_layer)
 
         self.tab_widget.setCurrentIndex(2)
         active_count = self.field_map.count_active()

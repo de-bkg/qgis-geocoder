@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import (QDialog, QTableWidgetItem, QAbstractScrollArea,
-                                 QLabel)
+                                 QLabel, QRadioButton, QHBoxLayout)
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt import uic
 from qgis.core import QgsPointXY, QgsGeometry
@@ -38,11 +38,6 @@ class SaveCSVDialog(Dialog):
 class OpenCSVDialog(Dialog):
     def __init__(self, parent=None):
         super().__init__('open_csv.ui', modal=True, parent=parent)
-
-
-class ReverseGeocodingDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('reverse_geocoding.ui', modal=False, parent=parent)
 
 
 class ProgressDialog(Dialog):
@@ -91,6 +86,60 @@ class InspectResultsDialog(Dialog):
                 item = QTableWidgetItem(str(properties[column]))
                 item.setData(Qt.UserRole, i)
                 self.results_table.setItem(i, j, item)
+
+        self.results_table.setSizeAdjustPolicy(
+            QAbstractScrollArea.AdjustToContents)
+        self.results_table.resizeColumnsToContents()
+
+    def result_changed(self, i):
+        self.result = self.results[i]
+        self.i = i
+        coords = self.result['geometry']['coordinates']
+        geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
+        self.layer.changeGeometry(self.feature.id(), geom)
+        self.canvas.refresh()
+        self.layer.removeSelection()
+        self.layer.select(self.feature.id())
+        self.canvas.zoomToSelected(self.layer)
+
+    def closeEvent(self, e):
+        # reset the geometry
+        self.layer.changeGeometry(self.feature.id(), self.init_geom)
+
+    def showEvent(self, e):
+        # exec() resets the modality
+        self.setModal(False)
+        self.adjustSize()
+
+
+class ReverseResultsDialog(Dialog):
+    def __init__(self, layer, feature, results, canvas, review_fields=[],
+                 parent=None):
+        super().__init__('reverse_geocoding.ui', modal=False, parent=parent)
+        self.canvas = canvas
+        self.results = results
+        self.feature = feature
+        self.layer = layer
+        self.init_geom = feature.geometry()
+
+        self.populate_review(review_fields)
+        self.populate_frame()
+
+    def populate_review(self, review_fields):
+        for i, field in enumerate(review_fields):
+            self.feature_grid.addWidget(QLabel(field), i, 0)
+            value = self.feature.attribute(field)
+            self.feature_grid.addWidget(QLabel(value), i, 1)
+
+    def populate_frame(self):
+        layout = self.results_frame.layout()
+
+        for i, result in enumerate(self.results):
+            properties = result['properties']
+            radio = QRadioButton(properties['text'])
+            hlayout = QHBoxLayout()
+            hlayout.addWidget(radio)
+            layout.addLayout(hlayout)
 
         self.results_table.setSizeAdjustPolicy(
             QAbstractScrollArea.AdjustToContents)
