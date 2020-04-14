@@ -66,7 +66,7 @@ class BKGGeocoder(Geocoder):
         self.rs = rs
         super().__init__(url=url, srs=srs)
 
-    def _build_params(self, args, kwargs):
+    def _build_params(self, *args, **kwargs):
         suffix = '~' if self.fuzzy else ''
         logic = ' {} '.format(self.logic_link)
         query = logic.join(
@@ -90,11 +90,22 @@ class BKGGeocoder(Geocoder):
         self.params = {}
         if ('geometry') in kwargs:
             self.params['geometry'] = kwargs.pop('geometry')
-        query = self._build_params(args, kwargs)
+        query = self._build_params(*args, **kwargs)
         self.params['query'] = query
         self.params['srsname'] = self.srs
         self.r = requests.get(self.url, params=self.params)
         # ToDo raise specific errors
+        if self.r.status_code != 200:
+            raise Exception(self.r.text)
+        return self.r.json()['features']
+
+    def reverse(self, x, y):
+        params = {
+            'lat': y,
+            'lon': x,
+            'srsname': self.srs
+        }
+        self.r = requests.get(self.url, params=params)
         if self.r.status_code != 200:
             raise Exception(self.r.text)
         return self.r.json()['features']

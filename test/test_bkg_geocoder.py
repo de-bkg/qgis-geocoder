@@ -15,13 +15,13 @@ __copyright__ = 'Copyright 2018, GGR'
 import unittest
 import sys
 import os
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsPoint
 from unittest.mock import patch
 import json
 
 sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
 from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding, FieldMap
+from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from utilities import get_qgis_app
 
 QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
@@ -39,8 +39,13 @@ class MockedResponse:
     def json(self):
         return {'features': self.responses[self.__query]}
 
-def mocked_get(*args, **kwargs):
+def mocked_geocode_get(*args, **kwargs):
     return MockedResponse(kwargs['params']['query'])
+
+def mocked_reverse_get(*args, **kwargs):
+    params = kwargs['params']
+    pnt = QgsPoint(params['lon'], params['lat'])
+    return MockedResponse(pnt.asWkt())
 
 
 class BKGGeocodingTest(unittest.TestCase):
@@ -54,7 +59,7 @@ class BKGGeocodingTest(unittest.TestCase):
         """Runs after each test."""
         pass
 
-    @patch('requests.get', side_effect=mocked_get)
+    @patch('requests.get', side_effect=mocked_geocode_get)
     def test_geocoding(self, mock_get):
         fn = 'A2-T1_adressen_mit-header_utf8.csv'
         fp = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -68,14 +73,30 @@ class BKGGeocodingTest(unittest.TestCase):
         if os.name != 'nt':
             prefix += '/'
         uri = f'{prefix}{fp}?delimiter=";"'
-        vlayer = QgsVectorLayer(uri, "test", "delimitedtext")
-        assert vlayer.isValid(), "Input layer is not valid"
-        layer_map = FieldMap(vlayer)
-        layer_map.set_field('Straße', keyword='strasse', active=True)
-        layer_map.set_field('Hausnummer', keyword='haus', active=True)
-        layer_map.set_field('Postleitzahl', keyword='plz', active=True)
-        layer_map.set_field('Ort', keyword='ort', active=True)
-        geocoding = Geocoding(self.geocoder, layer_map)
+        layer = QgsVectorLayer(uri, "test", "delimitedtext")
+        assert layer.isValid(), "Input layer is not valid"
+        field_map = FieldMap(layer)
+        field_map.set_field('Straße', keyword='strasse', active=True)
+        field_map.set_field('Hausnummer', keyword='haus', active=True)
+        field_map.set_field('Postleitzahl', keyword='plz', active=True)
+        field_map.set_field('Ort', keyword='ort', active=True)
+        geocoding = Geocoding(self.geocoder, field_map)
+        # not threaded
+        geocoding.work()
+
+    @patch('requests.get', side_effect=mocked_reverse_get)
+    def test_reverse(self, mock_get):
+        fn = 'mit_koordinaten.csv'
+        fp = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          'test_data', fn)
+        f_mock = f'{fp}.results.json'
+        with open(f_mock, 'r') as response_file:
+            res = json.load(response_file)
+            MockedResponse.responses = res
+
+        uri = f'file:/{fp}?crs=epsg:25832&xField=x&yField=y&delimiter=";"'
+        layer = QgsVectorLayer(uri, "test", "delimitedtext")
+        geocoding = ReverseGeocoding(self.geocoder, layer.getFeatures())
         # not threaded
         geocoding.work()
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
+    <width>394</width>
     <height>501</height>
    </rect>
   </property>
@@ -278,7 +278,7 @@ padding: 2px;
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>391</width>
+                <width>350</width>
                 <height>290</height>
                </rect>
               </property>
@@ -517,7 +517,7 @@ padding: 2px;
                 <bool>false</bool>
                </property>
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>

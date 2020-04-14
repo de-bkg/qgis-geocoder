@@ -158,13 +158,8 @@ class Geocoding(Worker):
                 success = False
                 self.error.emit('Anfrage abgebrochen')
                 break
-            args, kwargs = self.field_map.to_args(feature)
             try:
-                res = self.geocoder.query(*args, **kwargs)
-                self.feature_done.emit(feature, res)
-                message = (f'Feature {feature.id()} -> '
-                           f'<b>{len(res)} </b> Ergebnis(se)')
-                self.message.emit(message)
+                self.process(feature)
             except Exception as e:
                 success = False
                 self.error.emit(str(e))
@@ -174,4 +169,27 @@ class Geocoding(Worker):
 
         return success
 
+    def process(self, feature):
+        args, kwargs = self.field_map.to_args(feature)
+        res = self.geocoder.query(*args, **kwargs)
+        self.feature_done.emit(feature, res)
+        message = (f'Feature {feature.id()} -> '
+                   f'<b>{len(res)} </b> Ergebnis(se)')
+        self.message.emit(message)
 
+
+class ReverseGeocoding(Geocoding):
+
+    def __init__(self, geocoder: Geocoder,
+                 features: Union[QgsFeatureIterator, list], parent=None):
+        Worker.__init__(self, parent=parent)
+        self.geocoder = geocoder
+        self.features = features
+
+    def process(self, feature):
+        pnt = feature.geometry().asPoint()
+        res = self.geocoder.reverse(pnt.x(), pnt.y())
+        self.feature_done.emit(feature, res)
+        message = (f'Feature {feature.id()} -> '
+                   f'<b>{len(res)} </b> Ergebnis(se)')
+        self.message.emit(message)
