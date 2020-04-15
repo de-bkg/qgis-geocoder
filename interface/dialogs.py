@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import (QDialog, QTableWidgetItem, QAbstractScrollArea,
                                  QLabel, QRadioButton, QHBoxLayout)
-from qgis.PyQt.QtCore import Qt
+                                 #QGraphicsPixmapItem)
+#from qgis.PyQt.QtGui import QPixmap
+#from qgis.PyQt.QtCore import Qt, QPointF
+from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt import uic
-from qgis.core import QgsPointXY, QgsGeometry
+from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
+                       QgsField, QgsProject, QgsCoordinateReferenceSystem)
 import os
 
-from config import UI_PATH
+from config import UI_PATH, ICON_PATH, Config
+
+config = Config()
 
 
 class Dialog(QDialog):
@@ -113,6 +119,8 @@ class InspectResultsDialog(Dialog):
 
 
 class ReverseResultsDialog(Dialog):
+    marker_img = 'marker_{}.png'
+
     def __init__(self, layer, feature, results, canvas, review_fields=[],
                  parent=None):
         super().__init__('reverse_geocoding.ui', modal=False, parent=parent)
@@ -124,6 +132,32 @@ class ReverseResultsDialog(Dialog):
 
         self.populate_review(review_fields)
         self.populate_frame()
+        self.add_preview_layer()
+
+    def add_preview_layer(self):
+        self.preview_layer = QgsVectorLayer(
+            "Point", "reverse_preview", "memory")
+
+        crs = QgsCoordinateReferenceSystem(config.projection)
+        self.preview_layer.setCrs(crs)
+        self.preview_layer.startEditing()
+
+        provider = self.preview_layer.dataProvider()
+        provider.addAttributes([
+            QgsField('i',  QVariant.Int),
+            QgsField('text', QVariant.String)
+        ])
+
+        for i, result in enumerate(self.results):
+            feature = QgsFeature()
+            coords = result['geometry']['coordinates']
+            geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
+            feature.setGeometry(geom)
+            feature.setAttributes([i + 1, result['properties']['text'],])
+            provider.addFeature(feature)
+
+        self.preview_layer.commitChanges()
+        QgsProject.instance().addMapLayer(self.preview_layer)
 
     def populate_review(self, review_fields):
         for i, field in enumerate(review_fields):
@@ -140,6 +174,21 @@ class ReverseResultsDialog(Dialog):
             hlayout = QHBoxLayout()
             hlayout.addWidget(radio)
             layout.addLayout(hlayout)
+
+    #def draw_markers(self):
+        #scene = self.canvas.scene()
+        #self.markers = []
+        #for i, result in enumerate(self.results):
+            #img_path = os.path.join(ICON_PATH, self.marker_img.format(i))
+            #if not os.path.exists(img_path):
+                #continue
+            #image = QPixmap(img_path)
+            #marker = QGraphicsPixmapItem(image)
+            #self.markers.append(marker)
+            #point = QPointF(50, 50)
+            #point_item = marker.mapFromScene(point)
+            #marker.setPos(point_item)
+            #scene.addItem(marker)
 
     def result_changed(self, i):
         self.result = self.results[i]

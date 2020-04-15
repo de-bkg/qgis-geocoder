@@ -4,6 +4,7 @@ import os
 from os.path import expanduser
 
 UI_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'ui')
+ICON_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'ui', 'icons')
 STYLE_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'styles')
 
 DEFAULT_FILE = os.path.join(expanduser("~"), "bkg_geocoder.cfg")

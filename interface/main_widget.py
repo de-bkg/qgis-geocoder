@@ -174,7 +174,7 @@ class MainWidget(QtWidgets.QDockWidget):
     def inspect_results(self, feature):
         results = self.result_cache.get(feature.id(), None)
         # ToDo: warning dialog or pass it to results diag and show warning there
-        if not results:
+        if not results or not self.output_layer:
             return
         self.output_layer.removeSelection()
         self.output_layer.select(feature.id())
@@ -190,10 +190,16 @@ class MainWidget(QtWidgets.QDockWidget):
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
                             i=self.inspect_dialog.i)
-        self.output_layer.removeSelection()
+
+        try:
+            self.output_layer.removeSelection()
+        except:
+            pass
         self.inspect_dialog = None
 
     def reverse_geocode(self, feature):
+        if not self.output_layer:
+            return
         self.output_layer.removeSelection()
         self.output_layer.select(feature.id())
         # close dialog if there is already one opened
@@ -204,10 +210,8 @@ class MainWidget(QtWidgets.QDockWidget):
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
 
-        #self.geocoding.message.connect(self.log)
-        #self.geocoding.progress.connect(self.progress_bar.setValue)
-        #self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
-
+        rev_geocoding.error.connect(
+            lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
         def done(feature, results):
             if self.reverse_dialog:
@@ -220,7 +224,10 @@ class MainWidget(QtWidgets.QDockWidget):
             #if accepted:
                 #self.set_result(feature, self.inspect_dialog.result,
                                 #i=self.inspect_dialog.i, )
-            self.output_layer.removeSelection()
+            try:
+                self.output_layer.removeSelection()
+            except:
+                pass
             self.reverse_dialog = None
 
         rev_geocoding.feature_done.connect(done)
