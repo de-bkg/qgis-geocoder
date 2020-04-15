@@ -151,9 +151,8 @@ class Geocoding(Worker):
             self.error('no geocoder set')
             return False
         success = True
-        features = [f for f in self.features]
-        count = len(features)
-        for i, feature in enumerate(features):
+        count = len(self.features)
+        for i, feature in enumerate(self.features):
             if self.is_killed:
                 success = False
                 self.error.emit('Anfrage abgebrochen')
@@ -184,7 +183,7 @@ class ReverseGeocoding(Geocoding):
                  features: Union[QgsFeatureIterator, list], parent=None):
         Worker.__init__(self, parent=parent)
         self.geocoder = geocoder
-        self.features = features
+        self.features = [f for f in features]
 
     def process(self, feature):
         pnt = feature.geometry().asPoint()

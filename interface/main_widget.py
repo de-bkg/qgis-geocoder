@@ -197,9 +197,6 @@ class MainWidget(QtWidgets.QDockWidget):
         self.output_layer.removeSelection()
         self.output_layer.select(feature.id())
         # close dialog if there is already one opened
-        if self.reverse_dialog:
-            self.reverse_dialog.close()
-
         rs = config.rs if self.use_rs_check.isChecked() else None
         bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
                                    logic_link=config.logic_link, rs=rs)
@@ -211,7 +208,11 @@ class MainWidget(QtWidgets.QDockWidget):
         #self.geocoding.progress.connect(self.progress_bar.setValue)
         #self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
 
+
         def done(feature, results):
+            if self.reverse_dialog:
+                self.reverse_dialog.close()
+
             self.reverse_dialog = ReverseResultsDialog(
                 self.output_layer, feature, results, self.canvas,
                 review_fields=review_fields, parent=self)
@@ -223,8 +224,8 @@ class MainWidget(QtWidgets.QDockWidget):
             self.reverse_dialog = None
 
         rev_geocoding.feature_done.connect(done)
-        #self.geocoding.finished.connect(done)
-        rev_geocoding.start()
+        # ToDo: for some reason QGIS crashes while threading (with start())
+        rev_geocoding.work()
 
     def show_attribute_table(self):
         if not self.output_layer:

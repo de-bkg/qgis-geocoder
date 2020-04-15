@@ -141,10 +141,6 @@ class ReverseResultsDialog(Dialog):
             hlayout.addWidget(radio)
             layout.addLayout(hlayout)
 
-        self.results_table.setSizeAdjustPolicy(
-            QAbstractScrollArea.AdjustToContents)
-        self.results_table.resizeColumnsToContents()
-
     def result_changed(self, i):
         self.result = self.results[i]
         self.i = i
