@@ -3,7 +3,7 @@ from qgis.PyQt.QtWidgets import (QDialog, QTableWidgetItem, QAbstractScrollArea,
                                  QLabel, QRadioButton, QHBoxLayout)
                                  #QGraphicsPixmapItem)
 #from qgis.PyQt.QtGui import QPixmap
-#from qgis.PyQt.QtCore import Qt, QPointF
+from qgis.PyQt.QtCore import Qt# , QPointF
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
@@ -68,7 +68,8 @@ class InspectResultsDialog(Dialog):
         self.results_table.selectionModel().currentChanged.connect(
             lambda row, col: self.result_changed(row.data(Qt.UserRole)))
         i = self.feature.attribute('bkg_i')
-        self.results_table.selectRow(i)
+        if i >= 0:
+            self.results_table.selectRow(i)
 
         self.accept_button.clicked.connect(self.accept)
         self.discard_button.clicked.connect(self.reject)
@@ -108,9 +109,14 @@ class InspectResultsDialog(Dialog):
         self.layer.select(self.feature.id())
         self.canvas.zoomToSelected(self.layer)
 
-    def closeEvent(self, e):
+    def accept(self):
         # reset the geometry
         self.layer.changeGeometry(self.feature.id(), self.init_geom)
+        super().accept()
+
+    def reject(self):
+        self.layer.changeGeometry(self.feature.id(), self.init_geom)
+        super().reject()
 
     def showEvent(self, e):
         # exec() resets the modality
@@ -128,25 +134,31 @@ class ReverseResultsDialog(Dialog):
         self.results = results
         self.feature = feature
         self.layer = layer
-        self.init_geom = feature.geometry()
+        self.accept_button.clicked.connect(self.accept)
+        self.geom_only = False
+        def geom_only():
+            self.geom_only = True
+            self.accept()
+        self.geom_only_button.clicked.connect(geom_only)
+        self.discard_button.clicked.connect(self.reject)
 
+        self.add_results()
         self.populate_review(review_fields)
-        self.populate_frame()
-        self.add_preview_layer()
 
-    def add_preview_layer(self):
+    def add_results(self):
         self.preview_layer = QgsVectorLayer(
             "Point", "reverse_preview", "memory")
 
         crs = QgsCoordinateReferenceSystem(config.projection)
         self.preview_layer.setCrs(crs)
         self.preview_layer.startEditing()
-
         provider = self.preview_layer.dataProvider()
         provider.addAttributes([
             QgsField('i',  QVariant.Int),
             QgsField('text', QVariant.String)
         ])
+
+        layout = self.results_frame.layout()
 
         for i, result in enumerate(self.results):
             feature = QgsFeature()
@@ -156,7 +168,19 @@ class ReverseResultsDialog(Dialog):
             feature.setAttributes([i + 1, result['properties']['text'],])
             provider.addFeature(feature)
 
+            properties = result['properties']
+            radio = QRadioButton(properties['text'])
+            hlayout = QHBoxLayout()
+            hlayout.addWidget(radio)
+            layout.addLayout(hlayout)
+            radio.toggled.connect(
+                lambda c, i=i, f=feature:
+                self.toggle_result(self.results[i], f))
+
         self.preview_layer.commitChanges()
+        extent = self.preview_layer.extent()
+        self.canvas.setExtent(extent)
+        self.canvas.refresh()
         QgsProject.instance().addMapLayer(self.preview_layer)
 
     def populate_review(self, review_fields):
@@ -165,15 +189,11 @@ class ReverseResultsDialog(Dialog):
             value = self.feature.attribute(field)
             self.feature_grid.addWidget(QLabel(value), i, 1)
 
-    def populate_frame(self):
-        layout = self.results_frame.layout()
-
-        for i, result in enumerate(self.results):
-            properties = result['properties']
-            radio = QRadioButton(properties['text'])
-            hlayout = QHBoxLayout()
-            hlayout.addWidget(radio)
-            layout.addLayout(hlayout)
+    def toggle_result(self, result, feature):
+        self.preview_layer.removeSelection()
+        self.preview_layer.select(feature.id())
+        self.result = result
+        #self.canvas.zoomToSelected(self.preview_layer)
 
     #def draw_markers(self):
         #scene = self.canvas.scene()
@@ -201,9 +221,13 @@ class ReverseResultsDialog(Dialog):
         self.layer.select(self.feature.id())
         self.canvas.zoomToSelected(self.layer)
 
-    def closeEvent(self, e):
-        # reset the geometry
-        self.layer.changeGeometry(self.feature.id(), self.init_geom)
+    def accept(self):
+        QgsProject.instance().removeMapLayers([self.preview_layer.id()])
+        super().accept()
+
+    def reject(self):
+        QgsProject.instance().removeMapLayers([self.preview_layer.id()])
+        super().reject()
 
     def showEvent(self, e):
         # exec() resets the modality

@@ -67,7 +67,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="movetoaddress_button">
+      <widget class="QPushButton" name="accept_button">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -80,7 +80,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="onlymove_button">
+      <widget class="QPushButton" name="geom_only_button">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>

@@ -190,7 +190,8 @@ class MainWidget(QtWidgets.QDockWidget):
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
                             i=self.inspect_dialog.i)
-
+        # if you close QGIS with the dialog opened, the actual layer is
+        # is already removed at this point
         try:
             self.output_layer.removeSelection()
         except:
@@ -221,15 +222,14 @@ class MainWidget(QtWidgets.QDockWidget):
                 self.output_layer, feature, results, self.canvas,
                 review_fields=review_fields, parent=self)
             accepted = self.reverse_dialog.show()
-            #if accepted:
-                #self.set_result(feature, self.inspect_dialog.result,
-                                #i=self.inspect_dialog.i, )
+            if accepted:
+                self.set_result(feature, self.reverse_dialog.result, i=-1,
+                                geom_only=self.reverse_dialog.geom_only)
             try:
                 self.output_layer.removeSelection()
             except:
                 pass
             self.reverse_dialog = None
-
         rev_geocoding.feature_done.connect(done)
         # ToDo: for some reason QGIS crashes while threading (with start())
         rev_geocoding.work()
@@ -408,7 +408,8 @@ class MainWidget(QtWidgets.QDockWidget):
         self.result_cache[feature.id()] = results
         self.set_result(feature, best, i=0, n_results=len(results))
 
-    def set_result(self, feature, result, i=0, n_results=None):
+    def set_result(self, feature, result, i=0, n_results=None, geom_only=False,
+                   apply_adress=False):
         '''
         bkg specific
         set result to feature of given layer
@@ -424,17 +425,15 @@ class MainWidget(QtWidgets.QDockWidget):
             geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
             properties = result['properties']
             layer.changeGeometry(feat_id, geom)
-            layer.changeAttributeValue(
-                feat_id, fidx('bkg_typ'), properties['typ'])
-            layer.changeAttributeValue(
-                feat_id, fidx('bkg_text'), properties['text'])
-            layer.changeAttributeValue(
-                feat_id, fidx('bkg_score'), properties['score'])
-            layer.changeAttributeValue(
-                feat_id, fidx('bkg_treffer'), properties['treffer'])
-            if n_results:
-                layer.changeAttributeValue(
-                    feat_id, fidx('bkg_n_results'), n_results)
+            if not geom_only:
+                for prop in ['typ', 'text', 'score', 'treffer']:
+                    value = properties.get(prop, None)
+                    # property gets prefix bkg_ in layer
+                    layer.changeAttributeValue(
+                        feat_id, fidx(f'bkg_{prop}'), value)
+                if n_results:
+                    layer.changeAttributeValue(
+                        feat_id, fidx('bkg_n_results'), n_results)
             layer.changeAttributeValue(feat_id, fidx('bkg_i'), i)
         else:
             layer.changeAttributeValue(
