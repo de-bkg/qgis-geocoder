@@ -224,7 +224,8 @@ class MainWidget(QtWidgets.QDockWidget):
             accepted = self.reverse_dialog.show()
             if accepted:
                 self.set_result(feature, self.reverse_dialog.result, i=-1,
-                                geom_only=self.reverse_dialog.geom_only)
+                                geom_only=self.reverse_dialog.geom_only,
+                                apply_adress=not self.reverse_dialog.geom_only)
             try:
                 self.output_layer.removeSelection()
             except:
@@ -431,6 +432,14 @@ class MainWidget(QtWidgets.QDockWidget):
                     # property gets prefix bkg_ in layer
                     layer.changeAttributeValue(
                         feat_id, fidx(f'bkg_{prop}'), value)
+                if apply_adress:
+                    for field in self.field_map.fields():
+                        if not self.field_map.active(field):
+                            continue
+                        value = properties.get(
+                            self.field_map.keyword(field), None)
+                        layer.changeAttributeValue(
+                            feat_id, fidx(field), value)
                 if n_results:
                     layer.changeAttributeValue(
                         feat_id, fidx('bkg_n_results'), n_results)
