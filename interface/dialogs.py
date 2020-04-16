@@ -7,10 +7,12 @@ from qgis.PyQt.QtCore import Qt# , QPointF
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
-                       QgsField, QgsProject, QgsCoordinateReferenceSystem)
+                       QgsField, QgsProject, QgsCoordinateReferenceSystem,
+                       QgsCategorizedSymbolRenderer, QgsRendererCategory,
+                       QgsMarkerSymbol, QgsRasterMarkerSymbolLayer)
 import os
 
-from config import UI_PATH, ICON_PATH, Config
+from config import UI_PATH, STYLE_PATH, Config, ICON_PATH
 
 config = Config()
 
@@ -148,6 +150,20 @@ class ReverseResultsDialog(Dialog):
     def add_results(self):
         self.preview_layer = QgsVectorLayer(
             "Point", "reverse_preview", "memory")
+
+        renderer = QgsCategorizedSymbolRenderer('i')
+        for i in range(1, 21):
+            category = QgsRendererCategory()
+            category.setValue(i)
+            symbol = QgsMarkerSymbol.createSimple({'color': 'white'})
+            path = os.path.join(ICON_PATH, f'marker_{i}.png')
+            if os.path.exists(path):
+                symbol_layer = QgsRasterMarkerSymbolLayer()
+                symbol_layer.setPath(path)
+                symbol.appendSymbolLayer(symbol_layer)
+            category.setSymbol(symbol)
+            renderer.addCategory(category)
+        self.preview_layer.setRenderer(renderer)
 
         crs = QgsCoordinateReferenceSystem(config.projection)
         self.preview_layer.setCrs(crs)
