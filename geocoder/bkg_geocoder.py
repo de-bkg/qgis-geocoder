@@ -17,25 +17,9 @@ class BKGGeocoder(Geocoder):
         'strasse': 'Straße',
         'haus': 'Hausnummer',
         'plz': 'Postleitzahl',
-        'strasse_hnr': 'Straße + Hausnummer',
+        'strasse_haus': 'Straße + Hausnummer',
         'plz_ort': 'Postleitzahl + Ort',
     }
-
-    @staticmethod
-    def split_street_nr(value):
-        res = {}
-        # finds the last number with max. one trailing letter in the string
-        # (and possible spaces in between)
-        re_nr = '([\s\-]+[0-9]+[\s]*[a-zA-Z]{0,1}[\s]*$)'
-        f = re.findall(re_nr, value)
-        if f:
-            # take the last number found (e.g. bkg doesn't understand '6-8')
-            res['haus'] = f[-1].replace('-', '').replace(' ', '')
-        re_street = '([a-zA-ZäöüßÄÖÜ\\s\-\.]+[0-9]*[.\\]*[a-zA-ZäöüßÄÖÜ]+)'
-        m = re.match(re_street, value)
-        if m:
-            res['strasse'] = m[0]
-        return res
 
     @staticmethod
     def split_code_city(value):
@@ -54,7 +38,6 @@ class BKGGeocoder(Geocoder):
     # special keywords are keywords that are not supported by API but
     # its values are to be further processed into seperate keywords
     special_kw = {
-        'strasse_hnr': split_street_nr,
         'plz_ort': split_code_city,
     }
 
