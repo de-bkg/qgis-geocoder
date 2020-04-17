@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import (QDialog, QTableWidgetItem, QAbstractScrollArea,
                                  QLabel, QRadioButton, QHBoxLayout)
-                                 #QGraphicsPixmapItem)
-#from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import Qt# , QPointF
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
                        QgsField, QgsProject, QgsCoordinateReferenceSystem,
@@ -156,10 +154,10 @@ class ReverseResultsDialog(Dialog):
             category = QgsRendererCategory()
             category.setValue(i)
             symbol = QgsMarkerSymbol.createSimple({'color': 'white'})
-            path = os.path.join(ICON_PATH, f'marker_{i}.png')
-            if os.path.exists(path):
+            img_path = os.path.join(ICON_PATH, f'marker_{i}.png')
+            if os.path.exists(img_path):
                 symbol_layer = QgsRasterMarkerSymbolLayer()
-                symbol_layer.setPath(path)
+                symbol_layer.setPath(img_path)
                 symbol.appendSymbolLayer(symbol_layer)
             category.setSymbol(symbol)
             renderer.addCategory(category)
@@ -187,8 +185,19 @@ class ReverseResultsDialog(Dialog):
             properties = result['properties']
             radio = QRadioButton(properties['text'])
             hlayout = QHBoxLayout()
+            preview = QLabel()
+            hlayout.addWidget(preview)
             hlayout.addWidget(radio)
+            preview.setMaximumWidth(20)
+            preview.setMinimumWidth(20)
+            img_path = os.path.join(ICON_PATH, f'marker_{i+1}.png')
+            if os.path.exists(img_path):
+                pixmap = QPixmap(img_path)
+                preview.setPixmap(pixmap.scaled(
+                    preview.size(), Qt.KeepAspectRatio,
+                    Qt.SmoothTransformation))
             layout.addLayout(hlayout)
+
             radio.toggled.connect(
                 lambda c, i=i, f=feature:
                 self.toggle_result(self.results[i], f))
@@ -209,22 +218,6 @@ class ReverseResultsDialog(Dialog):
         self.preview_layer.removeSelection()
         self.preview_layer.select(feature.id())
         self.result = result
-        #self.canvas.zoomToSelected(self.preview_layer)
-
-    #def draw_markers(self):
-        #scene = self.canvas.scene()
-        #self.markers = []
-        #for i, result in enumerate(self.results):
-            #img_path = os.path.join(ICON_PATH, self.marker_img.format(i))
-            #if not os.path.exists(img_path):
-                #continue
-            #image = QPixmap(img_path)
-            #marker = QGraphicsPixmapItem(image)
-            #self.markers.append(marker)
-            #point = QPointF(50, 50)
-            #point_item = marker.mapFromScene(point)
-            #marker.setPos(point_item)
-            #scene.addItem(marker)
 
     def result_changed(self, i):
         self.result = self.results[i]

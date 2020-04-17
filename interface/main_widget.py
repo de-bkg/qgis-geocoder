@@ -24,13 +24,14 @@
 
 import os
 
-from qgis.PyQt import uic, QtWidgets
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
-                       QgsVectorDataProvider)
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QMessageBox
+                       QgsVectorDataProvider, QgsAction)
+from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
+                                 QDockWidget)
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
 from interface.map_tools import FeaturePicker
@@ -82,7 +83,7 @@ def clear_layout(layout):
             clear_layout(child.layout())
 
 
-class MainWidget(QtWidgets.QDockWidget):
+class MainWidget(QDockWidget):
     ui_file = 'main_dockwidget.ui'
     closingWidget = pyqtSignal()
 
@@ -369,6 +370,13 @@ class MainWidget(QtWidgets.QDockWidget):
 
         self.inspect_picker.set_layer(self.output_layer)
         self.reverse_picker.set_layer(self.output_layer)
+
+        #actions = self.output_layer.actions()
+        #action = QgsAction(QgsAction.GenericPython, "test_action", "import os",
+                           #"", False, shortTitle="test_action",
+                           #actionScopes={"Feature, Field"})
+        #actions.addAction(action)
+        #action.run = lambda a, b, c: print(f'{a}_{b}_{c}')
 
         self.tab_widget.setCurrentIndex(2)
         active_count = self.field_map.count_active()
