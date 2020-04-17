@@ -19,6 +19,11 @@ class BKGGeocoder(Geocoder):
         'plz': 'Postleitzahl',
         'strasse_haus': 'Straße + Hausnummer',
         'plz_ort': 'Postleitzahl + Ort',
+        'gemeinde': 'Gemeinde',
+        'kreis': 'Kreis',
+        'verwgem': 'Verwaltungsgemeinde',
+        'bundesland': 'Bundesland',
+        'ortsteil': 'Ortsteil'
     }
 
     @staticmethod
@@ -52,10 +57,8 @@ class BKGGeocoder(Geocoder):
 
     def _build_params(self, *args, **kwargs):
         suffix = '~' if self.fuzzy else ''
-        logic = ' {} '.format(self.logic_link)
-        query = logic.join(
-            ['{a}{s}'.format(a=a, s=suffix) for a in args if a]
-            ) or ''
+        logic = f' {self.logic_link} '
+        query = logic.join([f'{a}{suffix}' for a in args if a]) or ''
         if args and kwargs:
             query += logic
         # pop and process the special keywords
