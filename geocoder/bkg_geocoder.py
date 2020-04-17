@@ -59,11 +59,12 @@ class BKGGeocoder(Geocoder):
     }
 
     def __init__(self, key, srs: str='EPSG:4326', logic_link='AND', rs='',
-                 fuzzy=False):
+                 fuzzy=False, area_wkt=None):
         url = URL.format(key=key)
         self.logic_link = logic_link
         self.fuzzy = fuzzy
         self.rs = rs
+        self.area_wkt = area_wkt
         super().__init__(url=url, srs=srs)
 
     def _build_params(self, *args, **kwargs):
@@ -88,11 +89,11 @@ class BKGGeocoder(Geocoder):
 
     def query(self, *args, **kwargs):
         self.params = {}
-        if ('geometry') in kwargs:
-            self.params['geometry'] = kwargs.pop('geometry')
+        if self.area_wkt:
+            self.params['geometry'] = self.area_wkt
+        self.params['srsname'] = self.srs
         query = self._build_params(*args, **kwargs)
         self.params['query'] = query
-        self.params['srsname'] = self.srs
         self.r = requests.get(self.url, params=self.params)
         # ToDo raise specific errors
         if self.r.status_code != 200:

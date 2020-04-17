@@ -1,5 +1,6 @@
 from qgis.core import (QgsVectorLayer, QgsProject, QgsCoordinateTransform,
-                       QgsRasterLayer)
+                       QgsRasterLayer, QgsCoordinateReferenceSystem,
+                       QgsMultiPolygon)
 from qgis.utils import iface
 from abc import ABC
 
@@ -31,6 +32,22 @@ def nest_groups(parent, groupnames, prepend=True):
         next_parent = (parent.insertGroup(0, groupnames[0])
                        if prepend else parent.addGroup(groupnames[0]))
     return nest_groups(next_parent, groupnames[1:], prepend=prepend)
+
+def get_geometries(layer, selected=False, crs=None):
+    '''
+    get geometries of layer (optional selected only)
+    transform them to given target crs (optional)
+    '''
+    features = layer.selectedFeatures() if selected else layer.getFeatures()
+    geometries = [f.geometry() for f in features]
+    if crs:
+        crs = QgsCoordinateReferenceSystem(crs)
+        source_crs = layer.crs()
+        trans = QgsCoordinateTransform(source_crs, crs,
+                                       QgsProject.instance())
+        for geom in geometries:
+            geom.transform(trans)
+    return geometries
 
 
 class Layer(ABC):

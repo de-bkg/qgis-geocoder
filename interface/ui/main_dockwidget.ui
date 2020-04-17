@@ -279,7 +279,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>350</width>
-                <height>298</height>
+                <height>290</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -497,7 +497,7 @@ padding: 2px;
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="use_spatial_filter">
+            <widget class="QCheckBox" name="use_spatial_filter_check">
              <property name="text">
               <string>Räumlicher Filter:</string>
              </property>
@@ -546,7 +546,7 @@ padding: 2px;
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="onlyselectedpolygons_checkbox">
+              <widget class="QCheckBox" name="spatial_selected_only_check">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -690,7 +690,7 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QCheckBox" name="updateinputlayer_checkbox">
+              <widget class="QCheckBox" name="update_input_layer_check">
                <property name="minimumSize">
                 <size>
                  <width>180</width>
@@ -1196,7 +1196,7 @@ padding: 2px;
    </hints>
   </connection>
   <connection>
-   <sender>use_spatial_filter</sender>
+   <sender>use_spatial_filter_check</sender>
    <signal>toggled(bool)</signal>
    <receiver>spatial_filter_combo</receiver>
    <slot>setEnabled(bool)</slot>
@@ -1212,9 +1212,9 @@ padding: 2px;
    </hints>
   </connection>
   <connection>
-   <sender>use_spatial_filter</sender>
+   <sender>use_spatial_filter_check</sender>
    <signal>toggled(bool)</signal>
-   <receiver>onlyselectedpolygons_checkbox</receiver>
+   <receiver>spatial_selected_only_check</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

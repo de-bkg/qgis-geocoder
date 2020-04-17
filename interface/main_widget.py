@@ -29,14 +29,14 @@ from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
-                       QgsVectorDataProvider, QgsAction)
+                       QgsVectorDataProvider, QgsGeometryCollection)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget)
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
 from interface.map_tools import FeaturePicker
 from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
-                             OSMBackgroundLayer)
+                             OSMBackgroundLayer, get_geometries)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH
@@ -118,6 +118,7 @@ class MainWidget(QDockWidget):
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         self.layer_combo.layerChanged.connect(self.register_layer)
 
         for encoding in QgsVectorDataProvider.availableEncodings():
@@ -341,6 +342,14 @@ class MainWidget(QDockWidget):
         if not layer:
             return
 
+        active_count = self.field_map.count_active()
+        if active_count == 0:
+            QMessageBox.information(
+                self, 'Fehler',
+                (u'Es sind keine Adressfelder ausgewählt.\n\n'
+                 u'Start abgebrochen...'))
+            return
+
         bg_grey = TerrestrisBackgroundLayer(groupname='Hintergrundkarten',
                                             srs=config.projection)
         bg_grey.draw(checked=False)
@@ -349,10 +358,24 @@ class MainWidget(QDockWidget):
         bg_osm.draw(checked=True)
 
         rs = config.rs if self.use_rs_check.isChecked() else None
-        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
-                                   logic_link=config.logic_link, rs=rs)
         features = layer.selectedFeatures() if config.selected_features_only \
             else layer.getFeatures()
+        area_wkt = None
+        if self.use_spatial_filter_check.isChecked():
+            spatial_layer = self.spatial_filter_combo.currentLayer()
+            if spatial_layer:
+                selected_only = self.spatial_selected_only_check.isChecked()
+                geometries = get_geometries(
+                    spatial_layer, selected=selected_only,
+                    crs=config.projection)
+                union = None
+                for geom in geometries:
+                    union = geom if not union else union.combine(geom)
+                area_wkt = union.asWkt()
+
+        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
+                                   logic_link=config.logic_link, rs=rs,
+                                   area_wkt=area_wkt)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
@@ -371,22 +394,7 @@ class MainWidget(QDockWidget):
         self.inspect_picker.set_layer(self.output_layer)
         self.reverse_picker.set_layer(self.output_layer)
 
-        #actions = self.output_layer.actions()
-        #action = QgsAction(QgsAction.GenericPython, "test_action", "import os",
-                           #"", False, shortTitle="test_action",
-                           #actionScopes={"Feature, Field"})
-        #actions.addAction(action)
-        #action.run = lambda a, b, c: print(f'{a}_{b}_{c}')
-
         self.tab_widget.setCurrentIndex(2)
-        active_count = self.field_map.count_active()
-
-        if active_count == 0:
-            QMessageBox.information(
-                self, 'Fehler',
-                (u'Es sind keine Adressfelder ausgewählt.\n\n'
-                 u'Start abgebrochen...'))
-            return
 
         field_names = cloned.fields().names()
         add_fields = [QgsField(n, q, d) for n, q, d in BKG_FIELDS
@@ -403,7 +411,8 @@ class MainWidget(QDockWidget):
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
             extent = self.output_layer.extent()
-            self.canvas.setExtent(extent)
+            if not extent.isEmpty():
+                self.canvas.setExtent(extent)
             self.canvas.refresh()
         self.request_start_button.setVisible(True)
         self.request_stop_button.setVisible(False)
