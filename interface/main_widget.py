@@ -29,7 +29,7 @@ from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
-                       QgsVectorDataProvider, QgsGeometryCollection)
+                       QgsVectorDataProvider, QgsWkbTypes)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget)
 
@@ -114,7 +114,7 @@ class MainWidget(QDockWidget):
         self.import_csv_button.clicked.connect(self.import_csv_action.trigger)
         self.export_csv_button.clicked.connect(self.export_csv)
         self.attribute_table_button.clicked.connect(self.show_attribute_table)
-        self.request_start_button.clicked.connect(self.geocode)
+        self.request_start_button.clicked.connect(self.bkg_geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
@@ -337,7 +337,7 @@ class MainWidget(QDockWidget):
         # repopulate fields
         self.register_layer(layer, force_mapping=True)
 
-    def geocode(self):
+    def bkg_geocode(self):
         layer = self.layer_combo.currentLayer()
         if not layer:
             return
@@ -379,9 +379,24 @@ class MainWidget(QDockWidget):
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
-        cloned = clone_layer(layer, name=f'{layer.name()}_ergebnisse',
-                             srs=config.projection, features=features)
-        self.output_layer = cloned
+        if self.update_input_layer_check.isChecked():
+            if layer.wkbType() != QgsWkbTypes.Point:
+                QMessageBox.information(
+                    self, 'Fehler',
+                    (u'Der Layer enthält keine Punktgeometrie. Daher können '
+                     u'die Ergebnisse nicht direkt dem Layer hinzugefügt '
+                     u'werden.\n'
+                     u'Fügen Sie dem Layer eine Punktgeometrie hinzu oder '
+                     u'deaktivieren Sie die Checkbox '
+                     u'"Ausgangslayer aktualisieren".\n\n'
+                     u'Start abgebrochen...'))
+                return
+            self.output_layer = layer
+        else:
+            self.output_layer = clone_layer(
+                layer, name=f'{layer.name()}_ergebnisse',
+                srs=config.projection, features=features)
+
         style_file = os.path.join(STYLE_PATH, 'bkggeocoder_treffer.qml')
         self.output_layer.loadNamedStyle(style_file)
 
@@ -396,11 +411,11 @@ class MainWidget(QDockWidget):
 
         self.tab_widget.setCurrentIndex(2)
 
-        field_names = cloned.fields().names()
+        field_names = self.output_layer.fields().names()
         add_fields = [QgsField(n, q, d) for n, q, d in BKG_FIELDS
                       if n not in field_names]
-        cloned.dataProvider().addAttributes(add_fields)
-        cloned.updateFields()
+        self.output_layer.dataProvider().addAttributes(add_fields)
+        self.output_layer.updateFields()
 
         self.request_start_button.setVisible(False)
         self.request_stop_button.setVisible(True)
