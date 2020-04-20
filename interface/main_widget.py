@@ -360,6 +360,8 @@ class MainWidget(QDockWidget):
         rs = config.rs if self.use_rs_check.isChecked() else None
         features = layer.selectedFeatures() if config.selected_features_only \
             else layer.getFeatures()
+        # we use it 2 times, this avoids using same FeatureIterator twice
+        features = [f for f in features]
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():
             spatial_layer = self.spatial_filter_combo.currentLayer()
