@@ -102,6 +102,7 @@ class MainWidget(QDockWidget):
         self.setupUi()
         self.output_layer = None
         self.result_cache = {}
+        self.field_map_cache = {}
         self.inspect_dialog = None
         self.reverse_dialog = None
 
@@ -186,13 +187,13 @@ class MainWidget(QDockWidget):
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
         self.inspect_dialog = InspectResultsDialog(
-            self.output_layer, feature, results, self.canvas,
+            feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
             review_fields=review_fields, parent=self)
         accepted = self.inspect_dialog.show()
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
                             i=self.inspect_dialog.i)
-        # if you close QGIS with the dialog opened, the actual layer is
+        # when you close QGIS with the dialog opened, the actual layer is
         # is already removed at this point
         try:
             self.output_layer.removeSelection()
@@ -219,15 +220,21 @@ class MainWidget(QDockWidget):
         def done(feature, results):
             if self.reverse_dialog:
                 self.reverse_dialog.close()
-
+            # the first result will always be closest
+            # (meaning it is at exact position of requested feature)
+            preselect = 0
             self.reverse_dialog = ReverseResultsDialog(
-                self.output_layer, feature, results, self.canvas,
+                feature, results, self.canvas, preselect=preselect,
                 review_fields=review_fields, parent=self)
             accepted = self.reverse_dialog.show()
             if accepted:
-                self.set_result(feature, self.reverse_dialog.result, i=-1,
-                                geom_only=self.reverse_dialog.geom_only,
-                                apply_adress=not self.reverse_dialog.geom_only)
+                result = self.reverse_dialog.result
+                if result:
+                    self.set_result(
+                        feature, result, i=-1,
+                        geom_only=self.reverse_dialog.geom_only,
+                        apply_adress=not self.reverse_dialog.geom_only
+                    )
             try:
                 self.output_layer.removeSelection()
             except:
@@ -284,8 +291,11 @@ class MainWidget(QDockWidget):
 
         self.result_cache = {}
         bkg_f = [f[0] for f in BKG_FIELDS]
-        self.field_map = FieldMap(layer, ignore=bkg_f,
-                                  keywords=BKGGeocoder.keywords)
+        self.field_map = self.field_map_cache.get(layer.id(), None)
+        if not self.field_map or not self.field_map.valid(layer):
+            self.field_map = FieldMap(layer, ignore=bkg_f,
+                                      keywords=BKGGeocoder.keywords)
+            self.field_map_cache[layer.id()] = self.field_map
         # remove old widgets
         clear_layout(self.parameter_grid)
 
@@ -398,6 +408,9 @@ class MainWidget(QDockWidget):
             self.output_layer = clone_layer(
                 layer, name=f'{layer.name()}_ergebnisse',
                 srs=config.projection, features=features)
+            # cloned layer gets same mapping, it has the same fields
+            cloned_field_map = self.field_map.copy(layer=self.output_layer)
+            self.field_map_cache[self.output_layer.id()] = cloned_field_map
 
         style_file = os.path.join(STYLE_PATH, 'bkggeocoder_treffer.qml')
         self.output_layer.loadNamedStyle(style_file)

@@ -6,6 +6,7 @@ from qgis.core import QgsFeature, QgsFeatureIterator
 from typing import Union
 import re
 import math
+import copy
 
 
 class FieldMap:
@@ -36,6 +37,11 @@ class FieldMap:
             if field.name() not in self._mapping:
                 return False
         return True
+
+    def copy(self, layer=None):
+        clone = FieldMap(layer or self.layer)
+        clone._mapping = copy.deepcopy(self._mapping)
+        return clone
 
     def fields(self):
         return self._mapping.keys()

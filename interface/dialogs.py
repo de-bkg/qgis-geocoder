@@ -7,7 +7,8 @@ from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
                        QgsField, QgsProject, QgsCoordinateReferenceSystem,
                        QgsCategorizedSymbolRenderer, QgsRendererCategory,
-                       QgsMarkerSymbol, QgsRasterMarkerSymbolLayer)
+                       QgsMarkerSymbol, QgsRasterMarkerSymbolLayer,
+                       QgsRectangle)
 import os
 
 from config import UI_PATH, STYLE_PATH, Config, ICON_PATH
@@ -53,23 +54,21 @@ class ProgressDialog(Dialog):
 
 
 class InspectResultsDialog(Dialog):
-    def __init__(self, layer, feature, results, canvas, review_fields=[],
+    ui_file = 'featurepicker.ui'
+    marker_img = 'marker_{}.png'
+
+    def __init__(self, feature, results, canvas, review_fields=[], preselect=-1,
                  parent=None):
-        super().__init__('featurepicker.ui', modal=False, parent=parent)
+        super().__init__(self.ui_file, modal=False, parent=parent)
         self.canvas = canvas
         self.results = results
         self.feature = feature
-        self.layer = layer
-        self.init_geom = feature.geometry()
+        self.geom_only_button.setVisible(False)
+        self.result = None
+        self.i = -1
 
         self.populate_review(review_fields)
-        self.populate_table()
-
-        self.results_table.selectionModel().currentChanged.connect(
-            lambda row, col: self.result_changed(row.data(Qt.UserRole)))
-        i = self.feature.attribute('bkg_i')
-        if i >= 0:
-            self.results_table.selectRow(i)
+        self.add_results(preselect=preselect)
 
         self.accept_button.clicked.connect(self.accept)
         self.discard_button.clicked.connect(self.reject)
@@ -80,77 +79,11 @@ class InspectResultsDialog(Dialog):
             value = self.feature.attribute(field)
             self.feature_grid.addWidget(QLabel(value), i, 1)
 
-    def populate_table(self):
-        columns = ['text', 'score']
-        self.results_table.setColumnCount(len(columns))
-        for i, column in enumerate(columns):
-            self.results_table.setHorizontalHeaderItem(
-                i, QTableWidgetItem(column))
-        self.results_table.setRowCount(len(self.results))
-        for i, result in enumerate(self.results):
-            properties = result['properties']
-            for j, column in enumerate(columns):
-                item = QTableWidgetItem(str(properties[column]))
-                item.setData(Qt.UserRole, i)
-                self.results_table.setItem(i, j, item)
-
-        self.results_table.setSizeAdjustPolicy(
-            QAbstractScrollArea.AdjustToContents)
-        self.results_table.resizeColumnsToContents()
-
-    def result_changed(self, i):
-        self.result = self.results[i]
-        self.i = i
-        coords = self.result['geometry']['coordinates']
-        geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
-        self.layer.changeGeometry(self.feature.id(), geom)
-        self.canvas.refresh()
-        self.layer.removeSelection()
-        self.layer.select(self.feature.id())
-        self.canvas.zoomToSelected(self.layer)
-
-    def accept(self):
-        # reset the geometry
-        self.layer.changeGeometry(self.feature.id(), self.init_geom)
-        super().accept()
-
-    def reject(self):
-        self.layer.changeGeometry(self.feature.id(), self.init_geom)
-        super().reject()
-
-    def showEvent(self, e):
-        # exec() resets the modality
-        self.setModal(False)
-        self.adjustSize()
-
-
-class ReverseResultsDialog(Dialog):
-    marker_img = 'marker_{}.png'
-
-    def __init__(self, layer, feature, results, canvas, review_fields=[],
-                 parent=None):
-        super().__init__('reverse_geocoding.ui', modal=False, parent=parent)
-        self.canvas = canvas
-        self.results = results
-        self.feature = feature
-        self.layer = layer
-        self.accept_button.clicked.connect(self.accept)
-        self.geom_only = False
-        def geom_only():
-            self.geom_only = True
-            self.accept()
-        self.geom_only_button.clicked.connect(geom_only)
-        self.discard_button.clicked.connect(self.reject)
-
-        self.add_results()
-        self.populate_review(review_fields)
-
-    def add_results(self):
-        self.preview_layer = QgsVectorLayer(
-            "Point", "reverse_preview", "memory")
+    def add_results(self, preselect=-1):
+        self.preview_layer = QgsVectorLayer("Point", "results_tmp", "memory")
 
         renderer = QgsCategorizedSymbolRenderer('i')
-        for i in range(1, 21):
+        for i in range(1, len(self.results) + 1):
             category = QgsRendererCategory()
             category.setValue(i)
             symbol = QgsMarkerSymbol.createSimple({'color': 'white'})
@@ -200,7 +133,9 @@ class ReverseResultsDialog(Dialog):
 
             radio.toggled.connect(
                 lambda c, i=i, f=feature:
-                self.toggle_result(self.results[i], f))
+                self.toggle_result(self.results[i], f, i=i))
+            if i == preselect:
+                radio.setChecked(True)
 
         self.preview_layer.commitChanges()
         extent = self.preview_layer.extent()
@@ -208,27 +143,18 @@ class ReverseResultsDialog(Dialog):
         self.canvas.refresh()
         QgsProject.instance().addMapLayer(self.preview_layer)
 
-    def populate_review(self, review_fields):
-        for i, field in enumerate(review_fields):
-            self.feature_grid.addWidget(QLabel(field), i, 0)
-            value = self.feature.attribute(field)
-            self.feature_grid.addWidget(QLabel(value), i, 1)
-
-    def toggle_result(self, result, feature):
+    def toggle_result(self, result, feature, i=0):
+        self.result = self.results[i]
+        self.i = i
         self.preview_layer.removeSelection()
         self.preview_layer.select(feature.id())
         self.result = result
 
-    def result_changed(self, i):
-        self.result = self.results[i]
-        self.i = i
-        coords = self.result['geometry']['coordinates']
-        geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
-        self.layer.changeGeometry(self.feature.id(), geom)
+        # center map on point
+        point = feature.geometry().asPoint()
+        rect = QgsRectangle(point, point)
+        self.canvas.setExtent(rect)
         self.canvas.refresh()
-        self.layer.removeSelection()
-        self.layer.select(self.feature.id())
-        self.canvas.zoomToSelected(self.layer)
 
     def accept(self):
         QgsProject.instance().removeMapLayers([self.preview_layer.id()])
@@ -242,3 +168,20 @@ class ReverseResultsDialog(Dialog):
         # exec() resets the modality
         self.setModal(False)
         self.adjustSize()
+
+
+class ReverseResultsDialog(InspectResultsDialog):
+
+    def __init__(self, feature, results, canvas, review_fields=[],
+                 parent=None, preselect=0):
+        super().__init__(feature, results, canvas,
+                         review_fields=review_fields, parent=parent)
+        self.results_label.setText('Nächstgelegene Adressen')
+        self.accept_button.setText('Adresse und Koordinaten übernehmen')
+        self.geom_only_button.setVisible(True)
+        self.geom_only = False
+        def geom_only():
+            self.geom_only = True
+            self.accept()
+        self.geom_only_button.clicked.connect(geom_only)
+

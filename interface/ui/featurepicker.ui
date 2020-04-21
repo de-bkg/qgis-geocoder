@@ -25,23 +25,21 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_5">
+    <widget class="QLabel" name="results_label">
      <property name="text">
       <string>Ergebnisse</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QTableWidget" name="results_table">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
+    <widget class="QFrame" name="results_frame">
+     <property name="frameShape">
+      <enum>QFrame::Panel</enum>
      </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
      </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2"/>
     </widget>
    </item>
    <item>
@@ -85,6 +83,19 @@
        </property>
        <property name="text">
         <string>Übernehmen</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="geom_only_button">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Nur verschieben</string>
        </property>
       </widget>
      </item>
