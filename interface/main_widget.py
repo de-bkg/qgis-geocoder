@@ -419,7 +419,7 @@ class MainWidget(QDockWidget):
         self.geocoding.progress.connect(self.progress_bar.setValue)
         self.geocoding.feature_done.connect(self.store_results)
         self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
-        self.geocoding.finished.connect(self.done)
+        self.geocoding.finished.connect(self.geocoding_done)
 
         self.inspect_picker.set_layer(self.output_layer)
         self.reverse_picker.set_layer(self.output_layer)
@@ -437,13 +437,17 @@ class MainWidget(QDockWidget):
         self.log(f'<br>Starte Geokodierung <b>{layer.name()}</b>')
         self.geocoding.start()
 
-    def done(self, success: bool):
+    def geocoding_done(self, success: bool):
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
             extent = self.output_layer.extent()
             if not extent.isEmpty():
                 self.canvas.setExtent(extent)
             self.canvas.refresh()
+            # select output layer as current layer
+            self.layer_combo.setLayer(self.output_layer)
+            self.update_input_layer_check.setChecked(True)
+
         self.request_start_button.setVisible(True)
         self.request_stop_button.setVisible(False)
 
