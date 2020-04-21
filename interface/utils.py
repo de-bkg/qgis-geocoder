@@ -17,6 +17,7 @@ def clone_layer(layer, srs='EPSG:4326', name=None, features=None):
 
     data = clone.dataProvider()
     attr = layer.dataProvider().fields().toList()
+    data.setEncoding(layer.dataProvider().encoding())
     data.addAttributes(attr)
     clone.updateFields()
     data.addFeatures([f for f in features])
