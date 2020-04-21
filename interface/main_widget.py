@@ -91,6 +91,12 @@ class MainWidget(QDockWidget):
         """Constructor."""
         super(MainWidget, self).__init__(parent)
 
+        self.output_layer = None
+        self.result_cache = {}
+        self.field_map_cache = {}
+        self.inspect_dialog = None
+        self.reverse_dialog = None
+
         self.iface = utils.iface
         self.canvas = self.iface.mapCanvas()
         ui_file = self.ui_file if os.path.exists(self.ui_file) \
@@ -100,11 +106,6 @@ class MainWidget(QDockWidget):
             Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
         )
         self.setupUi()
-        self.output_layer = None
-        self.result_cache = {}
-        self.field_map_cache = {}
-        self.inspect_dialog = None
-        self.reverse_dialog = None
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
@@ -120,13 +121,13 @@ class MainWidget(QDockWidget):
         self.request_stop_button.setVisible(False)
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
-        self.layer_combo.layerChanged.connect(self.register_layer)
+        self.layer_combo.layerChanged.connect(self.change_layer)
 
         for encoding in QgsVectorDataProvider.availableEncodings():
             self.encoding_combo.addItem(encoding)
         self.encoding_combo.currentTextChanged.connect(self.set_encoding)
 
-        self.register_layer(self.layer_combo.currentLayer())
+        self.change_layer(self.layer_combo.currentLayer())
 
         self.rs_combo.addItem('Eingabehilfe Bundesländer')
         self.rs_combo.model().item(0).setEnabled(False)
@@ -276,7 +277,7 @@ class MainWidget(QDockWidget):
         scrollbar = self.log_edit.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
-    def register_layer(self, layer, force_mapping=False):
+    def change_layer(self, layer, force_mapping=False):
         '''
         add field checks depending on given layer to UI and preset
         layer related UI elements
@@ -345,7 +346,7 @@ class MainWidget(QDockWidget):
         layer.dataProvider().setEncoding(encoding)
         layer.updateFields()
         # repopulate fields
-        self.register_layer(layer, force_mapping=True)
+        self.change_layer(layer, force_mapping=True)
 
     def bkg_geocode(self):
         layer = self.layer_combo.currentLayer()

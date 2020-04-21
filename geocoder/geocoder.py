@@ -33,8 +33,9 @@ class FieldMap:
             self._mapping[name] = [active, keyword]
 
     def valid(self, layer):
-        for field in layer.fields():
-            if field.name() not in self._mapping:
+        field_names = [f.name() for f in layer.fields()]
+        for mapped in self._mapping.keys():
+            if mapped not in field_names:
                 return False
         return True
 
