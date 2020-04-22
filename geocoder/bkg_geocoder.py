@@ -46,14 +46,21 @@ class BKGGeocoder(Geocoder):
         'plz_ort': split_code_city,
     }
 
-    def __init__(self, key, srs: str='EPSG:4326', logic_link='AND', rs='',
-                 fuzzy=False, area_wkt=None):
-        url = URL.format(key=key)
+    def __init__(self, key='', url='', srs: str='EPSG:4326', logic_link='AND',
+                 rs='', fuzzy=False, area_wkt=None):
+        if not key and not url:
+            raise ValueError('at least one keyword out of "key" and "url" has '
+                             'to be passed')
+        url = url or self.get_url(key)
         self.logic_link = logic_link
         self.fuzzy = fuzzy
         self.rs = rs
         self.area_wkt = area_wkt
         super().__init__(url=url, srs=srs)
+
+    @staticmethod
+    def get_url(key):
+        return URL.format(key=key)
 
     def _build_params(self, *args, **kwargs):
         suffix = '~' if self.fuzzy else ''

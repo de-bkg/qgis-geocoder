@@ -279,7 +279,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>350</width>
-                <height>282</height>
+                <height>286</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -566,7 +566,7 @@ padding: 2px;
         <item>
          <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier entweder die UUID oder die Dienst-URL inklusive der UUID an.&lt;/p&gt;</string>
           </property>
           <property name="title">
            <string>Zugangsdaten</string>
@@ -577,16 +577,36 @@ padding: 2px;
           <property name="saveCollapsedState">
            <bool>false</bool>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_2">
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="1" column="0">
+            <widget class="QRadioButton" name="api_url_check">
              <property name="text">
-              <string>Geokodierungsdienst</string>
+              <string>BKG Dienst-URL inkl. UUID</string>
              </property>
             </widget>
            </item>
-           <item>
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="api_key_check">
+             <property name="text">
+              <string>BKG UUID</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
             <widget class="QLineEdit" name="api_key_edit">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="api_url_edit">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="toolTip">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
@@ -698,7 +718,7 @@ padding: 2px;
                 </size>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;p&gt;Die Option ist nur verfügbar, wenn der gewählte Layer eine Punktgeometrie enthält.&lt;/p&gt;</string>
                </property>
                <property name="layoutDirection">
                 <enum>Qt::LeftToRight</enum>
@@ -844,7 +864,7 @@ padding: 2px;
              <item>
               <widget class="QLabel" name="elapsed_time_label">
                <property name="text">
-                <string>00:29:24</string>
+                <string>00:00:00</string>
                </property>
               </widget>
              </item>
@@ -1067,13 +1087,13 @@ padding: 2px;
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
+          <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>24</height>
+          <height>16777215</height>
          </size>
         </property>
         <property name="text">
@@ -1183,7 +1203,7 @@ padding: 2px;
      <y>117</y>
     </hint>
     <hint type="destinationlabel">
-     <x>193</x>
+     <x>178</x>
      <y>148</y>
     </hint>
    </hints>
@@ -1233,6 +1253,38 @@ padding: 2px;
     <hint type="destinationlabel">
      <x>361</x>
      <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>api_key_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>api_key_edit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>api_url_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>api_url_edit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>256</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>259</y>
     </hint>
    </hints>
   </connection>

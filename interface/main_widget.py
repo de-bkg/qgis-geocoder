@@ -172,8 +172,23 @@ class MainWidget(QDockWidget):
             lambda: setattr(config, 'logic_link', 'OR'))
 
         self.api_key_edit.setText(config.api_key)
-        self.api_key_edit.editingFinished.connect(
-            lambda: setattr(config, 'api_key', self.api_key_edit.text()))
+        self.api_url_edit.setText(config.api_url)
+        def api_key_edited():
+            api_key = self.api_key_edit.text()
+            setattr(config, 'api_key', api_key)
+            url = BKGGeocoder.get_url(api_key)
+            self.api_url_edit.setText(url)
+            setattr(config, 'api_url', url)
+        self.api_key_edit.editingFinished.connect(api_key_edited)
+        self.api_url_edit.editingFinished.connect(
+            lambda: setattr(config, 'api_url', self.api_url_edit.text()))
+        if config.use_api_url:
+            self.api_url_check.setChecked(True)
+        else:
+            self.api_key_check.setChecked(True)
+        self.api_key_check.toggled.connect(
+            lambda checked: setattr(config, 'use_api_url', not checked))
+
         crs = QgsCoordinateReferenceSystem(config.projection)
         self.output_projection_select.setCrs(crs)
 
@@ -229,7 +244,9 @@ class MainWidget(QDockWidget):
         self.output_layer.removeSelection()
         self.output_layer.select(feature.id())
         crs = self.output_layer.crs().authid()
-        bkg_geocoder = BKGGeocoder(config.api_key, srs=crs,
+        url = config.api_url if config.use_api_url else None
+
+        bkg_geocoder = BKGGeocoder(key=config.api_key, srs=crs, url=url,
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
         review_fields = [f for f in self.field_map.fields()
@@ -308,11 +325,17 @@ class MainWidget(QDockWidget):
 
         self.input_layer = layer
 
-        # by default store results in selected layer if it is an output layer
-        # otherwise use create a new output layer when geocoding (can be over-
-        # ridden by user)
-        self.update_input_layer_check.setChecked(
-            layer.id() in self.output_layer_ids)
+        # layer can only be updated in place if it has a point geometry
+        if layer.wkbType() != QgsWkbTypes.Point:
+            self.update_input_layer_check.setChecked(False)
+            self.update_input_layer_check.setEnabled(False)
+        else:
+            self.update_input_layer_check.setEnabled(True)
+            # by default store results in selected layer if it is an output
+            # layer. otherwise use create a new output layer when geocoding
+            # (can be overridden by user)
+            self.update_input_layer_check.setChecked(
+                layer.id() in self.output_layer_ids)
 
         encoding = layer.dataProvider().encoding()
         self.encoding_combo.blockSignals(True)
@@ -406,8 +429,10 @@ class MainWidget(QDockWidget):
                     union = geom if not union else union.combine(geom)
                 area_wkt = union.asWkt()
 
-        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
-                                   logic_link=config.logic_link, rs=rs,
+        url = config.api_url if config.use_api_url else None
+
+        bkg_geocoder = BKGGeocoder(key=config.api_key, srs=config.projection,
+                                   url=url, logic_link=config.logic_link, rs=rs,
                                    area_wkt=area_wkt)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
