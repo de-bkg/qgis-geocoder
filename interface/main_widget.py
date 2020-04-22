@@ -44,7 +44,6 @@ from config import Config, STYLE_PATH, UI_PATH
 config = Config()
 
 BKG_FIELDS = [
-    ('bkg_feature_id', QVariant.Int, 'int4'),
     ('bkg_n_results', QVariant.Int, 'int2'),
     ('bkg_i', QVariant.Double, 'int2'),
     ('bkg_typ', QVariant.String, 'text'),
@@ -155,6 +154,11 @@ class MainWidget(QDockWidget):
         self.reverse_picker = FeaturePicker(
             self.reverse_picker_button, canvas=self.canvas)
         self.reverse_picker.feature_picked.connect(self.reverse_geocode)
+
+        self.reverse_picker_button.setEnabled(False)
+        self.inspect_picker_button.setEnabled(False)
+        self.export_csv_button.setEnabled(False)
+        self.attribute_table_button.setEnabled(False)
 
     def setup_config(self):
         self.search_and_check.setChecked(config.logic_link == 'AND')
@@ -463,6 +467,11 @@ class MainWidget(QDockWidget):
         self.canvas.refresh()
         self.request_start_button.setVisible(True)
         self.request_stop_button.setVisible(False)
+        self.reverse_picker_button.setEnabled(True)
+        self.inspect_picker_button.setEnabled(True)
+        self.export_csv_button.setEnabled(True)
+        self.attribute_table_button.setEnabled(True)
+
 
     def store_results(self, feature, results):
         if results:
