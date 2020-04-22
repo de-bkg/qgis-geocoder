@@ -25,7 +25,7 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
@@ -40,6 +40,7 @@ from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH
+import datetime
 
 config = Config()
 
@@ -159,6 +160,9 @@ class MainWidget(QDockWidget):
         self.inspect_picker_button.setEnabled(False)
         self.export_csv_button.setEnabled(False)
         self.attribute_table_button.setEnabled(False)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_timer)
 
     def setup_config(self):
         self.search_and_check.setChecked(config.logic_link == 'AND')
@@ -453,7 +457,16 @@ class MainWidget(QDockWidget):
         self.request_start_button.setVisible(False)
         self.request_stop_button.setVisible(True)
         self.log(f'<br>Starte Geokodierung <b>{layer.name()}</b>')
+        self.start_time = datetime.datetime.now()
+        self.timer.start(1000)
         self.geocoding.start()
+
+    def update_timer(self):
+        delta = datetime.datetime.now() - self.start_time
+        h, remainder = divmod(delta.seconds, 3600)
+        m, s = divmod(remainder, 60)
+        timer_text = '{:02d}:{:02d}:{:02d}'.format(h, m, s)
+        self.elapsed_time_label.setText(timer_text)
 
     def geocoding_done(self, success: bool):
         if success:
@@ -465,6 +478,7 @@ class MainWidget(QDockWidget):
         if not extent.isEmpty():
             self.canvas.setExtent(extent)
         self.canvas.refresh()
+        self.timer.stop()
         self.request_start_button.setVisible(True)
         self.request_stop_button.setVisible(False)
         self.reverse_picker_button.setEnabled(True)
