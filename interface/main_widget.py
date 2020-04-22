@@ -29,7 +29,8 @@ from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
-                       QgsVectorDataProvider, QgsWkbTypes)
+                       QgsVectorDataProvider, QgsWkbTypes,
+                       QgsCoordinateTransform, QgsProject)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget)
 
@@ -225,7 +226,8 @@ class MainWidget(QDockWidget):
                          if self.field_map.active(f)]
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
-            review_fields=review_fields, parent=self)
+            review_fields=review_fields, parent=self,
+            crs=self.output_layer.crs().authid())
         accepted = self.inspect_dialog.show()
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
@@ -264,7 +266,8 @@ class MainWidget(QDockWidget):
             preselect = 0
             self.reverse_dialog = ReverseResultsDialog(
                 feature, results, self.canvas, preselect=preselect,
-                review_fields=review_fields, parent=self)
+                review_fields=review_fields, parent=self,
+                crs=self.output_layer.crs().authid())
             accepted = self.reverse_dialog.show()
             if accepted:
                 result = self.reverse_dialog.result
@@ -501,7 +504,12 @@ class MainWidget(QDockWidget):
 
         extent = self.output_layer.extent()
         if not extent.isEmpty():
-            self.canvas.setExtent(extent)
+            transform = QgsCoordinateTransform(
+                self.output_layer.crs(),
+                self.canvas.mapSettings().destinationCrs(),
+                QgsProject.instance()
+            )
+            self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
         self.timer.stop()
         self.request_start_button.setVisible(True)
@@ -510,7 +518,6 @@ class MainWidget(QDockWidget):
         self.inspect_picker_button.setEnabled(True)
         self.export_csv_button.setEnabled(True)
         self.attribute_table_button.setEnabled(True)
-
 
     def store_results(self, feature, results):
         if results:

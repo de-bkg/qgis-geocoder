@@ -30,7 +30,7 @@ class Config(object):
         'use_api_url': False,
         'logic_link': 'OR',
         'selected_features_only': False,
-        'projection': 'EPSG:4326',
+        'projection': 'EPSG:25832',
         'use_rs': False,
         'rs': '',
     }

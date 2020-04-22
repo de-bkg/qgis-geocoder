@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import (QDialog, QTableWidgetItem, QAbstractScrollArea,
-                                 QLabel, QRadioButton, QHBoxLayout)
+from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QHBoxLayout)
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
@@ -8,10 +7,10 @@ from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
                        QgsField, QgsProject, QgsCoordinateReferenceSystem,
                        QgsCategorizedSymbolRenderer, QgsRendererCategory,
                        QgsMarkerSymbol, QgsRasterMarkerSymbolLayer,
-                       QgsRectangle)
+                       QgsRectangle, QgsCoordinateTransform)
 import os
 
-from config import UI_PATH, STYLE_PATH, Config, ICON_PATH
+from config import UI_PATH, Config, ICON_PATH
 
 config = Config()
 
@@ -58,7 +57,7 @@ class InspectResultsDialog(Dialog):
     marker_img = 'marker_{}.png'
 
     def __init__(self, feature, results, canvas, review_fields=[], preselect=-1,
-                 parent=None):
+                 crs='EPSG:4326', parent=None):
         super().__init__(self.ui_file, modal=False, parent=parent)
         self.canvas = canvas
         self.results = results
@@ -66,6 +65,7 @@ class InspectResultsDialog(Dialog):
         self.geom_only_button.setVisible(False)
         self.result = None
         self.i = -1
+        self.crs = crs
 
         self.populate_review(review_fields)
         self.add_results(preselect=preselect)
@@ -80,7 +80,8 @@ class InspectResultsDialog(Dialog):
             self.feature_grid.addWidget(QLabel(value), i, 1)
 
     def add_results(self, preselect=-1):
-        self.preview_layer = QgsVectorLayer("Point", "results_tmp", "memory")
+        self.preview_layer = QgsVectorLayer(
+            f'Point?crs={self.crs}', 'results_tmp', 'memory')
 
         renderer = QgsCategorizedSymbolRenderer('i')
         for i in range(1, len(self.results) + 1):
@@ -96,8 +97,6 @@ class InspectResultsDialog(Dialog):
             renderer.addCategory(category)
         self.preview_layer.setRenderer(renderer)
 
-        crs = QgsCoordinateReferenceSystem(config.projection)
-        self.preview_layer.setCrs(crs)
         self.preview_layer.startEditing()
         provider = self.preview_layer.dataProvider()
         provider.addAttributes([
@@ -139,7 +138,12 @@ class InspectResultsDialog(Dialog):
 
         self.preview_layer.commitChanges()
         extent = self.preview_layer.extent()
-        self.canvas.setExtent(extent)
+        transform = QgsCoordinateTransform(
+            self.preview_layer.crs(),
+            self.canvas.mapSettings().destinationCrs(),
+            QgsProject.instance()
+        )
+        self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
         QgsProject.instance().addMapLayer(self.preview_layer)
 
@@ -153,7 +157,12 @@ class InspectResultsDialog(Dialog):
         # center map on point
         point = feature.geometry().asPoint()
         rect = QgsRectangle(point, point)
-        self.canvas.setExtent(rect)
+        transform = QgsCoordinateTransform(
+            self.preview_layer.crs(),
+            self.canvas.mapSettings().destinationCrs(),
+            QgsProject.instance()
+        )
+        self.canvas.setExtent(transform.transform(rect))
         self.canvas.refresh()
 
     def accept(self):
@@ -173,8 +182,8 @@ class InspectResultsDialog(Dialog):
 class ReverseResultsDialog(InspectResultsDialog):
 
     def __init__(self, feature, results, canvas, review_fields=[],
-                 parent=None, preselect=0):
-        super().__init__(feature, results, canvas,
+                 parent=None, preselect=0, crs='EPSG:4326'):
+        super().__init__(feature, results, canvas, crs=crs,
                          review_fields=review_fields, parent=parent)
         self.results_label.setText('Nächstgelegene Adressen')
         self.accept_button.setText('Adresse und Koordinaten übernehmen')
