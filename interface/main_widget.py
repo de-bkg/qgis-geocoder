@@ -50,7 +50,8 @@ BKG_FIELDS = [
     ('bkg_typ', QVariant.String, 'text'),
     ('bkg_text', QVariant.String, 'text'),
     ('bkg_score', QVariant.Double, 'float8'),
-    ('bkg_treffer', QVariant.String, 'text')
+    ('bkg_treffer', QVariant.String, 'text'),
+    ('manuell_bearbeitet', QVariant.Bool, 'bool')
 ]
 
 RS_PRESETS = [
@@ -92,6 +93,7 @@ class MainWidget(QDockWidget):
         super(MainWidget, self).__init__(parent)
 
         self.output_layer = None
+        self.input_layer = None
         self.result_cache = {}
         self.field_map_cache = {}
         self.inspect_dialog = None
@@ -176,7 +178,10 @@ class MainWidget(QDockWidget):
             lambda checked: setattr(config, 'use_rs', checked))
 
     def inspect_results(self, feature):
-        results = self.result_cache.get(feature.id(), None)
+        if not self.output_layer:
+            return
+        results = self.result_cache.get((self.output_layer.id(), feature.id()),
+                                        None)
         # ToDo: warning dialog or pass it to results diag and show warning there
         if not results or not self.output_layer:
             return
@@ -193,7 +198,7 @@ class MainWidget(QDockWidget):
         accepted = self.inspect_dialog.show()
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
-                            i=self.inspect_dialog.i)
+                            i=self.inspect_dialog.i, set_edited=True)
         # when you close QGIS with the dialog opened, the actual layer is
         # is already removed at this point
         try:
@@ -232,7 +237,7 @@ class MainWidget(QDockWidget):
                 result = self.reverse_dialog.result
                 if result:
                     self.set_result(
-                        feature, result, i=-1,
+                        feature, result, i=-1, set_edited=True,
                         geom_only=self.reverse_dialog.geom_only,
                         apply_adress=not self.reverse_dialog.geom_only
                     )
@@ -285,12 +290,13 @@ class MainWidget(QDockWidget):
         if not layer:
             return
 
+        self.input_layer = layer
+
         encoding = layer.dataProvider().encoding()
         self.encoding_combo.blockSignals(True)
         self.encoding_combo.setCurrentText(encoding)
         self.encoding_combo.blockSignals(False)
 
-        self.result_cache = {}
         bkg_f = [f[0] for f in BKG_FIELDS]
         self.field_map = self.field_map_cache.get(layer.id(), None)
         if not self.field_map or not self.field_map.valid(layer):
@@ -342,14 +348,13 @@ class MainWidget(QDockWidget):
             #'({} Feature(s) selektiert)'.format(n_selected))
 
     def set_encoding(self, encoding):
-        layer = self.layer_combo.currentLayer()
-        layer.dataProvider().setEncoding(encoding)
-        layer.updateFields()
+        self.input_layer.dataProvider().setEncoding(encoding)
+        self.input_layer.updateFields()
         # repopulate fields
-        self.change_layer(layer, force_mapping=True)
+        self.change_layer(self.input_layer, force_mapping=True)
 
     def bkg_geocode(self):
-        layer = self.layer_combo.currentLayer()
+        layer = self.input_layer
         if not layer:
             return
 
@@ -441,14 +446,15 @@ class MainWidget(QDockWidget):
     def geocoding_done(self, success: bool):
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
-            extent = self.output_layer.extent()
-            if not extent.isEmpty():
-                self.canvas.setExtent(extent)
-            self.canvas.refresh()
+            # keep working with same output layer by default
+            self.update_input_layer_check.setChecked(True)
             # select output layer as current layer
             self.layer_combo.setLayer(self.output_layer)
-            self.update_input_layer_check.setChecked(True)
 
+        extent = self.output_layer.extent()
+        if not extent.isEmpty():
+            self.canvas.setExtent(extent)
+        self.canvas.refresh()
         self.request_start_button.setVisible(True)
         self.request_stop_button.setVisible(False)
 
@@ -458,11 +464,11 @@ class MainWidget(QDockWidget):
             best = results[0]
         else:
             best = None
-        self.result_cache[feature.id()] = results
+        self.result_cache[self.output_layer.id(), feature.id()] = results
         self.set_result(feature, best, i=0, n_results=len(results))
 
     def set_result(self, feature, result, i=0, n_results=None, geom_only=False,
-                   apply_adress=False):
+                   apply_adress=False, set_edited=False):
         '''
         bkg specific
         set result to feature of given layer
@@ -501,3 +507,5 @@ class MainWidget(QDockWidget):
                 feat_id, fidx('bkg_typ'), '')
             layer.changeAttributeValue(
                 feat_id, fidx('bkg_score'), 0)
+        layer.changeAttributeValue(
+            feat_id, fidx('manuell_bearbeitet'), set_edited)

@@ -1,6 +1,5 @@
 from qgis.core import (QgsVectorLayer, QgsProject, QgsCoordinateTransform,
-                       QgsRasterLayer, QgsCoordinateReferenceSystem,
-                       QgsMultiPolygon)
+                       QgsRasterLayer, QgsCoordinateReferenceSystem)
 from qgis.utils import iface
 from abc import ABC
 
