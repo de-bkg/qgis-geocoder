@@ -93,6 +93,7 @@ class MainWidget(QDockWidget):
         super(MainWidget, self).__init__(parent)
 
         self.output_layer = None
+        self.output_layer_ids = []
         self.input_layer = None
         self.result_cache = {}
         self.field_map_cache = {}
@@ -108,6 +109,14 @@ class MainWidget(QDockWidget):
             Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
         )
         self.setupUi()
+        self.setup_config()
+
+        bg_grey = TerrestrisBackgroundLayer(groupname='Hintergrundkarten',
+                                            srs=config.projection)
+        bg_grey.draw(checked=False)
+        bg_osm = OSMBackgroundLayer(groupname='Hintergrundkarten',
+                                    srs=config.projection)
+        bg_osm.draw(checked=True)
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
@@ -146,7 +155,6 @@ class MainWidget(QDockWidget):
         self.reverse_picker = FeaturePicker(
             self.reverse_picker_button, canvas=self.canvas)
         self.reverse_picker.feature_picked.connect(self.reverse_geocode)
-        self.setup_config()
 
     def setup_config(self):
         self.search_and_check.setChecked(config.logic_link == 'AND')
@@ -212,10 +220,9 @@ class MainWidget(QDockWidget):
             return
         self.output_layer.removeSelection()
         self.output_layer.select(feature.id())
-        # close dialog if there is already one opened
-        rs = config.rs if self.use_rs_check.isChecked() else None
-        bkg_geocoder = BKGGeocoder(config.api_key, srs=config.projection,
-                                   logic_link=config.logic_link, rs=rs)
+        crs = self.output_layer.crs().authid()
+        bkg_geocoder = BKGGeocoder(config.api_key, srs=crs,
+                                   logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
@@ -224,6 +231,7 @@ class MainWidget(QDockWidget):
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
         def done(feature, results):
+            # only one opened dialog at a time
             if self.reverse_dialog:
                 self.reverse_dialog.close()
             # the first result will always be closest
@@ -291,6 +299,12 @@ class MainWidget(QDockWidget):
             return
 
         self.input_layer = layer
+
+        # by default store results in selected layer if it is an output layer
+        # otherwise use create a new output layer when geocoding (can be over-
+        # ridden by user)
+        self.update_input_layer_check.setChecked(
+            layer.id() in self.output_layer_ids)
 
         encoding = layer.dataProvider().encoding()
         self.encoding_combo.blockSignals(True)
@@ -366,13 +380,6 @@ class MainWidget(QDockWidget):
                  u'Start abgebrochen...'))
             return
 
-        bg_grey = TerrestrisBackgroundLayer(groupname='Hintergrundkarten',
-                                            srs=config.projection)
-        bg_grey.draw(checked=False)
-        bg_osm = OSMBackgroundLayer(groupname='Hintergrundkarten',
-                                    srs=config.projection)
-        bg_osm.draw(checked=True)
-
         rs = config.rs if self.use_rs_check.isChecked() else None
         features = layer.selectedFeatures() if config.selected_features_only \
             else layer.getFeatures()
@@ -414,6 +421,7 @@ class MainWidget(QDockWidget):
             self.output_layer = clone_layer(
                 layer, name=f'{layer.name()}_ergebnisse',
                 srs=config.projection, features=features)
+            self.output_layer_ids.append(self.output_layer.id())
             # cloned layer gets same mapping, it has the same fields
             cloned_field_map = self.field_map.copy(layer=self.output_layer)
             self.field_map_cache[self.output_layer.id()] = cloned_field_map
@@ -446,8 +454,6 @@ class MainWidget(QDockWidget):
     def geocoding_done(self, success: bool):
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
-            # keep working with same output layer by default
-            self.update_input_layer_check.setChecked(True)
             # select output layer as current layer
             self.layer_combo.setLayer(self.output_layer)
 
