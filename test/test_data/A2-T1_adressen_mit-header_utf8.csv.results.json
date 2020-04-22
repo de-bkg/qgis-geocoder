@@ -1,1 +1,1293 @@
-{"strasse:\"B\u00fcchsenstra\u00dfe\" AND haus:\"54\" AND plz:\"70025\" AND ort:\"Stuttgart\"": [], "strasse:\"Alexandrastra\u00dfe\" AND haus:\"4\" AND plz:\"80538\" AND ort:\"M\u00fcnchen\"": [{"bbox": [11.5903571818005, 48.1415851732475, 11.5904914689356, 48.1416750508326], "geometry": {"coordinates": [11.59042, 48.14163], "type": "Point"}, "id": "DEBYv00086193073", "properties": {"ags": "09162000", "bbox": {"coordinates": [[[11.59036, 48.14159], [11.59036, 48.14168], [11.59049, 48.14168], [11.59049, 48.14159], [11.59036, 48.14159]]], "type": "Polygon"}, "bundesland": "Bayern", "gemeinde": "M\u00fcnchen", "haus": "4", "kreis": "M\u00fcnchen", "ort": "M\u00fcnchen", "ortsteil": "Altstadt-Lehel", "plz": "80538", "qualitaet": "A", "regbezirk": "Oberbayern", "rs": "091620000000", "schluessel": "091620000000000100000", "score": 0.999, "strasse": "Alexandrastra\u00dfe", "text": "Alexandrastra\u00dfe 4, 80538 M\u00fcnchen - Altstadt-Lehel", "treffer": "T", "typ": "Haus", "verwgem": "M\u00fcnchen"}, "type": "Feature"}], "strasse:\"Fehrbelliner Platz\" AND haus:\"1\" AND plz:\"10707\" AND ort:\"Berlin\"": [{"bbox": [13.3150078081464, 52.491189241407, 13.3151546731126, 52.4912788883918], "geometry": {"coordinates": [13.31508, 52.49123], "type": "Point"}, "id": "DEBE04YY50003qrB", "properties": {"ags": "11000000", "bbox": {"coordinates": [[[13.31501, 52.49119], [13.31501, 52.49128], [13.31515, 52.49128], [13.31515, 52.49119], [13.31501, 52.49119]]], "type": "Polygon"}, "bundesland": "Berlin", "haus": "1", "kreis": "", "ort": "Berlin", "ortsteil": "Wilmersdorf", "plz": "10707", "qualitaet": "A", "regbezirk": "", "rs": "110000000000", "schluessel": "110000000000040206970", "score": 0.999, "strasse": "Fehrbelliner Platz", "text": "Fehrbelliner Platz 1, 10707 Berlin - Wilmersdorf", "treffer": "T", "typ": "Haus", "verwgem": "Berlin"}, "type": "Feature"}], "strasse:\"Heinrich-Mann-Allee\" AND haus:\"103\" AND plz:\"14473\" AND ort:\"Potsdam\"": [{"bbox": [13.078405228272, 52.3812935847052, 13.0785517727784, 52.3813832605581], "geometry": {"coordinates": [13.07848, 52.38134], "type": "Point"}, "id": "DEBBAL540001BPjR", "properties": {"ags": "12054000", "bbox": {"coordinates": [[[13.07841, 52.38129], [13.07841, 52.38138], [13.07855, 52.38138], [13.07855, 52.38129], [13.07841, 52.38129]]], "type": "Polygon"}, "bundesland": "Brandenburg", "gemeinde": "Potsdam", "haus": "103", "kreis": "Potsdam", "ort": "Potsdam", "ortsteil": "S\u00fcdliche Innenstadt", "plz": "14473", "qualitaet": "A", "regbezirk": "", "rs": "120540000000", "schluessel": "120540000000000004104", "score": 0.999, "strasse": "Heinrich-Mann-Allee", "text": "Heinrich-Mann-Allee 103, 14473 Potsdam - S\u00fcdliche Innenstadt", "treffer": "T", "typ": "Haus", "verwgem": "Potsdam"}, "type": "Feature"}], "strasse:\"Contrescarpe\" AND haus:\"72\" AND plz:\"28195\" AND ort:\"Bremen\"": [{"bbox": [8.8121415921711, 53.0799509269686, 8.81229087570169, 53.0800408195718], "geometry": {"coordinates": [8.81222, 53.08], "type": "Point"}, "id": "DEHB01ALn0000a6z", "properties": {"ags": "04011000", "bbox": {"coordinates": [[[8.81214, 53.07995], [8.81214, 53.08004], [8.81229, 53.08004], [8.81229, 53.07995], [8.81214, 53.07995]]], "type": "Polygon"}, "bundesland": "Bremen", "gemeinde": "Bremen", "haus": "72", "kreis": "Stadt Bremen", "ort": "Bremen", "ortsteil": "Bahnhofsvorstadt", "plz": "28195", "qualitaet": "A", "regbezirk": "Bremen", "rs": "040110000000", "schluessel": "040110000000011216630", "score": 0.999, "strasse": "Contrescarpe", "text": "Contrescarpe 72, 28195 Bremen - Bahnhofsvorstadt", "treffer": "T", "typ": "Haus", "verwgem": "Bremen"}, "type": "Feature"}], "strasse:\"Neuenfelder Stra\u00dfe\" AND haus:\"19\" AND plz:\"21109\" AND ort:\"Hamburg\"": [{"bbox": [10.0040710393855, 53.4974624540668, 10.0042217630139, 53.4975523270063], "geometry": {"coordinates": [10.00415, 53.49751], "type": "Point"}, "id": "DEHHALKA10007htF", "properties": {"ags": "02000000", "bbox": {"coordinates": [[[10.00407, 53.49746], [10.00407, 53.49755], [10.00422, 53.49755], [10.00422, 53.49746], [10.00407, 53.49746]]], "type": "Polygon"}, "bundesland": "Hamburg", "haus": "19", "ort": "Hamburg", "ortsteil": "Wilhelmsburg", "plz": "21109", "qualitaet": "A", "rs": "020000000000", "schluessel": "0200000000000137N0550", "score": 0.999, "strasse": "Neuenfelder Stra\u00dfe", "text": "Neuenfelder Stra\u00dfe 19, 21109 Hamburg - Wilhelmsburg", "treffer": "T", "typ": "Haus", "verwgem": "Hamburg"}, "type": "Feature"}], "strasse:\"Schaperstra\u00dfe\" AND haus:\"16\" AND plz:\"65195\" AND ort:\"Wiesbaden\"": [{"bbox": [8.22675994377327, 50.0879624734201, 8.22689972046756, 50.0880524043865], "geometry": {"coordinates": [8.22683, 50.08801], "type": "Point"}, "id": "DEHE062000019vYU", "properties": {"ags": "06414000", "bbox": {"coordinates": [[[8.22676, 50.08796], [8.22676, 50.08805], [8.2269, 50.08805], [8.2269, 50.08796], [8.22676, 50.08796]]], "type": "Polygon"}, "bundesland": "Hessen", "gemeinde": "Wiesbaden", "haus": "16", "kreis": "Landeshauptstadt Wiesbaden", "ort": "Wiesbaden", "ortsteil": "", "plz": "65195", "qualitaet": "A", "regbezirk": "Darmstadt", "rs": "064140000000", "schluessel": "064140000000058901104", "score": 0.999, "strasse": "Schaperstra\u00dfe", "text": "Schaperstra\u00dfe 16, 65195 Wiesbaden", "treffer": "T", "typ": "Haus", "verwgem": "Wiesbaden"}, "type": "Feature"}], "strasse:\"L\u00fcbecker Stra\u00dfe\" AND haus:\"289\" AND plz:\"19059\" AND ort:\"Schwerin\"": [{"bbox": [11.378225297728, 53.6469461657749, 11.3783764466972, 53.6470359727807], "geometry": {"coordinates": [11.3783, 53.64699], "type": "Point"}, "id": "DEMV000000044559", "properties": {"ags": "13004000", "bbox": {"coordinates": [[[11.37823, 53.64695], [11.37823, 53.64704], [11.37838, 53.64704], [11.37838, 53.64695], [11.37823, 53.64695]]], "type": "Polygon"}, "bundesland": "Mecklenburg-Vorpommern", "gemeinde": "Schwerin, Landeshauptstadt", "haus": "289", "kreis": "Landeshauptstadt Schwerin", "ort": "Schwerin, Mecklenburg", "ortsteil": "Lankow", "plz": "19059", "qualitaet": "A", "rs": "130040000000", "schluessel": "130040000000000000366", "score": 0.9834525, "strasse": "L\u00fcbecker Str.", "text": "L\u00fcbecker Str. 289, 19059 Schwerin, Mecklenburg - Lankow", "treffer": "T", "typ": "Haus", "verwgem": "Schwerin"}, "type": "Feature"}], "strasse:\"Podbielskistra\u00dfe\" AND haus:\"331\" AND plz:\"30659\" AND ort:\"Hannover\"": [{"bbox": [9.80197862229792, 52.4072429511222, 9.80212561098666, 52.4073328456491], "geometry": {"coordinates": [9.80205, 52.40729], "type": "Point"}, "id": "DENIHK0000509041", "properties": {"ags": "03241001", "bbox": {"coordinates": [[[9.80198, 52.40724], [9.80198, 52.40733], [9.80213, 52.40733], [9.80213, 52.40724], [9.80198, 52.40724]]], "type": "Polygon"}, "bundesland": "Niedersachsen", "gemeinde": "Hannover, Landeshauptstadt", "haus": "331", "kreis": "Hannover, Region", "ort": "Hannover", "ortsteil": "Bothfeld", "plz": "30659", "qualitaet": "A", "regbezirk": "Hannover", "rs": "032410001001", "schluessel": "032410001001000002197", "score": 0.999, "strasse": "Podbielskistra\u00dfe", "text": "Podbielskistra\u00dfe 331, 30659 Hannover - Bothfeld", "treffer": "T", "typ": "Haus", "verwgem": "Hannover"}, "type": "Feature"}], "strasse:\"Muffendorfer Stra\u00dfe\" AND haus:\"19-21\" AND plz:\"53177\" AND ort:\"Bonn\"": [{"bbox": [7.12204109726829, 50.655719511547, 7.17229153705322, 50.6893055543248], "geometry": {"coordinates": [7.15036, 50.67914], "type": "Point"}, "id": "DEGAC00000029686", "properties": {"ags": "05314000", "bbox": {"coordinates": [[[7.12204, 50.65572], [7.12204, 50.68931], [7.17229, 50.68931], [7.17229, 50.65572], [7.12204, 50.65572]]], "type": "Polygon"}, "bundesland": "Nordrhein-Westfalen", "gemeinde": "Bonn", "kreis": "Bonn", "ort": "Bonn", "ortsteil": "Bad Godesberg", "plz": "53177", "regbezirk": "K\u00f6ln", "rs": "053140000000", "schluessel": "0531400000000000", "score": 0.999, "text": "53177 Bonn - Bad Godesberg", "treffer": "", "typ": "Ort", "verwgem": "Bonn"}, "type": "Feature"}, {"bbox": [7.13305395001695, 50.6539385854595, 7.16343304949883, 50.670053805318], "geometry": {"coordinates": [7.15233, 50.66299], "type": "Point"}, "id": "DEGAC00000029687", "properties": {"ags": "05314000", "bbox": {"coordinates": [[[7.13305, 50.65394], [7.13305, 50.67005], [7.16343, 50.67005], [7.16343, 50.65394], [7.13305, 50.65394]]], "type": "Polygon"}, "bundesland": "Nordrhein-Westfalen", "gemeinde": "Bonn", "kreis": "Bonn", "ort": "Bonn", "ortsteil": "Heiderhof", "plz": "53177", "regbezirk": "K\u00f6ln", "rs": "053140000000", "schluessel": "0531400000000000", "score": 0.999, "text": "53177 Bonn - Heiderhof", "treffer": "", "typ": "Ort", "verwgem": "Bonn"}, "type": "Feature"}, {"bbox": [7.16232568689017, 50.6634874880009, 7.17023917674719, 50.6692235829198], "geometry": {"coordinates": [7.16682, 50.66556], "type": "Point"}, "id": "DEGAC00000029688", "properties": {"ags": "05314000", "bbox": {"coordinates": [[[7.16233, 50.66349], [7.16233, 50.66922], [7.17024, 50.66922], [7.17024, 50.66349], [7.16233, 50.66349]]], "type": "Polygon"}, "bundesland": "Nordrhein-Westfalen", "gemeinde": "Bonn", "kreis": "Bonn", "ort": "Bonn", "ortsteil": "Lannesdorf", "plz": "53177", "regbezirk": "K\u00f6ln", "rs": "053140000000", "schluessel": "0531400000000000", "score": 0.999, "text": "53177 Bonn - Lannesdorf", "treffer": "", "typ": "Ort", "verwgem": "Bonn"}, "type": "Feature"}, {"bbox": [7.15194779383361, 50.6629296033693, 7.1681868168675, 50.6779414824533], "geometry": {"coordinates": [7.15967, 50.67039], "type": "Point"}, "id": "DEGAC00000029689", "properties": {"ags": "05314000", "bbox": {"coordinates": [[[7.15195, 50.66293], [7.15195, 50.67794], [7.16819, 50.67794], [7.16819, 50.66293], [7.15195, 50.66293]]], "type": "Polygon"}, "bundesland": "Nordrhein-Westfalen", "gemeinde": "Bonn", "kreis": "Bonn", "ort": "Bonn", "ortsteil": "Muffendorf", "plz": "53177", "regbezirk": "K\u00f6ln", "rs": "053140000000", "schluessel": "0531400000000000", "score": 0.999, "text": "53177 Bonn - Muffendorf", "treffer": "", "typ": "Ort", "verwgem": "Bonn"}, "type": "Feature"}, {"bbox": [7.15965589399546, 50.6659584043821, 7.18011271685028, 50.6802572974416], "geometry": {"coordinates": [7.16844, 50.67239], "type": "Point"}, "id": "DEGAC00000029690", "properties": {"ags": "05314000", "bbox": {"coordinates": [[[7.15966, 50.66596], [7.15966, 50.68026], [7.18011, 50.68026], [7.18011, 50.66596], [7.15966, 50.66596]]], "type": "Polygon"}, "bundesland": "Nordrhein-Westfalen", "gemeinde": "Bonn", "kreis": "Bonn", "ort": "Bonn", "ortsteil": "Pennenfeld", "plz": "53177", "regbezirk": "K\u00f6ln", "rs": "053140000000", "schluessel": "0531400000000000", "score": 0.999, "text": "53177 Bonn - Pennenfeld", "treffer": "", "typ": "Ort", "verwgem": "Bonn"}, "type": "Feature"}, {"bbox": [7.11236460210087, 50.6740239656971, 7.1504575913669, 50.6857684423074], "geometry": {"coordinates": [7.14109, 50.68152], "type": "Point"}, "id": "DEGAC00000029691", "properties": {"ags": "05314000", "bbox": {"coordinates": [[[7.11236, 50.67402], [7.11236, 50.68577], [7.15046, 50.68577], [7.15046, 50.67402], [7.11236, 50.67402]]], "type": "Polygon"}, "bundesland": "Nordrhein-Westfalen", "gemeinde": "Bonn", "kreis": "Bonn", "ort": "Bonn", "ortsteil": "Schweinheim", "plz": "53177", "regbezirk": "K\u00f6ln", "rs": "053140000000", "schluessel": "0531400000000000", "score": 0.999, "text": "53177 Bonn - Schweinheim", "treffer": "", "typ": "Ort", "verwgem": "Bonn"}, "type": "Feature"}], "strasse:\"Von-Kuhl-Stra\u00dfe\" AND haus:\"49\" AND plz:\"56070\" AND ort:\"Koblenz\"": [{"bbox": [7.58486921530729, 50.374811983603, 7.58500980294557, 50.3749018908459], "geometry": {"coordinates": [7.58494, 50.37486], "type": "Point"}, "id": "DERPLP050000G1RC", "properties": {"ags": "07111000", "bbox": {"coordinates": [[[7.58487, 50.37481], [7.58487, 50.3749], [7.58501, 50.3749], [7.58501, 50.37481], [7.58487, 50.37481]]], "type": "Polygon"}, "bundesland": "Rheinland-Pfalz", "gemeinde": "Koblenz", "haus": "49", "kreis": "Stadt Koblenz", "ort": "Koblenz am Rhein", "ortsteil": "L\u00fctzel", "plz": "56070", "qualitaet": "A", "regbezirk": "Koblenz", "rs": "071110000000", "schluessel": "071110000000000000964", "score": 0.9850616, "strasse": "Von-Kuhl-Stra\u00dfe", "text": "Von-Kuhl-Stra\u00dfe 49, 56070 Koblenz am Rhein - L\u00fctzel", "treffer": "T", "typ": "Haus", "verwgem": "Koblenz"}, "type": "Feature"}], "strasse:\"Von der Heydt\" AND haus:\"22\" AND plz:\"66115\" AND ort:\"Saarbr\u00fccken\"": [{"bbox": [6.95513297068782, 49.2440395424986, 6.95527027508501, 49.2441294374926], "geometry": {"coordinates": [6.9552, 49.24408], "type": "Point"}, "id": "DESLALKI4R000jnk", "properties": {"ags": "10041100", "bbox": {"coordinates": [[[6.95513, 49.24404], [6.95513, 49.24413], [6.95527, 49.24413], [6.95527, 49.24404], [6.95513, 49.24404]]], "type": "Polygon"}, "bundesland": "Saarland", "gemeinde": "Saarbr\u00fccken", "haus": "22", "kreis": "Saarbr\u00fccken", "ort": "Saarbr\u00fccken", "ortsteil": "Burbach", "plz": "66115", "qualitaet": "A", "regbezirk": "", "rs": "100410100100", "schluessel": "100410100100024001406", "score": 0.9850318, "strasse": "Von-der-Heydt-Stra\u00dfe", "text": "Von-der-Heydt-Stra\u00dfe 22, 66115 Saarbr\u00fccken - Burbach", "treffer": "T", "typ": "Haus", "verwgem": "Saarbr\u00fccken"}, "type": "Feature"}], "strasse:\"Olbrichtplatz\" AND haus:\"3\" AND plz:\"1099\" AND ort:\"Dresden\"": [], "strasse:\"Otto-von-Guericke-Stra\u00dfe\" AND haus:\"15\" AND plz:\"39104\" AND ort:\"Magdeburg\"": [{"bbox": [11.6307763785251, 52.1296074619346, 11.6309223120867, 52.1296972746773], "geometry": {"coordinates": [11.63085, 52.12965], "type": "Point"}, "id": "DEST0GGA0003Mdlq", "properties": {"ags": "15003000", "bbox": {"coordinates": [[[11.63078, 52.12961], [11.63078, 52.1297], [11.63092, 52.1297], [11.63092, 52.12961], [11.63078, 52.12961]]], "type": "Polygon"}, "bundesland": "Sachsen-Anhalt", "gemeinde": "Magdeburg, Landeshauptstadt", "haus": "15", "kreis": "Magdeburg", "ort": "Magdeburg", "ortsteil": "Altstadt", "plz": "39104", "qualitaet": "A", "regbezirk": "", "rs": "150030000000", "schluessel": "150030000000000004790", "score": 0.999, "strasse": "Otto-von-Guericke-Stra\u00dfe", "text": "Otto-von-Guericke-Stra\u00dfe 15, 39104 Magdeburg - Altstadt", "treffer": "T", "typ": "Haus", "verwgem": "Magdeburg"}, "type": "Feature"}], "strasse:\"Mercatorstra\u00dfe\" AND haus:\"1\" AND plz:\"24106\" AND ort:\"Kiel\"": [{"bbox": [10.1314743301902, 54.3555425714322, 10.1316281708311, 54.3556324277254], "geometry": {"coordinates": [10.13155, 54.35559], "type": "Point"}, "id": "DESHPDHK0002bw3b", "properties": {"ags": "01002000", "bbox": {"coordinates": [[[10.13147, 54.35554], [10.13147, 54.35563], [10.13163, 54.35563], [10.13163, 54.35554], [10.13147, 54.35554]]], "type": "Polygon"}, "bundesland": "Schleswig-Holstein", "gemeinde": "Kiel, Landeshauptstadt", "haus": "1", "kreis": "Kiel, Landeshauptstadt", "ort": "Kiel", "ortsteil": "Wik", "plz": "24106", "qualitaet": "A", "regbezirk": "", "rs": "010020000000", "schluessel": "010020000000080000716", "score": 0.999, "strasse": "Mercatorstra\u00dfe", "text": "Mercatorstra\u00dfe 1, 24106 Kiel - Wik", "treffer": "T", "typ": "Haus", "verwgem": "Kiel"}, "type": "Feature"}], "strasse:\"Hohenwindenstra\u00dfe\" AND haus:\"13 a\" AND plz:\"99086\" AND ort:\"Erfurt\"": [{"bbox": [11.0276449431225, 51.0048962320797, 11.0277873807804, 51.0049861006379], "geometry": {"coordinates": [11.02772, 51.00494], "type": "Point"}, "id": "DETHL51P0000h0X6", "properties": {"ags": "16051000", "bbox": {"coordinates": [[[11.02764, 51.0049], [11.02764, 51.00499], [11.02779, 51.00499], [11.02779, 51.0049], [11.02764, 51.0049]]], "type": "Polygon"}, "bundesland": "Th\u00fcringen", "gemeinde": "Erfurt", "haus": "13a", "kreis": "Erfurt", "ort": "Erfurt", "ortsteil": "Ilversgehofen", "plz": "99086", "qualitaet": "A", "regbezirk": "", "rs": "160510000000", "schluessel": "160510000000000004010", "score": 0.999, "strasse": "Hohenwindenstra\u00dfe", "text": "Hohenwindenstra\u00dfe 13a, 99086 Erfurt - Ilversgehofen", "treffer": "T", "typ": "Haus", "verwgem": "Erfurt"}, "type": "Feature"}], "strasse:\"Richard-Strauss-Allee\" AND haus:\"11\" AND plz:\"60598\" AND ort:\"Frankfurt am Main\"": [], "strasse:\"Karl-Rothe-Stra\u00dfe\" AND haus:\"10-14\" AND plz:\"4105\" AND ort:\"Leipzig\"": [], "strasse:\"Frauenberger Stra\u00dfe\" AND haus:\"250\" AND plz:\"53879\" AND ort:\"Euskirchen\"": [{"bbox": [6.76420598532904, 50.6743658014104, 6.76434740116512, 50.6744556629285], "geometry": {"coordinates": [6.76428, 50.67441], "type": "Point"}, "id": "DENW000000985660", "properties": {"ags": "05366016", "bbox": {"coordinates": [[[6.76421, 50.67437], [6.76421, 50.67446], [6.76435, 50.67446], [6.76435, 50.67437], [6.76421, 50.67437]]], "type": "Polygon"}, "bundesland": "Nordrhein-Westfalen", "gemeinde": "Euskirchen", "haus": "250", "kreis": "Euskirchen", "ort": "Euskirchen", "ortsteil": "Innenstadt", "plz": "53879", "qualitaet": "A", "regbezirk": "K\u00f6ln", "rs": "053660016016", "schluessel": "053660016016000001121", "score": 0.999, "strasse": "Frauenberger Stra\u00dfe", "text": "Frauenberger Stra\u00dfe 250, 53879 Euskirchen - Innenstadt", "treffer": "T", "typ": "Haus", "verwgem": "Euskirchen"}, "type": "Feature"}]}
+{
+    "strasse:\"B\u00fcchsenstra\u00dfe\" AND haus:\"54\" AND plz:\"70025\" AND ort:\"Stuttgart\"": [],
+    "strasse:\"Alexandrastra\u00dfe\" AND haus:\"4\" AND plz:\"80538\" AND ort:\"M\u00fcnchen\"": [
+        {
+            "bbox": [
+                692692.2342282409,
+                5335282.291054309,
+                692702.5594682447,
+                5335292.616294316
+            ],
+            "geometry": {
+                "coordinates": [
+                    692697.39684,
+                    5335287.45367
+                ],
+                "type": "Point"
+            },
+            "id": "DEBYv00086193073",
+            "properties": {
+                "ags": "09162000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                692692.5708,
+                                5335282.29105
+                            ],
+                            [
+                                692692.23423,
+                                5335292.27971
+                            ],
+                            [
+                                692702.22288,
+                                5335292.61629
+                            ],
+                            [
+                                692702.55947,
+                                5335282.62764
+                            ],
+                            [
+                                692692.5708,
+                                5335282.29105
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Bayern",
+                "gemeinde": "M\u00fcnchen",
+                "haus": "4",
+                "kreis": "M\u00fcnchen",
+                "ort": "M\u00fcnchen",
+                "ortsteil": "Altstadt-Lehel",
+                "plz": "80538",
+                "qualitaet": "A",
+                "regbezirk": "Oberbayern",
+                "rs": "091620000000",
+                "schluessel": "091620000000000100000",
+                "score": 0.999,
+                "strasse": "Alexandrastra\u00dfe",
+                "text": "Alexandrastra\u00dfe 4, 80538 M\u00fcnchen - Altstadt-Lehel",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "M\u00fcnchen"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Fehrbelliner Platz\" AND haus:\"1\" AND plz:\"10707\" AND ort:\"Berlin\"": [
+        {
+            "bbox": [
+                792902.3423783302,
+                5824428.39877396,
+                792912.9031005254,
+                5824438.959496168
+            ],
+            "geometry": {
+                "coordinates": [
+                    792907.62273,
+                    5824433.67913
+                ],
+                "type": "Point"
+            },
+            "id": "DEBE04YY50003qrB",
+            "properties": {
+                "ags": "11000000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                792902.93879,
+                                5824428.39877
+                            ],
+                            [
+                                792902.34238,
+                                5824438.36307
+                            ],
+                            [
+                                792912.30667,
+                                5824438.9595
+                            ],
+                            [
+                                792912.9031,
+                                5824428.9952
+                            ],
+                            [
+                                792902.93879,
+                                5824428.39877
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Berlin",
+                "haus": "1",
+                "kreis": "",
+                "ort": "Berlin",
+                "ortsteil": "Wilmersdorf",
+                "plz": "10707",
+                "qualitaet": "A",
+                "regbezirk": "",
+                "rs": "110000000000",
+                "schluessel": "110000000000040206970",
+                "score": 0.999,
+                "strasse": "Fehrbelliner Platz",
+                "text": "Fehrbelliner Platz 1, 10707 Berlin - Wilmersdorf",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Berlin"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Heinrich-Mann-Allee\" AND haus:\"103\" AND plz:\"14473\" AND ort:\"Potsdam\"": [
+        {
+            "bbox": [
+                777539.4561607102,
+                5811278.111606384,
+                777549.9873574877,
+                5811288.642803159
+            ],
+            "geometry": {
+                "coordinates": [
+                    777544.72175,
+                    5811283.3772
+                ],
+                "type": "Point"
+            },
+            "id": "DEBBAL540001BPjR",
+            "properties": {
+                "ags": "12054000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                777540.01914,
+                                5811278.11161
+                            ],
+                            [
+                                777539.45616,
+                                5811288.07981
+                            ],
+                            [
+                                777549.42435,
+                                5811288.6428
+                            ],
+                            [
+                                777549.98736,
+                                5811278.6746
+                            ],
+                            [
+                                777540.01914,
+                                5811278.11161
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Brandenburg",
+                "gemeinde": "Potsdam",
+                "haus": "103",
+                "kreis": "Potsdam",
+                "ort": "Potsdam",
+                "ortsteil": "S\u00fcdliche Innenstadt",
+                "plz": "14473",
+                "qualitaet": "A",
+                "regbezirk": "",
+                "rs": "120540000000",
+                "schluessel": "120540000000000004104",
+                "score": 0.999,
+                "strasse": "Heinrich-Mann-Allee",
+                "text": "Heinrich-Mann-Allee 103, 14473 Potsdam - S\u00fcdliche Innenstadt",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Potsdam"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Contrescarpe\" AND haus:\"72\" AND plz:\"28195\" AND ort:\"Bremen\"": [
+        {
+            "bbox": [
+                487416.05993910914,
+                5881180.940169604,
+                487426.08607271087,
+                5881190.966303213
+            ],
+            "geometry": {
+                "coordinates": [
+                    487421.07301,
+                    5881185.95323
+                ],
+                "type": "Point"
+            },
+            "id": "DEHB01ALn0000a6z",
+            "properties": {
+                "ags": "04011000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                487416.05994,
+                                5881180.96637
+                            ],
+                            [
+                                487416.08615,
+                                5881190.9663
+                            ],
+                            [
+                                487426.08607,
+                                5881190.9401
+                            ],
+                            [
+                                487426.05988,
+                                5881180.94017
+                            ],
+                            [
+                                487416.05994,
+                                5881180.96637
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Bremen",
+                "gemeinde": "Bremen",
+                "haus": "72",
+                "kreis": "Stadt Bremen",
+                "ort": "Bremen",
+                "ortsteil": "Bahnhofsvorstadt",
+                "plz": "28195",
+                "qualitaet": "A",
+                "regbezirk": "Bremen",
+                "rs": "040110000000",
+                "schluessel": "040110000000011216630",
+                "score": 0.999,
+                "strasse": "Contrescarpe",
+                "text": "Contrescarpe 72, 28195 Bremen - Bahnhofsvorstadt",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Bremen"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Neuenfelder Stra\u00dfe\" AND haus:\"19\" AND plz:\"21109\" AND ort:\"Hamburg\"": [
+        {
+            "bbox": [
+                566605.3945069923,
+                5928080.59674365,
+                566615.5333855371,
+                5928090.735622189
+            ],
+            "geometry": {
+                "coordinates": [
+                    566610.46394,
+                    5928085.66618
+                ],
+                "type": "Point"
+            },
+            "id": "DEHHALKA10007htF",
+            "properties": {
+                "ags": "02000000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                566605.53536,
+                                5928080.59674
+                            ],
+                            [
+                                566605.39451,
+                                5928090.59476
+                            ],
+                            [
+                                566615.39251,
+                                5928090.73562
+                            ],
+                            [
+                                566615.53339,
+                                5928080.73761
+                            ],
+                            [
+                                566605.53536,
+                                5928080.59674
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Hamburg",
+                "haus": "19",
+                "ort": "Hamburg",
+                "ortsteil": "Wilhelmsburg",
+                "plz": "21109",
+                "qualitaet": "A",
+                "rs": "020000000000",
+                "schluessel": "0200000000000137N0550",
+                "score": 0.999,
+                "strasse": "Neuenfelder Stra\u00dfe",
+                "text": "Neuenfelder Stra\u00dfe 19, 21109 Hamburg - Wilhelmsburg",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Hamburg"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Schaperstra\u00dfe\" AND haus:\"16\" AND plz:\"65195\" AND ort:\"Wiesbaden\"": [
+        {
+            "bbox": [
+                444685.6158275782,
+                5548697.050333784,
+                444695.7182573671,
+                5548707.1527635725
+            ],
+            "geometry": {
+                "coordinates": [
+                    444690.66705,
+                    5548702.10155
+                ],
+                "type": "Point"
+            },
+            "id": "DEHE062000019vYU",
+            "properties": {
+                "ags": "06414000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                444685.61583,
+                                5548697.15383
+                            ],
+                            [
+                                444685.71934,
+                                5548707.15276
+                            ],
+                            [
+                                444695.71826,
+                                5548707.04926
+                            ],
+                            [
+                                444695.61477,
+                                5548697.05033
+                            ],
+                            [
+                                444685.61583,
+                                5548697.15383
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Hessen",
+                "gemeinde": "Wiesbaden",
+                "haus": "16",
+                "kreis": "Landeshauptstadt Wiesbaden",
+                "ort": "Wiesbaden",
+                "ortsteil": "",
+                "plz": "65195",
+                "qualitaet": "A",
+                "regbezirk": "Darmstadt",
+                "rs": "064140000000",
+                "schluessel": "064140000000058901104",
+                "score": 0.999,
+                "strasse": "Schaperstra\u00dfe",
+                "text": "Schaperstra\u00dfe 16, 65195 Wiesbaden",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Wiesbaden"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"L\u00fcbecker Stra\u00dfe\" AND haus:\"289\" AND plz:\"19059\" AND ort:\"Schwerin\"": [
+        {
+            "bbox": [
+                657193.9303918672,
+                5946870.003685138,
+                657204.2533408729,
+                5946880.326634145
+            ],
+            "geometry": {
+                "coordinates": [
+                    657199.09186,
+                    5946875.16516
+                ],
+                "type": "Point"
+            },
+            "id": "DEMV000000044559",
+            "properties": {
+                "ags": "13004000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                657194.26451,
+                                5946870.00369
+                            ],
+                            [
+                                657193.93039,
+                                5946879.99251
+                            ],
+                            [
+                                657203.9192,
+                                5946880.32663
+                            ],
+                            [
+                                657204.25334,
+                                5946870.33781
+                            ],
+                            [
+                                657194.26451,
+                                5946870.00369
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Mecklenburg-Vorpommern",
+                "gemeinde": "Schwerin, Landeshauptstadt",
+                "haus": "289",
+                "kreis": "Landeshauptstadt Schwerin",
+                "ort": "Schwerin, Mecklenburg",
+                "ortsteil": "Lankow",
+                "plz": "19059",
+                "qualitaet": "A",
+                "rs": "130040000000",
+                "schluessel": "130040000000000000366",
+                "score": 0.9834525,
+                "strasse": "L\u00fcbecker Str.",
+                "text": "L\u00fcbecker Str. 289, 19059 Schwerin, Mecklenburg - Lankow",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Schwerin"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Podbielskistra\u00dfe\" AND haus:\"331\" AND plz:\"30659\" AND ort:\"Hannover\"": [
+        {
+            "bbox": [
+                554554.7071159007,
+                5806637.049476172,
+                554564.8167983292,
+                5806647.159158596
+            ],
+            "geometry": {
+                "coordinates": [
+                    554559.76195,
+                    5806642.10431
+                ],
+                "type": "Point"
+            },
+            "id": "DENIHK0000509041",
+            "properties": {
+                "ags": "03241001",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                554554.81802,
+                                5806637.04948
+                            ],
+                            [
+                                554554.70712,
+                                5806647.04825
+                            ],
+                            [
+                                554564.70588,
+                                5806647.15916
+                            ],
+                            [
+                                554564.8168,
+                                5806637.16039
+                            ],
+                            [
+                                554554.81802,
+                                5806637.04948
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Niedersachsen",
+                "gemeinde": "Hannover, Landeshauptstadt",
+                "haus": "331",
+                "kreis": "Hannover, Region",
+                "ort": "Hannover",
+                "ortsteil": "Bothfeld",
+                "plz": "30659",
+                "qualitaet": "A",
+                "regbezirk": "Hannover",
+                "rs": "032410001001",
+                "schluessel": "032410001001000002197",
+                "score": 0.999,
+                "strasse": "Podbielskistra\u00dfe",
+                "text": "Podbielskistra\u00dfe 331, 30659 Hannover - Bothfeld",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Hannover"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Muffendorfer Stra\u00dfe\" AND haus:\"19-21\" AND plz:\"53177\" AND ort:\"Bonn\"": [
+        {
+            "bbox": [
+                367256.2155900906,
+                5613134.534781368,
+                370900.11338816176,
+                5616957.680615536
+            ],
+            "geometry": {
+                "coordinates": [
+                    369323.11711,
+                    5615776.89049
+                ],
+                "type": "Point"
+            },
+            "id": "DEGAC00000029686",
+            "properties": {
+                "ags": "05314000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                367256.21559,
+                                5613223.38958
+                            ],
+                            [
+                                367350.92832,
+                                5616957.68062
+                            ],
+                            [
+                                370900.11339,
+                                5616868.84659
+                            ],
+                            [
+                                370807.93622,
+                                5613134.53478
+                            ],
+                            [
+                                367256.21559,
+                                5613223.38958
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Nordrhein-Westfalen",
+                "gemeinde": "Bonn",
+                "kreis": "Bonn",
+                "ort": "Bonn",
+                "ortsteil": "Bad Godesberg",
+                "plz": "53177",
+                "regbezirk": "K\u00f6ln",
+                "rs": "053140000000",
+                "schluessel": "0531400000000000",
+                "score": 0.999,
+                "text": "53177 Bonn - Bad Godesberg",
+                "treffer": "",
+                "typ": "Ort",
+                "verwgem": "Bonn"
+            },
+            "type": "Feature"
+        },
+        {
+            "bbox": [
+                368029.61514189385,
+                5612952.00959759,
+                370221.3393003524,
+                5614797.4794434095
+            ],
+            "geometry": {
+                "coordinates": [
+                    369416.98811,
+                    5613978.0935
+                ],
+                "type": "Point"
+            },
+            "id": "DEGAC00000029687",
+            "properties": {
+                "ags": "05314000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                368029.61514,
+                                5613005.69653
+                            ],
+                            [
+                                368074.7866,
+                                5614797.47944
+                            ],
+                            [
+                                370221.3393,
+                                5614743.79852
+                            ],
+                            [
+                                370176.90323,
+                                5612952.0096
+                            ],
+                            [
+                                368029.61514,
+                                5613005.69653
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Nordrhein-Westfalen",
+                "gemeinde": "Bonn",
+                "kreis": "Bonn",
+                "ort": "Bonn",
+                "ortsteil": "Heiderhof",
+                "plz": "53177",
+                "regbezirk": "K\u00f6ln",
+                "rs": "053140000000",
+                "schluessel": "0531400000000000",
+                "score": 0.999,
+                "text": "53177 Bonn - Heiderhof",
+                "treffer": "",
+                "typ": "Ort",
+                "verwgem": "Bonn"
+            },
+            "type": "Feature"
+        },
+        {
+            "bbox": [
+                370124.97606916865,
+                5614001.8081804495,
+                370699.9724969054,
+                5614653.430484032
+            ],
+            "geometry": {
+                "coordinates": [
+                    370448.00611,
+                    5614238.3765
+                ],
+                "type": "Point"
+            },
+            "id": "DEGAC00000029688",
+            "properties": {
+                "ags": "05314000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                370124.97607,
+                                5614015.65594
+                            ],
+                            [
+                                370140.8033,
+                                5614653.43048
+                            ],
+                            [
+                                370699.9725,
+                                5614639.58328
+                            ],
+                            [
+                                370684.21345,
+                                5614001.80818
+                            ],
+                            [
+                                370124.97607,
+                                5614015.65594
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Nordrhein-Westfalen",
+                "gemeinde": "Bonn",
+                "kreis": "Bonn",
+                "ort": "Bonn",
+                "ortsteil": "Lannesdorf",
+                "plz": "53177",
+                "regbezirk": "K\u00f6ln",
+                "rs": "053140000000",
+                "schluessel": "0531400000000000",
+                "score": 0.999,
+                "text": "53177 Bonn - Lannesdorf",
+                "treffer": "",
+                "typ": "Ort",
+                "verwgem": "Bonn"
+            },
+            "type": "Feature"
+        },
+        {
+            "bbox": [
+                369390.03486998443,
+                5613943.364770374,
+                370578.93266008736,
+                5615640.990593609
+            ],
+            "geometry": {
+                "coordinates": [
+                    369956.27311,
+                    5614787.50149
+                ],
+                "type": "Point"
+            },
+            "id": "DEGAC00000029689",
+            "properties": {
+                "ags": "05314000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                369390.03487,
+                                5613971.87779
+                            ],
+                            [
+                                369431.69266,
+                                5615640.99059
+                            ],
+                            [
+                                370578.93266,
+                                5615612.48056
+                            ],
+                            [
+                                370537.6411,
+                                5613943.36477
+                            ],
+                            [
+                                369390.03487,
+                                5613971.87779
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Nordrhein-Westfalen",
+                "gemeinde": "Bonn",
+                "kreis": "Bonn",
+                "ort": "Bonn",
+                "ortsteil": "Muffendorf",
+                "plz": "53177",
+                "regbezirk": "K\u00f6ln",
+                "rs": "053140000000",
+                "schluessel": "0531400000000000",
+                "score": 0.999,
+                "text": "53177 Bonn - Muffendorf",
+                "treffer": "",
+                "typ": "Ort",
+                "verwgem": "Bonn"
+            },
+            "type": "Feature"
+        },
+        {
+            "bbox": [
+                369943.1325189606,
+                5614259.346628179,
+                371427.79346157616,
+                5615884.913562154
+            ],
+            "geometry": {
+                "coordinates": [
+                    370581.47611,
+                    5614994.67249
+                ],
+                "type": "Point"
+            },
+            "id": "DEGAC00000029690",
+            "properties": {
+                "ags": "05314000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                369943.13252,
+                                5614295.07291
+                            ],
+                            [
+                                369982.64772,
+                                5615884.91356
+                            ],
+                            [
+                                371427.79346,
+                                5615849.19084
+                            ],
+                            [
+                                371388.71771,
+                                5614259.34663
+                            ],
+                            [
+                                369943.13252,
+                                5614295.07291
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Nordrhein-Westfalen",
+                "gemeinde": "Bonn",
+                "kreis": "Bonn",
+                "ort": "Bonn",
+                "ortsteil": "Pennenfeld",
+                "plz": "53177",
+                "regbezirk": "K\u00f6ln",
+                "rs": "053140000000",
+                "schluessel": "0531400000000000",
+                "score": 0.999,
+                "text": "53177 Bonn - Pennenfeld",
+                "treffer": "",
+                "typ": "Ort",
+                "verwgem": "Bonn"
+            },
+            "type": "Feature"
+        },
+        {
+            "bbox": [
+                366624.15841376083,
+                5615208.04563158,
+                369348.15509912156,
+                5616581.786640859
+            ],
+            "geometry": {
+                "coordinates": [
+                    368674.63011,
+                    5616057.52349
+                ],
+                "type": "Point"
+            },
+            "id": "DEGAC00000029691",
+            "properties": {
+                "ags": "05314000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                366624.15841,
+                                5615275.96755
+                            ],
+                            [
+                                366657.45216,
+                                5616581.78664
+                            ],
+                            [
+                                369348.1551,
+                                5616513.87028
+                            ],
+                            [
+                                369315.53356,
+                                5615208.04563
+                            ],
+                            [
+                                366624.15841,
+                                5615275.96755
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Nordrhein-Westfalen",
+                "gemeinde": "Bonn",
+                "kreis": "Bonn",
+                "ort": "Bonn",
+                "ortsteil": "Schweinheim",
+                "plz": "53177",
+                "regbezirk": "K\u00f6ln",
+                "rs": "053140000000",
+                "schluessel": "0531400000000000",
+                "score": 0.999,
+                "text": "53177 Bonn - Schweinheim",
+                "treffer": "",
+                "typ": "Ort",
+                "verwgem": "Bonn"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Von-Kuhl-Stra\u00dfe\" AND haus:\"49\" AND plz:\"56070\" AND ort:\"Koblenz\"": [
+        {
+            "bbox": [
+                399374.26879179646,
+                5581262.407234455,
+                399384.4553710426,
+                5581272.593813692
+            ],
+            "geometry": {
+                "coordinates": [
+                    399379.36209,
+                    5581267.50052
+                ],
+                "type": "Point"
+            },
+            "id": "DERPLP050000G1RC",
+            "properties": {
+                "ags": "07111000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                399374.26879,
+                                5581262.59743
+                            ],
+                            [
+                                399374.459,
+                                5581272.59381
+                            ],
+                            [
+                                399384.45537,
+                                5581272.40362
+                            ],
+                            [
+                                399384.26518,
+                                5581262.40723
+                            ],
+                            [
+                                399374.26879,
+                                5581262.59743
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Rheinland-Pfalz",
+                "gemeinde": "Koblenz",
+                "haus": "49",
+                "kreis": "Stadt Koblenz",
+                "ort": "Koblenz am Rhein",
+                "ortsteil": "L\u00fctzel",
+                "plz": "56070",
+                "qualitaet": "A",
+                "regbezirk": "Koblenz",
+                "rs": "071110000000",
+                "schluessel": "071110000000000000964",
+                "score": 0.9850616,
+                "strasse": "Von-Kuhl-Stra\u00dfe",
+                "text": "Von-Kuhl-Stra\u00dfe 49, 56070 Koblenz am Rhein - L\u00fctzel",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Koblenz"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Von der Heydt\" AND haus:\"22\" AND plz:\"66115\" AND ort:\"Saarbr\u00fccken\"": [
+        {
+            "bbox": [
+                351169.98164611356,
+                5456597.003137623,
+                351180.2445937162,
+                5456607.266085231
+            ],
+            "geometry": {
+                "coordinates": [
+                    351175.11312,
+                    5456602.13461
+                ],
+                "type": "Point"
+            },
+            "id": "DESLALKI4R000jnk",
+            "properties": {
+                "ags": "10041100",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                351169.98165,
+                                5456597.27339
+                            ],
+                            [
+                                351170.25191,
+                                5456607.26609
+                            ],
+                            [
+                                351180.24459,
+                                5456606.99583
+                            ],
+                            [
+                                351179.97435,
+                                5456597.00314
+                            ],
+                            [
+                                351169.98165,
+                                5456597.27339
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Saarland",
+                "gemeinde": "Saarbr\u00fccken",
+                "haus": "22",
+                "kreis": "Saarbr\u00fccken",
+                "ort": "Saarbr\u00fccken",
+                "ortsteil": "Burbach",
+                "plz": "66115",
+                "qualitaet": "A",
+                "regbezirk": "",
+                "rs": "100410100100",
+                "schluessel": "100410100100024001406",
+                "score": 0.9850318,
+                "strasse": "Von-der-Heydt-Stra\u00dfe",
+                "text": "Von-der-Heydt-Stra\u00dfe 22, 66115 Saarbr\u00fccken - Burbach",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Saarbr\u00fccken"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Olbrichtplatz\" AND haus:\"3\" AND plz:\"1099\" AND ort:\"Dresden\"": [],
+    "strasse:\"Otto-von-Guericke-Stra\u00dfe\" AND haus:\"15\" AND plz:\"39104\" AND ort:\"Magdeburg\"": [
+        {
+            "bbox": [
+                680066.2812936581,
+                5778718.037788157,
+                680076.6304025969,
+                5778728.386897084
+            ],
+            "geometry": {
+                "coordinates": [
+                    680071.45584,
+                    5778723.21234
+                ],
+                "type": "Point"
+            },
+            "id": "DEST0GGA0003Mdlq",
+            "properties": {
+                "ags": "15003000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                680066.64353,
+                                5778718.03779
+                            ],
+                            [
+                                680066.28129,
+                                5778728.02465
+                            ],
+                            [
+                                680076.26814,
+                                5778728.3869
+                            ],
+                            [
+                                680076.6304,
+                                5778718.40004
+                            ],
+                            [
+                                680066.64353,
+                                5778718.03779
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Sachsen-Anhalt",
+                "gemeinde": "Magdeburg, Landeshauptstadt",
+                "haus": "15",
+                "kreis": "Magdeburg",
+                "ort": "Magdeburg",
+                "ortsteil": "Altstadt",
+                "plz": "39104",
+                "qualitaet": "A",
+                "regbezirk": "",
+                "rs": "150030000000",
+                "schluessel": "150030000000000004790",
+                "score": 0.999,
+                "strasse": "Otto-von-Guericke-Stra\u00dfe",
+                "text": "Otto-von-Guericke-Stra\u00dfe 15, 39104 Magdeburg - Altstadt",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Magdeburg"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Mercatorstra\u00dfe\" AND haus:\"1\" AND plz:\"24106\" AND ort:\"Kiel\"": [
+        {
+            "bbox": [
+                573532.5029919391,
+                6023670.743118557,
+                573542.660888216,
+                6023680.901014825
+            ],
+            "geometry": {
+                "coordinates": [
+                    573537.58193,
+                    6023675.82206
+                ],
+                "type": "Point"
+            },
+            "id": "DESHPDHK0002bw3b",
+            "properties": {
+                "ags": "01002000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                573532.66345,
+                                6023670.74312
+                            ],
+                            [
+                                573532.50299,
+                                6023680.74054
+                            ],
+                            [
+                                573542.50041,
+                                6023680.90101
+                            ],
+                            [
+                                573542.66089,
+                                6023670.90359
+                            ],
+                            [
+                                573532.66345,
+                                6023670.74312
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Schleswig-Holstein",
+                "gemeinde": "Kiel, Landeshauptstadt",
+                "haus": "1",
+                "kreis": "Kiel, Landeshauptstadt",
+                "ort": "Kiel",
+                "ortsteil": "Wik",
+                "plz": "24106",
+                "qualitaet": "A",
+                "regbezirk": "",
+                "rs": "010020000000",
+                "schluessel": "010020000000080000716",
+                "score": 0.999,
+                "strasse": "Mercatorstra\u00dfe",
+                "text": "Mercatorstra\u00dfe 1, 24106 Kiel - Wik",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Kiel"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Hohenwindenstra\u00dfe\" AND haus:\"13 a\" AND plz:\"99086\" AND ort:\"Erfurt\"": [
+        {
+            "bbox": [
+                642257.6281847864,
+                5652326.097767773,
+                642267.8955794426,
+                5652336.365162428
+            ],
+            "geometry": {
+                "coordinates": [
+                    642262.76188,
+                    5652331.23146
+                ],
+                "type": "Point"
+            },
+            "id": "DETHL51P0000h0X6",
+            "properties": {
+                "ags": "16051000",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                642257.90314,
+                                5652326.09777
+                            ],
+                            [
+                                642257.62818,
+                                5652336.0902
+                            ],
+                            [
+                                642267.62061,
+                                5652336.36516
+                            ],
+                            [
+                                642267.89558,
+                                5652326.37273
+                            ],
+                            [
+                                642257.90314,
+                                5652326.09777
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Th\u00fcringen",
+                "gemeinde": "Erfurt",
+                "haus": "13a",
+                "kreis": "Erfurt",
+                "ort": "Erfurt",
+                "ortsteil": "Ilversgehofen",
+                "plz": "99086",
+                "qualitaet": "A",
+                "regbezirk": "",
+                "rs": "160510000000",
+                "schluessel": "160510000000000004010",
+                "score": 0.999,
+                "strasse": "Hohenwindenstra\u00dfe",
+                "text": "Hohenwindenstra\u00dfe 13a, 99086 Erfurt - Ilversgehofen",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Erfurt"
+            },
+            "type": "Feature"
+        }
+    ],
+    "strasse:\"Richard-Strauss-Allee\" AND haus:\"11\" AND plz:\"60598\" AND ort:\"Frankfurt am Main\"": [],
+    "strasse:\"Karl-Rothe-Stra\u00dfe\" AND haus:\"10-14\" AND plz:\"4105\" AND ort:\"Leipzig\"": [],
+    "strasse:\"Frauenberger Stra\u00dfe\" AND haus:\"250\" AND plz:\"53879\" AND ort:\"Euskirchen\"": [
+        {
+            "bbox": [
+                342027.50182355696,
+                5615998.657188125,
+                342037.7944376826,
+                5616008.949802256
+            ],
+            "geometry": {
+                "coordinates": [
+                    342032.64814,
+                    5616003.80349
+                ],
+                "type": "Point"
+            },
+            "id": "DENW000000985660",
+            "properties": {
+                "ags": "05366016",
+                "bbox": {
+                    "coordinates": [
+                        [
+                            [
+                                342027.50182,
+                                5615998.95891
+                            ],
+                            [
+                                342027.80356,
+                                5616008.9498
+                            ],
+                            [
+                                342037.79444,
+                                5616008.64808
+                            ],
+                            [
+                                342037.49272,
+                                5615998.65719
+                            ],
+                            [
+                                342027.50182,
+                                5615998.95891
+                            ]
+                        ]
+                    ],
+                    "type": "Polygon"
+                },
+                "bundesland": "Nordrhein-Westfalen",
+                "gemeinde": "Euskirchen",
+                "haus": "250",
+                "kreis": "Euskirchen",
+                "ort": "Euskirchen",
+                "ortsteil": "Innenstadt",
+                "plz": "53879",
+                "qualitaet": "A",
+                "regbezirk": "K\u00f6ln",
+                "rs": "053660016016",
+                "schluessel": "053660016016000001121",
+                "score": 0.999,
+                "strasse": "Frauenberger Stra\u00dfe",
+                "text": "Frauenberger Stra\u00dfe 250, 53879 Euskirchen - Innenstadt",
+                "treffer": "T",
+                "typ": "Haus",
+                "verwgem": "Euskirchen"
+            },
+            "type": "Feature"
+        }
+    ]
+}

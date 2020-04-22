@@ -25,6 +25,12 @@
 import sys
 import os
 
+try:
+    import wingdbstub
+    wingdbstub.Ensure()
+except:
+    pass
+
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
     """Load BKGGeocoder class from file BKGGeocoder.

@@ -1,0 +1,20 @@
+ID;Bezeichnung;Straße + Hausnummer;Postleitzahl;Ort;Bundesland
+1;Landesamt für Geoinformation und Landentwicklung Baden-Württemberg (LGL);Büchsenstraße54;70025;Stuttgart;Baden-Württemberg
+2;Landesamt für Digitalisierung, Breitband und Vermessung (LDBV);Alexandrastraße4;80538;München;Bayern
+3;Senatsverwaltung für Stadtentwicklung und Wohnen Abt. III Geoinformation;Fehrbelliner Platz 1;10707;Berlin;Berlin
+4;Landesvermessung und Geobasisinformation Brandenburg (LGB);Heinrich-Mann-Allee 103;14473;Potsdam;Brandenburg
+5;GeoInformation Bremen Landesamt Kataster, Vermessung, Immobilienbewertung, Informationssysteme;Contrescarpe 72;28195;Bremen;Freie und Hansestadt Bremen
+6;Landesbetrieb Geoinformation und Vermessung Hamburg;Neuenfelder Straße 19;21109;Hamburg;Freie und Hansestadt Hamburg
+7;Hessisches Landesamt für Bodenmanagement und Geoinformation;Schaperstraße 16;65195;Wiesbaden;Hessen
+8;Landesamt für innere Verwaltung Mecklenburg-Vorpommern - Amt für Geoinformation, Vermessungs- und Katasterwesen;Lübecker Straße 289;19059;Schwerin;Mecklenburg-Vorpommern
+9;Landesamt für Geoinformation und Landesvermessung Niedersachsen (LGLN);Podbielskistraße 331;30659;Hannover;Niedersachsen
+10;Bezirksregierung Köln - Geobasis NRW;Muffendorfer Straße 19-21;53177;Bonn;Nordrhein-Westfalen
+11;Landesamt für Vermessung und Geobasisinformation Rheinland-Pfalz;Von-Kuhl-Straße 49;56070;Koblenz;Rheinland-Pfalz
+12;Landesamt für Vermessung, Geoinformation und Landentwicklung (LVGL);Von der Heydt 22;66115;Saarbrücken;Saarland
+13;Staatsbetrieb Geobasisinformation und Vermessung Sachsen (GeoSN);Olbrichtplatz 3;01099;Dresden;Sachsen
+14;Landesamt für Vermessung und Geoinformation Sachsen-Anhalt;Otto-von-Guericke-Straße 15;39104;Magdeburg;Sachsen-Anhalt
+15;Landesamt für Vermessung und Geoinformation Schleswig-Holstein;Mercatorstraße 1;24106;Kiel;Schleswig Holstein
+16;Landesamt für Vermessung und Geoinformation des Freistaats Thüringen (TLVermGeo);Hohenwindenstraße 13 a;99086;Erfurt;Thüringen
+17;Bundesamt für Kartographie und Geodäsie;Richard-Strauss-Allee 11;60598;Frankfurt am Main;Hessen
+18;Dienstleistungszentrum des Bundes für Geoinformation und Geodäsie (DLZ) im Bundesamt für Kartographie und Geodäsie (BKG);Karl-Rothe-Straße 10-14;04105;Leipzig;Sachsen
+19;Amt für Geoinformationswesen der Bundeswehr - Mercator-Kaserne;Frauenberger Straße 250;53879;Euskirchen;Nordrhein-Westfalen;Zentrum für Geoinformationswesen der Bundeswehr

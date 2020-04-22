@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import json
-import os, sys, copy
+import os
 from os.path import expanduser
 
 UI_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'ui')
+ICON_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'ui', 'icons')
+STYLE_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'styles')
 
 DEFAULT_FILE = os.path.join(expanduser("~"), "bkg_geocoder.cfg")
 DEFAULT_URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
@@ -13,7 +15,8 @@ class Singleton(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(Singleton, cls).__call__(
+                *args, **kwargs)
         return cls._instances[cls]
 
 
@@ -22,7 +25,14 @@ class Config(object):
 
     _default = {
         'url': DEFAULT_URL,
-        'api_key': ''
+        'api_key': '',
+        'api_url': '',
+        'use_api_url': False,
+        'logic_link': 'OR',
+        'selected_features_only': False,
+        'projection': 'EPSG:25832',
+        'use_rs': False,
+        'rs': '',
     }
 
     _config = {}
@@ -96,6 +106,6 @@ class Config(object):
             self._callbacks[attribute] = []
         self._callbacks[attribute].append(callback)
 
-    def remove_listeners(attribute):
+    def remove_listeners(self, attribute):
         if attribute in self._callbacks:
             self._callbacks.pop(attribute)

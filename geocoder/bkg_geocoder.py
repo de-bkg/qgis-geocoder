@@ -1,7 +1,7 @@
 import requests
 import re
 
-from .geocoder import Geocoder
+from geocoder.geocoder import Geocoder
 
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
 
@@ -17,28 +17,14 @@ class BKGGeocoder(Geocoder):
         'strasse': 'Straße',
         'haus': 'Hausnummer',
         'plz': 'Postleitzahl',
-        'strasse_hnr': 'Straße + Hausnummer',
+        'strasse_haus': 'Straße + Hausnummer',
         'plz_ort': 'Postleitzahl + Ort',
+        'gemeinde': 'Gemeinde',
+        'kreis': 'Kreis',
+        'verwgem': 'Verwaltungsgemeinde',
+        'bundesland': 'Bundesland',
+        'ortsteil': 'Ortsteil'
     }
-
-    logic_link = 'AND'
-    fuzzy = False
-
-    @staticmethod
-    def split_street_nr(value):
-        res = {}
-        # finds the last number with max. one trailing letter in the string
-        # (and possible spaces in between)
-        re_nr = '([\s\-]+[0-9]+[\s]*[a-zA-Z]{0,1}[\s]*$)'
-        f = re.findall(re_nr, value)
-        if f:
-            # take the last number found (e.g. bkg doesn't understand '6-8')
-            res['haus'] = f[-1].replace('-', '').replace(' ', '')
-        re_street = '([a-zA-ZäöüßÄÖÜ\\s\-\.]+[0-9]*[.\\]*[a-zA-ZäöüßÄÖÜ]+)'
-        m = re.match(re_street, value)
-        if m:
-            res['strasse'] = m[0]
-        return res
 
     @staticmethod
     def split_code_city(value):
@@ -57,20 +43,29 @@ class BKGGeocoder(Geocoder):
     # special keywords are keywords that are not supported by API but
     # its values are to be further processed into seperate keywords
     special_kw = {
-        'strasse_hnr': split_street_nr,
         'plz_ort': split_code_city,
     }
 
-    def __init__(self, key, srs: str='EPSG:4326'):
-        url = URL.format(key=key)
+    def __init__(self, key='', url='', srs: str='EPSG:4326', logic_link='AND',
+                 rs='', fuzzy=False, area_wkt=None):
+        if not key and not url:
+            raise ValueError('at least one keyword out of "key" and "url" has '
+                             'to be passed')
+        url = url or self.get_url(key)
+        self.logic_link = logic_link
+        self.fuzzy = fuzzy
+        self.rs = rs
+        self.area_wkt = area_wkt
         super().__init__(url=url, srs=srs)
 
-    def _build_params(self, args, kwargs):
+    @staticmethod
+    def get_url(key):
+        return URL.format(key=key)
+
+    def _build_params(self, *args, **kwargs):
         suffix = '~' if self.fuzzy else ''
-        logic = ' {} '.format(self.logic_link)
-        query = logic.join(
-            ['{a}{s}'.format(a=a, s=suffix) for a in args if a]
-            ) or ''
+        logic = f' {self.logic_link} '
+        query = logic.join([f'{a}{suffix}' for a in args if a]) or ''
         if args and kwargs:
             query += logic
         # pop and process the special keywords
@@ -81,17 +76,30 @@ class BKGGeocoder(Geocoder):
         query += logic.join(('{k}:"{v}"{s}'.format(k=k, v=v, s=suffix)
                              for k, v in kwargs.items()
                              if v))
+        if self.rs:
+            query = f'({query}) AND rs:"{self.rs}"'
         return query
 
     def query(self, *args, **kwargs):
         self.params = {}
-        if ('geometry') in kwargs:
-            self.params['geometry'] = kwargs.pop('geometry')
-        query = self._build_params(args, kwargs)
-        self.params['query'] = query
+        if self.area_wkt:
+            self.params['geometry'] = self.area_wkt
         self.params['srsname'] = self.srs
+        query = self._build_params(*args, **kwargs)
+        self.params['query'] = query
         self.r = requests.get(self.url, params=self.params)
         # ToDo raise specific errors
+        if self.r.status_code != 200:
+            raise Exception(self.r.text)
+        return self.r.json()['features']
+
+    def reverse(self, x, y):
+        params = {
+            'lat': y,
+            'lon': x,
+            'srsname': self.srs
+        }
+        self.r = requests.get(self.url, params=params)
         if self.r.status_code != 200:
             raise Exception(self.r.text)
         return self.r.json()['features']

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
+    <width>394</width>
     <height>501</height>
    </rect>
   </property>
@@ -64,7 +64,7 @@ padding: 2px;
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tab_widget">
       <property name="toolTip">
        <string/>
       </property>
@@ -101,7 +101,7 @@ padding: 2px;
            </widget>
           </item>
           <item>
-           <widget class="QgsMapLayerComboBox" name="maplayer_combo">
+           <widget class="QgsMapLayerComboBox" name="layer_combo">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -148,7 +148,7 @@ padding: 2px;
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="importcsv_button">
+           <widget class="QPushButton" name="import_csv_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -166,6 +166,36 @@ padding: 2px;
               <normaloff>icons/20190619_iconset_mob_wborders_load_1.png</normaloff>icons/20190619_iconset_mob_wborders_load_1.png</iconset>
             </property>
            </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Encoding: </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="encoding_combo"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -248,8 +278,8 @@ padding: 2px;
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>391</width>
-                <height>316</height>
+                <width>350</width>
+                <height>286</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -269,7 +299,7 @@ padding: 2px;
                 <number>0</number>
                </property>
                <item>
-                <layout class="QGridLayout" name="zuuordnung_parameter_grid">
+                <layout class="QGridLayout" name="parameter_grid">
                  <property name="bottomMargin">
                   <number>12</number>
                  </property>
@@ -321,7 +351,7 @@ padding: 2px;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
-            <widget class="QgsProjectionSelectionWidget" name="outputprojection_projectionselectionwidget">
+            <widget class="QgsProjectionSelectionWidget" name="output_projection_select">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -355,9 +385,12 @@ padding: 2px;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QLabel" name="label_9">
+            <widget class="QCheckBox" name="use_rs_check">
              <property name="text">
               <string>Regionalschlüssel:</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -373,7 +406,7 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QLineEdit" name="rs_lineedit">
+              <widget class="QLineEdit" name="rs_edit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -395,7 +428,7 @@ padding: 2px;
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="rsinputaid_combobox">
+              <widget class="QComboBox" name="rs_combo">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -421,96 +454,11 @@ padding: 2px;
                 <bool>false</bool>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>-1</number>
                </property>
                <property name="maxVisibleItems">
                 <number>17</number>
                </property>
-               <item>
-                <property name="text">
-                 <string>Eingabehilfe Bundesländer</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="01">Schleswig-Holstein</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="02">Freie und Hansestadt Hamburg</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="03">Niedersachsen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string comment="04">Freie Hansestadt Bremen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Nordrhein-Westfalen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Hessen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Rheinland-Pfalz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Baden-Württemberg</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Freistaat Bayern</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Saarland</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Berlin</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Brandenburg</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Mecklenburg-Vorpommern</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Freistaat Sachsen</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Sachsen-Anhalt</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Freistaat Thüringen</string>
-                </property>
-               </item>
               </widget>
              </item>
              <item>
@@ -549,9 +497,12 @@ padding: 2px;
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_7">
+            <widget class="QCheckBox" name="use_spatial_filter_check">
              <property name="text">
               <string>Räumlicher Filter:</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -561,9 +512,12 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QgsMapLayerComboBox" name="restrictgeom_maplayercombobox">
+              <widget class="QgsMapLayerComboBox" name="spatial_filter_combo">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -592,7 +546,10 @@ padding: 2px;
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="onlyselectedpolygons_checkbox">
+              <widget class="QCheckBox" name="spatial_selected_only_check">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beschränken Sie die Suche weiter auf lediglich die selektierten Objekte des gewählten Layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -609,27 +566,47 @@ padding: 2px;
         <item>
          <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier entweder die UUID oder die Dienst-URL inklusive der UUID an.&lt;/p&gt;</string>
           </property>
           <property name="title">
            <string>Zugangsdaten</string>
           </property>
           <property name="collapsed">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="saveCollapsedState">
            <bool>false</bool>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_2">
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="1" column="0">
+            <widget class="QRadioButton" name="api_url_check">
              <property name="text">
-              <string>Geokodierungsdienst</string>
+              <string>BKG Dienst-URL inkl. UUID</string>
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit">
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="api_key_check">
+             <property name="text">
+              <string>BKG UUID</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="api_key_edit">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="api_url_edit">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="toolTip">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
@@ -659,7 +636,7 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QCheckBox" name="onlyselected_checkbox">
+              <widget class="QCheckBox" name="selected_features_only_check">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -733,7 +710,7 @@ padding: 2px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QCheckBox" name="updateinputlayer_checkbox">
+              <widget class="QCheckBox" name="update_input_layer_check">
                <property name="minimumSize">
                 <size>
                  <width>180</width>
@@ -741,7 +718,7 @@ padding: 2px;
                 </size>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;p&gt;Die Option ist nur verfügbar, wenn der gewählte Layer eine Punktgeometrie enthält.&lt;/p&gt;</string>
                </property>
                <property name="layoutDirection">
                 <enum>Qt::LeftToRight</enum>
@@ -788,7 +765,7 @@ padding: 2px;
               </spacer>
              </item>
              <item>
-              <widget class="QRadioButton" name="radioButton">
+              <widget class="QRadioButton" name="search_and_check">
                <property name="minimumSize">
                 <size>
                  <width>50</width>
@@ -804,7 +781,7 @@ padding: 2px;
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="radioButton_2">
+              <widget class="QRadioButton" name="search_or_check">
                <property name="minimumSize">
                 <size>
                  <width>47</width>
@@ -855,7 +832,7 @@ padding: 2px;
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="useraccess_tab">
+      <widget class="QWidget" name="results_tab">
        <attribute name="title">
         <string>Ergebnis</string>
        </attribute>
@@ -873,15 +850,9 @@ padding: 2px;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <widget class="QPlainTextEdit" name="progresstextoutput_textedit">
-             <property name="documentTitle">
-              <string/>
-             </property>
+            <widget class="QTextEdit" name="log_edit">
              <property name="readOnly">
               <bool>true</bool>
-             </property>
-             <property name="backgroundVisible">
-              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -893,14 +864,14 @@ padding: 2px;
              <item>
               <widget class="QLabel" name="elapsed_time_label">
                <property name="text">
-                <string>00:29:24</string>
+                <string>00:00:00</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QProgressBar" name="geocodingprogress_progressbar">
+              <widget class="QProgressBar" name="progress_bar">
                <property name="value">
-                <number>42</number>
+                <number>0</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -921,7 +892,7 @@ padding: 2px;
         <item>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QPushButton" name="showattributtable_button">
+           <widget class="QPushButton" name="attribute_table_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -941,7 +912,7 @@ padding: 2px;
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QPushButton" name="exportcsv_button">
+           <widget class="QPushButton" name="export_csv_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -970,7 +941,7 @@ padding: 2px;
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QPushButton" name="featurepicker_button">
+           <widget class="QPushButton" name="inspect_picker_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1002,7 +973,7 @@ padding: 2px;
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QPushButton" name="reversegeocoding_button">
+           <widget class="QPushButton" name="reverse_picker_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1067,8 +1038,17 @@ padding: 2px;
       <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>12</number>
+      </property>
       <property name="topMargin">
-       <number>9</number>
+       <number>12</number>
+      </property>
+      <property name="rightMargin">
+       <number>12</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
       </property>
       <item>
        <widget class="QPushButton" name="help_button">
@@ -1107,13 +1087,13 @@ padding: 2px;
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>24</height>
+          <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>24</height>
+          <height>16777215</height>
          </size>
         </property>
         <property name="text">
@@ -1163,6 +1143,9 @@ padding: 2px;
       </item>
       <item>
        <widget class="QPushButton" name="request_stop_button">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -1208,5 +1191,102 @@ padding: 2px;
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>use_rs_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>rs_edit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>117</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>use_rs_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>rs_combo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>292</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>295</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>use_spatial_filter_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spatial_filter_combo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>180</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>use_spatial_filter_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spatial_selected_only_check</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>360</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>361</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>api_key_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>api_key_edit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>api_url_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>api_url_edit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>256</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>259</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

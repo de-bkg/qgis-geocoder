@@ -10,8 +10,8 @@
 name=BKG Geocoder
 qgisMinimumVersion=3.0
 description=Geokodierung mit der BKG API
-version=0.9.5
-author=GGR
+version=0.9.8
+author=BKG
 email=franke@ggr-planung.de
 
 about=Plugin für die Geokodierung von Adressen mit Hilfe Schnittstelle des Bundesamtes für Kartographie und Geodäsie.
@@ -28,7 +28,7 @@ repository=https://github.com/ChrFr/qgis-geocoder
 # Tags are comma separated with spaces allowed
 tags=geocode bkg
 
-homepage=http://www.ggr-planung.de
+homepage=https://www.bkg.bund.de/
 category=Plugins
 icon=icon.png
 # experimental flag

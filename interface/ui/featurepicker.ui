@@ -7,40 +7,39 @@
     <x>0</x>
     <y>0</y>
     <width>288</width>
-    <height>172</height>
+    <height>262</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Ergebnisse inspizieren</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QFrame" name="actual_values_frame">
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
+    <layout class="QGridLayout" name="feature_grid"/>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <layout class="QGridLayout" name="gridLayout"/>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_5">
+    <widget class="QLabel" name="results_label">
      <property name="text">
-      <string>weitere Ergebnisse für Eingabedaten</string>
+      <string>Ergebnisse</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="alternative_features_frame">
+    <widget class="QFrame" name="results_frame">
      <property name="frameShape">
-      <enum>QFrame::Box</enum>
+      <enum>QFrame::Panel</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Sunken</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2"/>
+     <layout class="QVBoxLayout" name="verticalLayout_2"/>
     </widget>
    </item>
    <item>
@@ -84,6 +83,19 @@
        </property>
        <property name="text">
         <string>Übernehmen</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="geom_only_button">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Nur verschieben</string>
        </property>
       </widget>
      </item>

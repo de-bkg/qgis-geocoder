@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, QThread, pyqtSignal, QTimer, QVariant, QObject
-from qgis.PyQt.QtWidgets import QDialog
-from qgis.PyQt.QtGui import QTextCursor
+from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QHBoxLayout)
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
+from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
+                       QgsField, QgsProject, QgsCoordinateReferenceSystem,
+                       QgsCategorizedSymbolRenderer, QgsRendererCategory,
+                       QgsMarkerSymbol, QgsRasterMarkerSymbolLayer,
+                       QgsRectangle, QgsCoordinateTransform)
 import os
-import datetime
 
-from ..geocoder.geocoder import Geocoding
-from ..config import UI_PATH
+from config import UI_PATH, Config, ICON_PATH
+
+config = Config()
 
 
 class Dialog(QDialog):
@@ -41,136 +46,151 @@ class OpenCSVDialog(Dialog):
         super().__init__('open_csv.ui', modal=True, parent=parent)
 
 
-class ReverseGeocodingDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('reverse_geocoding.ui', modal=False, parent=parent)
-
-
-class FeaturePickerDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('featurepicker.ui', modal=False, parent=parent)
-
-
 class ProgressDialog(Dialog):
     def __init__(self, parent=None):
         super().__init__('progress.ui', modal=True, parent=parent)
         self.close_button.clicked.connect(self.close)
 
-#class ProgressDialog(QDialog, FORM_CLASS):
-    #"""
-    #Dialog showing progress in textfield and bar after starting a certain task with run()
-    #"""
-    #def __init__(self, worker, parent=None, auto_close=False, auto_run=False):
-        #super().__init__(parent=parent)
-        #self.parent = parent
-        #self.setupUi(self)
-        #self.setAttribute(Qt.WA_DeleteOnClose)
-        #self.progress_bar.setValue(0)
-        #self.close_button.clicked.connect(self.close)
-        #self.stop_button.setVisible(False)
-        #self.close_button.setVisible(False)
-        #self.auto_close = auto_close
 
-        #self.worker = worker
-        #self.thread = QThread(self.parent)
-        #self.worker.moveToThread(self.thread)
+class InspectResultsDialog(Dialog):
+    ui_file = 'featurepicker.ui'
+    marker_img = 'marker_{}.png'
 
-        #self.thread.started.connect(self.worker.run)
-        #self.worker.finished.connect(self.finished)
-        #self.worker.error.connect(self.show_status)
-        #self.worker.message.connect(self.show_status)
-        #self.worker.counter.connect(self.progress)
+    def __init__(self, feature, results, canvas, review_fields=[], preselect=-1,
+                 crs='EPSG:4326', parent=None):
+        super().__init__(self.ui_file, modal=False, parent=parent)
+        self.canvas = canvas
+        self.results = results
+        self.feature = feature
+        self.geom_only_button.setVisible(False)
+        self.result = None
+        self.i = -1
+        self.crs = crs
 
-        #self.start_button.clicked.connect(self.run)
-        #self.stop_button.clicked.connect(self.stop)
-        #self.close_button.clicked.connect(self.close)
+        self.populate_review(review_fields)
+        self.add_results(preselect=preselect)
 
-        #self.timer = QTimer(self)
-        #self.timer.timeout.connect(self.update_timer)
-        #if auto_run:
-            #self.run()
+        self.accept_button.clicked.connect(self.accept)
+        self.discard_button.clicked.connect(self.reject)
 
-    #def running(self):
-        #self.close_button.setVisible(True)
-        #self.cancelButton.setText('Stoppen')
-        #self.cancelButton.clicked.disconnect(self.close)
+    def populate_review(self, review_fields):
+        for i, field in enumerate(review_fields):
+            self.feature_grid.addWidget(QLabel(field), i, 0)
+            value = self.feature.attribute(field)
+            self.feature_grid.addWidget(QLabel(value), i, 1)
 
-    #def finished(self):
-        ## already gone if killed
-        #try:
-            #self.worker.deleteLater()
-        #except:
-            #pass
-        #self.thread.quit()
-        #self.thread.wait()
-        #self.thread.deleteLater()
-        #self.timer.stop()
-        #self.close_button.setVisible(True)
-        #self.stop_button.setVisible(False)
-        #if self.auto_close:
-            #self.close()
+    def add_results(self, preselect=-1):
+        self.preview_layer = QgsVectorLayer(
+            f'Point?crs={self.crs}', 'results_tmp', 'memory')
 
-    #def show_status(self, text):
-        #self.log_edit.appendHtml(text)
-        ##self.log_edit.moveCursor(QTextCursor.Down)
-        #scrollbar = self.log_edit.verticalScrollBar()
-        #scrollbar.setValue(scrollbar.maximum());
+        renderer = QgsCategorizedSymbolRenderer('i')
+        for i in range(1, len(self.results) + 1):
+            category = QgsRendererCategory()
+            category.setValue(i)
+            symbol = QgsMarkerSymbol.createSimple({'color': 'white'})
+            img_path = os.path.join(ICON_PATH, f'marker_{i}.png')
+            if os.path.exists(img_path):
+                symbol_layer = QgsRasterMarkerSymbolLayer()
+                symbol_layer.setPath(img_path)
+                symbol.appendSymbolLayer(symbol_layer)
+            category.setSymbol(symbol)
+            renderer.addCategory(category)
+        self.preview_layer.setRenderer(renderer)
 
-    #def progress(self, progress, obj=None):
-        #if isinstance(progress, QVariant):
-            #progress = progress.toInt()[0]
-        #self.progress_bar.setValue(progress)
+        self.preview_layer.startEditing()
+        provider = self.preview_layer.dataProvider()
+        provider.addAttributes([
+            QgsField('i',  QVariant.Int),
+            QgsField('text', QVariant.String)
+        ])
 
-    #def start_timer(self):
-        #self.start_time = datetime.datetime.now()
-        #self.timer.start(1000)
+        layout = self.results_frame.layout()
 
-    ## task needs to be overridden
-    #def run(self):
-        #self.start_timer()
-        #self.stop_button.setVisible(True)
-        #self.start_button.setVisible(False)
-        #self.thread.start()
+        for i, result in enumerate(self.results):
+            feature = QgsFeature()
+            coords = result['geometry']['coordinates']
+            geom = QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1]))
+            feature.setGeometry(geom)
+            feature.setAttributes([i + 1, result['properties']['text'],])
+            provider.addFeature(feature)
 
-    #def stop(self):
-        #self.timer.stop()
-        #self.worker.kill()
-        #self.log_edit.appendHtml('<b> Vorgang abgebrochen </b> <br>')
-        #self.log_edit.moveCursor(QTextCursor.End)
-        #self.finished()
+            properties = result['properties']
+            radio = QRadioButton(properties['text'])
+            hlayout = QHBoxLayout()
+            preview = QLabel()
+            hlayout.addWidget(preview)
+            hlayout.addWidget(radio)
+            preview.setMaximumWidth(20)
+            preview.setMinimumWidth(20)
+            img_path = os.path.join(ICON_PATH, f'marker_{i+1}.png')
+            if os.path.exists(img_path):
+                pixmap = QPixmap(img_path)
+                preview.setPixmap(pixmap.scaled(
+                    preview.size(), Qt.KeepAspectRatio,
+                    Qt.SmoothTransformation))
+            layout.addLayout(hlayout)
 
-    #def update_timer(self):
-        #delta = datetime.datetime.now() - self.start_time
-        #h, remainder = divmod(delta.seconds, 3600)
-        #m, s = divmod(remainder, 60)
-        #timer_text = '{:02d}:{:02d}:{:02d}'.format(h, m, s)
-        #self.elapsed_time_label.setText(timer_text)
+            radio.toggled.connect(
+                lambda c, i=i, f=feature:
+                self.toggle_result(self.results[i], f, i=i))
+            if i == preselect:
+                radio.setChecked(True)
+
+        self.preview_layer.commitChanges()
+        extent = self.preview_layer.extent()
+        transform = QgsCoordinateTransform(
+            self.preview_layer.crs(),
+            self.canvas.mapSettings().destinationCrs(),
+            QgsProject.instance()
+        )
+        self.canvas.setExtent(transform.transform(extent))
+        self.canvas.refresh()
+        QgsProject.instance().addMapLayer(self.preview_layer)
+
+    def toggle_result(self, result, feature, i=0):
+        self.result = self.results[i]
+        self.i = i
+        self.preview_layer.removeSelection()
+        self.preview_layer.select(feature.id())
+        self.result = result
+
+        # center map on point
+        point = feature.geometry().asPoint()
+        rect = QgsRectangle(point, point)
+        transform = QgsCoordinateTransform(
+            self.preview_layer.crs(),
+            self.canvas.mapSettings().destinationCrs(),
+            QgsProject.instance()
+        )
+        self.canvas.setExtent(transform.transform(rect))
+        self.canvas.refresh()
+
+    def accept(self):
+        QgsProject.instance().removeMapLayers([self.preview_layer.id()])
+        super().accept()
+
+    def reject(self):
+        QgsProject.instance().removeMapLayers([self.preview_layer.id()])
+        super().reject()
+
+    def showEvent(self, e):
+        # exec() resets the modality
+        self.setModal(False)
+        self.adjustSize()
 
 
-#class GeocodeProgressDialog(ProgressDialog):
-    #'''
-    #dialog showing progress on threaded geocoding
-    #'''
-    #feature_done = pyqtSignal(int, Results)
+class ReverseResultsDialog(InspectResultsDialog):
 
-    #def __init__(self, geocoder, layer, field_map, on_progress,
-                 #on_done, feature_ids=None, parent=None, area_wkt=None):
-        #queries = []
-        #features = layer.getFeatures(feature_ids) if feature_ids \
-            #else layer.getFeatures()
-
-        #for feature in features:
-            #args, kwargs = field_map.to_args(feature)
-            #if area_wkt:
-                #kwargs['geometry'] = area_wkt
-            #queries.append((feature.id(), (args, kwargs)))
-
-        #worker = GeocodeWorker(geocoder, queries)
-        #worker.feature_done.connect(on_progress)
-        #worker.finished.connect(on_done)
-        #super().__init__(worker, parent=parent, auto_run=True)
-
-
-
-
+    def __init__(self, feature, results, canvas, review_fields=[],
+                 parent=None, preselect=0, crs='EPSG:4326'):
+        super().__init__(feature, results, canvas, crs=crs,
+                         review_fields=review_fields, parent=parent)
+        self.results_label.setText('Nächstgelegene Adressen')
+        self.accept_button.setText('Adresse und Koordinaten übernehmen')
+        self.geom_only_button.setVisible(True)
+        self.geom_only = False
+        def geom_only():
+            self.geom_only = True
+            self.accept()
+        self.geom_only_button.clicked.connect(geom_only)
 
