@@ -217,8 +217,6 @@ class MainWidget(QDockWidget):
         # ToDo: warning dialog or pass it to results diag and show warning there
         if not results or not self.output_layer:
             return
-        self.output_layer.removeSelection()
-        self.output_layer.select(feature.id())
         # close dialog if there is already one opened
         if self.inspect_dialog:
             self.inspect_dialog.close()
@@ -232,19 +230,12 @@ class MainWidget(QDockWidget):
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
                             i=self.inspect_dialog.i, set_edited=True)
-        # when you close QGIS with the dialog opened, the actual layer is
-        # is already removed at this point
-        try:
-            self.output_layer.removeSelection()
-        except:
-            pass
+            self.canvas.refresh()
         self.inspect_dialog = None
 
     def reverse_geocode(self, feature):
         if not self.output_layer:
             return
-        self.output_layer.removeSelection()
-        self.output_layer.select(feature.id())
         crs = self.output_layer.crs().authid()
         url = config.api_url if config.use_api_url else None
 
@@ -274,13 +265,10 @@ class MainWidget(QDockWidget):
                 if result:
                     self.set_result(
                         feature, result, i=-1, set_edited=True,
-                        geom_only=self.reverse_dialog.geom_only,
-                        apply_adress=not self.reverse_dialog.geom_only
+                        geom_only=self.reverse_dialog.geom_only
+                        #,apply_adress=not self.reverse_dialog.geom_only
                     )
-            try:
-                self.output_layer.removeSelection()
-            except:
-                pass
+                    self.canvas.refresh()
             self.reverse_dialog = None
         rev_geocoding.feature_done.connect(done)
         # ToDo: for some reason QGIS crashes while threading (with start())
@@ -300,6 +288,9 @@ class MainWidget(QDockWidget):
             if action.objectName() == 'mActionLayerSaveAs':
                 break
         action.trigger()
+
+    def unload(self):
+        pass
 
     def closeEvent(self, event):
         self.closingWidget.emit()
@@ -529,7 +520,7 @@ class MainWidget(QDockWidget):
         self.set_result(feature, best, i=0, n_results=len(results))
 
     def set_result(self, feature, result, i=0, n_results=None, geom_only=False,
-                   apply_adress=False, set_edited=False):
+                   set_edited=False):  #, apply_adress=False):
         '''
         bkg specific
         set result to feature of given layer
@@ -548,17 +539,19 @@ class MainWidget(QDockWidget):
             if not geom_only:
                 for prop in ['typ', 'text', 'score', 'treffer']:
                     value = properties.get(prop, None)
-                    # property gets prefix bkg_ in layer
-                    layer.changeAttributeValue(
-                        feat_id, fidx(f'bkg_{prop}'), value)
-                if apply_adress:
-                    for field in self.field_map.fields():
-                        if not self.field_map.active(field):
-                            continue
-                        value = properties.get(
-                            self.field_map.keyword(field), None)
+                    if value is not None:
+                        # property gets prefix bkg_ in layer
                         layer.changeAttributeValue(
-                            feat_id, fidx(field), value)
+                            feat_id, fidx(f'bkg_{prop}'), value)
+                #if apply_adress:
+                    #for field in self.field_map.fields():
+                        #if not self.field_map.active(field):
+                            #continue
+                        #value = properties.get(
+                            #self.field_map.keyword(field), None)
+                        #if value is not None:
+                            #layer.changeAttributeValue(
+                                #feat_id, fidx(field), value)
                 if n_results:
                     layer.changeAttributeValue(
                         feat_id, fidx('bkg_n_results'), n_results)

@@ -4,7 +4,7 @@ from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
-                       QgsField, QgsProject, QgsCoordinateReferenceSystem,
+                       QgsField, QgsProject,
                        QgsCategorizedSymbolRenderer, QgsRendererCategory,
                        QgsMarkerSymbol, QgsRasterMarkerSymbolLayer,
                        QgsRectangle, QgsCoordinateTransform)
