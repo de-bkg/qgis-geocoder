@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QHBoxLayout)
+from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QGridLayout)
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
@@ -55,6 +55,7 @@ class ProgressDialog(Dialog):
 class InspectResultsDialog(Dialog):
     ui_file = 'featurepicker.ui'
     marker_img = 'marker_{}.png'
+    show_score = True
 
     def __init__(self, feature, results, canvas, review_fields=[], preselect=-1,
                  crs='EPSG:4326', parent=None):
@@ -74,10 +75,13 @@ class InspectResultsDialog(Dialog):
         self.discard_button.clicked.connect(self.reject)
 
     def populate_review(self, review_fields):
+        bkg_text = self.feature.attribute('bkg_text')
+        self.feature_grid.addWidget(QLabel('Anschrift\nlaut Dienst'), 0, 0)
+        self.feature_grid.addWidget(QLabel(bkg_text), 0, 1)
         for i, field in enumerate(review_fields):
-            self.feature_grid.addWidget(QLabel(field), i, 0)
+            self.feature_grid.addWidget(QLabel(field), i+1, 0)
             value = self.feature.attribute(field)
-            self.feature_grid.addWidget(QLabel(value), i, 1)
+            self.feature_grid.addWidget(QLabel(value), i+1, 1)
 
     def add_results(self, preselect=-1):
         self.preview_layer = QgsVectorLayer(
@@ -104,7 +108,7 @@ class InspectResultsDialog(Dialog):
             QgsField('text', QVariant.String)
         ])
 
-        layout = self.results_frame.layout()
+        grid = self.results_contents
 
         for i, result in enumerate(self.results):
             feature = QgsFeature()
@@ -116,19 +120,21 @@ class InspectResultsDialog(Dialog):
 
             properties = result['properties']
             radio = QRadioButton(properties['text'])
-            hlayout = QHBoxLayout()
+
             preview = QLabel()
-            hlayout.addWidget(preview)
-            hlayout.addWidget(radio)
             preview.setMaximumWidth(20)
             preview.setMinimumWidth(20)
+            grid.addWidget(preview, i, 0)
+            grid.addWidget(radio, i, 1)
+            if self.show_score:
+                score = QLabel(f'Score {properties["score"]}')
+                grid.addWidget(score, i, 2)
             img_path = os.path.join(ICON_PATH, f'marker_{i+1}.png')
             if os.path.exists(img_path):
                 pixmap = QPixmap(img_path)
                 preview.setPixmap(pixmap.scaled(
                     preview.size(), Qt.KeepAspectRatio,
                     Qt.SmoothTransformation))
-            layout.addLayout(hlayout)
 
             radio.toggled.connect(
                 lambda c, i=i, f=feature:
@@ -180,6 +186,7 @@ class InspectResultsDialog(Dialog):
 
 
 class ReverseResultsDialog(InspectResultsDialog):
+    show_score = False
 
     def __init__(self, feature, results, canvas, review_fields=[],
                  parent=None, preselect=0, crs='EPSG:4326'):

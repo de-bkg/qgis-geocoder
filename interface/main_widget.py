@@ -220,17 +220,14 @@ class MainWidget(QDockWidget):
         # close dialog if there is already one opened
         if self.inspect_dialog:
             self.inspect_dialog.close()
-        review_fields = [f for f in self.field_map.fields()
-                         if self.field_map.active(f)]
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
-            review_fields=review_fields, parent=self,
-            crs=self.output_layer.crs().authid())
+            parent=self, crs=self.output_layer.crs().authid())
         accepted = self.inspect_dialog.show()
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
                             i=self.inspect_dialog.i, set_edited=True)
-            self.canvas.refresh()
+        self.canvas.refresh()
         self.inspect_dialog = None
 
     def reverse_geocode(self, feature):
@@ -242,9 +239,6 @@ class MainWidget(QDockWidget):
         bkg_geocoder = BKGGeocoder(key=config.api_key, srs=crs, url=url,
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
-        review_fields = [f for f in self.field_map.fields()
-                         if self.field_map.active(f)]
-
         rev_geocoding.error.connect(
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
@@ -257,8 +251,7 @@ class MainWidget(QDockWidget):
             preselect = 0
             self.reverse_dialog = ReverseResultsDialog(
                 feature, results, self.canvas, preselect=preselect,
-                review_fields=review_fields, parent=self,
-                crs=self.output_layer.crs().authid())
+                parent=self, crs=self.output_layer.crs().authid())
             accepted = self.reverse_dialog.show()
             if accepted:
                 result = self.reverse_dialog.result
@@ -268,7 +261,7 @@ class MainWidget(QDockWidget):
                         geom_only=self.reverse_dialog.geom_only
                         #,apply_adress=not self.reverse_dialog.geom_only
                     )
-                    self.canvas.refresh()
+            self.canvas.refresh()
             self.reverse_dialog = None
         rev_geocoding.feature_done.connect(done)
         # ToDo: for some reason QGIS crashes while threading (with start())
