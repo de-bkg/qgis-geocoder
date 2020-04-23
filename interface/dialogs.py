@@ -10,6 +10,7 @@ from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
                        QgsRectangle, QgsCoordinateTransform)
 import os
 
+from interface.utils import clear_layout
 from config import UI_PATH, Config, ICON_PATH
 
 config = Config()
@@ -69,6 +70,7 @@ class InspectResultsDialog(Dialog):
         self.crs = crs
 
         self.populate_review(review_fields)
+        self.setup_preview_layer()
         self.add_results(preselect=preselect)
 
         self.accept_button.clicked.connect(self.accept)
@@ -83,7 +85,7 @@ class InspectResultsDialog(Dialog):
             value = self.feature.attribute(field)
             self.feature_grid.addWidget(QLabel(value), i+1, 1)
 
-    def add_results(self, preselect=-1):
+    def setup_preview_layer(self):
         self.preview_layer = QgsVectorLayer(
             f'Point?crs={self.crs}', 'results_tmp', 'memory')
 
@@ -107,8 +109,12 @@ class InspectResultsDialog(Dialog):
             QgsField('i',  QVariant.Int),
             QgsField('text', QVariant.String)
         ])
+        QgsProject.instance().addMapLayer(self.preview_layer)
+
+    def add_results(self, preselect=-1):
 
         grid = self.results_contents
+        provider = self.preview_layer.dataProvider()
 
         for i, result in enumerate(self.results):
             feature = QgsFeature()
@@ -151,7 +157,6 @@ class InspectResultsDialog(Dialog):
         )
         self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
-        QgsProject.instance().addMapLayer(self.preview_layer)
 
     def toggle_result(self, result, feature, i=0):
         self.result = self.results[i]
@@ -200,4 +205,8 @@ class ReverseResultsDialog(InspectResultsDialog):
             self.geom_only = True
             self.accept()
         self.geom_only_button.clicked.connect(geom_only)
+
+    def update_results(self, results):
+        clear_layout(self.results_contents)
+        self.add_results(preselect=0)
 

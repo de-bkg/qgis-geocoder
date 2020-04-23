@@ -35,9 +35,9 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget)
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
-from interface.map_tools import FeaturePicker
+from interface.map_tools import FeaturePicker, FeatureDragger
 from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
-                             OSMBackgroundLayer, get_geometries)
+                             OSMBackgroundLayer, get_geometries, clear_layout)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH
@@ -73,16 +73,6 @@ RS_PRESETS = [
     ('Sachsen-Anhalt', '15*'),
     ('Freistaat Thüringen', '16*')
 ]
-
-def clear_layout(layout):
-    while layout.count():
-        child = layout.takeAt(0)
-        if not child:
-            continue
-        if child.widget():
-            child.widget().deleteLater()
-        elif child.layout() is not None:
-            clear_layout(child.layout())
 
 
 class MainWidget(QDockWidget):
@@ -153,9 +143,9 @@ class MainWidget(QDockWidget):
         self.inspect_picker = FeaturePicker(
             self.inspect_picker_button, canvas=self.canvas)
         self.inspect_picker.feature_picked.connect(self.inspect_results)
-        self.reverse_picker = FeaturePicker(
+        self.reverse_picker = FeatureDragger(
             self.reverse_picker_button, canvas=self.canvas)
-        self.reverse_picker.feature_picked.connect(self.reverse_geocode)
+        self.reverse_picker.feature_dragged.connect(self.reverse_geocode)
 
         self.reverse_picker_button.setEnabled(False)
         self.inspect_picker_button.setEnabled(False)
@@ -209,10 +199,10 @@ class MainWidget(QDockWidget):
         self.use_rs_check.toggled.connect(
             lambda checked: setattr(config, 'use_rs', checked))
 
-    def inspect_results(self, feature):
+    def inspect_results(self, feature_id):
         if not self.output_layer:
             return
-        results = self.result_cache.get((self.output_layer.id(), feature.id()),
+        results = self.result_cache.get((self.output_layer.id(), feature_id),
                                         None)
         # ToDo: warning dialog or pass it to results diag and show warning there
         if not results or not self.output_layer:
@@ -220,6 +210,7 @@ class MainWidget(QDockWidget):
         # close dialog if there is already one opened
         if self.inspect_dialog:
             self.inspect_dialog.close()
+        feature = self.output_layer.getFeature(feature_id)
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
             parent=self, crs=self.output_layer.crs().authid())
@@ -230,22 +221,25 @@ class MainWidget(QDockWidget):
         self.canvas.refresh()
         self.inspect_dialog = None
 
-    def reverse_geocode(self, feature):
+    def reverse_geocode(self, feature_id, point):
         if not self.output_layer:
             return
         crs = self.output_layer.crs().authid()
         url = config.api_url if config.use_api_url else None
 
+        feature = self.output_layer.getFeature(feature_id)
+
         bkg_geocoder = BKGGeocoder(key=config.api_key, srs=crs, url=url,
                                    logic_link=config.logic_link)
-        rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
-        rev_geocoding.error.connect(
-            lambda msg: QMessageBox.information(self, 'Fehler', msg))
+        # feature-geometries seem not to be thread-safe
+        # -> using Geocoder directly without worker here
+        try:
+            results = bkg_geocoder.reverse(point.x(), point.y())
+        except Exception as e:
+            QMessageBox.information(self, 'Fehler', e)
+            return
 
-        def done(feature, results):
-            # only one opened dialog at a time
-            if self.reverse_dialog:
-                self.reverse_dialog.close()
+        if not self.reverse_dialog:
             # the first result will always be closest
             # (meaning it is at exact position of requested feature)
             preselect = 0
@@ -263,9 +257,8 @@ class MainWidget(QDockWidget):
                     )
             self.canvas.refresh()
             self.reverse_dialog = None
-        rev_geocoding.feature_done.connect(done)
-        # ToDo: for some reason QGIS crashes while threading (with start())
-        rev_geocoding.work()
+        else:
+            self.reverse_dialog.update_results(results)
 
     def show_attribute_table(self):
         if not self.output_layer:
@@ -390,6 +383,11 @@ class MainWidget(QDockWidget):
         if not layer:
             return
 
+        self.reverse_picker_button.setEnabled(False)
+        self.inspect_picker_button.setEnabled(False)
+        self.export_csv_button.setEnabled(False)
+        self.attribute_table_button.setEnabled(False)
+
         active_count = self.field_map.count_active()
         if active_count == 0:
             QMessageBox.information(
@@ -399,10 +397,35 @@ class MainWidget(QDockWidget):
             return
 
         rs = config.rs if self.use_rs_check.isChecked() else None
-        features = layer.selectedFeatures() if config.selected_features_only \
-            else layer.getFeatures()
-        # we use it 2 times, this avoids using same FeatureIterator twice
-        features = [f for f in features]
+
+        if self.update_input_layer_check.isChecked():
+            if layer.wkbType() != QgsWkbTypes.Point:
+                QMessageBox.information(
+                    self, 'Fehler',
+                    (u'Der Layer enthält keine Punktgeometrie. Daher können '
+                     u'die Ergebnisse nicht direkt dem Layer hinzugefügt '
+                     u'werden.\n'
+                     u'Fügen Sie dem Layer eine Punktgeometrie hinzu oder '
+                     u'deaktivieren Sie die Checkbox '
+                     u'"Ausgangslayer aktualisieren".\n\n'
+                     u'Start abgebrochen...'))
+                return
+            self.output_layer = layer
+        else:
+            features = layer.selectedFeatures() \
+                if config.selected_features_only else layer.getFeatures()
+            self.output_layer = clone_layer(
+                layer, name=f'{layer.name()}_ergebnisse',
+                srs=config.projection, features=features)
+            self.output_layer_ids.append(self.output_layer.id())
+            # cloned layer gets same mapping, it has the same fields
+            cloned_field_map = self.field_map.copy(layer=self.output_layer)
+            self.field_map_cache[self.output_layer.id()] = cloned_field_map
+
+        # take features of output layer as input (either it is cloned
+        # and therefore contains all (selected) features anyway or it
+        # is the input layer itself)
+        features = [f for f in self.output_layer.getFeatures()]
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():
             spatial_layer = self.spatial_filter_combo.currentLayer()
@@ -423,28 +446,6 @@ class MainWidget(QDockWidget):
                                    area_wkt=area_wkt)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
-
-        if self.update_input_layer_check.isChecked():
-            if layer.wkbType() != QgsWkbTypes.Point:
-                QMessageBox.information(
-                    self, 'Fehler',
-                    (u'Der Layer enthält keine Punktgeometrie. Daher können '
-                     u'die Ergebnisse nicht direkt dem Layer hinzugefügt '
-                     u'werden.\n'
-                     u'Fügen Sie dem Layer eine Punktgeometrie hinzu oder '
-                     u'deaktivieren Sie die Checkbox '
-                     u'"Ausgangslayer aktualisieren".\n\n'
-                     u'Start abgebrochen...'))
-                return
-            self.output_layer = layer
-        else:
-            self.output_layer = clone_layer(
-                layer, name=f'{layer.name()}_ergebnisse',
-                srs=config.projection, features=features)
-            self.output_layer_ids.append(self.output_layer.id())
-            # cloned layer gets same mapping, it has the same fields
-            cloned_field_map = self.field_map.copy(layer=self.output_layer)
-            self.field_map_cache[self.output_layer.id()] = cloned_field_map
 
         style_file = os.path.join(STYLE_PATH, 'bkggeocoder_treffer.qml')
         self.output_layer.loadNamedStyle(style_file)

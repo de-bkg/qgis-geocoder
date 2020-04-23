@@ -3,6 +3,16 @@ from qgis.core import (QgsVectorLayer, QgsProject, QgsCoordinateTransform,
 from qgis.utils import iface
 from abc import ABC
 
+def clear_layout(layout):
+    while layout.count():
+        child = layout.takeAt(0)
+        if not child:
+            continue
+        if child.widget():
+            child.widget().deleteLater()
+        elif child.layout() is not None:
+            clear_layout(child.layout())
+
 def clone_layer(layer, srs='EPSG:4326', name=None, features=None):
     '''
     clone given layer, adds Point geometry with given srs

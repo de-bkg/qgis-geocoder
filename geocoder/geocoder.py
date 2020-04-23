@@ -168,7 +168,7 @@ class Geocoding(Worker):
                 self.process(feature)
             except Exception as e:
                 success = False
-                self.error.emit(str(e))
+                self.error.emit(f'Feature {feature.id()} -> {e}')
             finally:
                 progress = math.floor(100 * (i + 1) / count)
                 self.progress.emit(progress)

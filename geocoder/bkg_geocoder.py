@@ -86,6 +86,8 @@ class BKGGeocoder(Geocoder):
             self.params['geometry'] = self.area_wkt
         self.params['srsname'] = self.srs
         query = self._build_params(*args, **kwargs)
+        if not query:
+            raise Exception('keine Suchparameter gefunden')
         self.params['query'] = query
         self.r = requests.get(self.url, params=self.params)
         # ToDo raise specific errors
