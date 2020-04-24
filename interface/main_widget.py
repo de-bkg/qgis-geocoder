@@ -35,9 +35,9 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget)
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
-from interface.map_tools import FeaturePicker
+from interface.map_tools import FeaturePicker, FeatureDragger
 from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
-                             OSMBackgroundLayer, get_geometries)
+                             OSMBackgroundLayer, get_geometries, clear_layout)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH
@@ -73,16 +73,6 @@ RS_PRESETS = [
     ('Sachsen-Anhalt', '15*'),
     ('Freistaat Thüringen', '16*')
 ]
-
-def clear_layout(layout):
-    while layout.count():
-        child = layout.takeAt(0)
-        if not child:
-            continue
-        if child.widget():
-            child.widget().deleteLater()
-        elif child.layout() is not None:
-            clear_layout(child.layout())
 
 
 class MainWidget(QDockWidget):
@@ -153,9 +143,9 @@ class MainWidget(QDockWidget):
         self.inspect_picker = FeaturePicker(
             self.inspect_picker_button, canvas=self.canvas)
         self.inspect_picker.feature_picked.connect(self.inspect_results)
-        self.reverse_picker = FeaturePicker(
+        self.reverse_picker = FeatureDragger(
             self.reverse_picker_button, canvas=self.canvas)
-        self.reverse_picker.feature_picked.connect(self.reverse_geocode)
+        self.reverse_picker.feature_dragged.connect(self.reverse_geocode)
 
         self.reverse_picker_button.setEnabled(False)
         self.inspect_picker_button.setEnabled(False)
@@ -209,82 +199,91 @@ class MainWidget(QDockWidget):
         self.use_rs_check.toggled.connect(
             lambda checked: setattr(config, 'use_rs', checked))
 
-    def inspect_results(self, feature):
+    def inspect_results(self, feature_id):
         if not self.output_layer:
             return
-        results = self.result_cache.get((self.output_layer.id(), feature.id()),
+        results = self.result_cache.get((self.output_layer.id(), feature_id),
                                         None)
         # ToDo: warning dialog or pass it to results diag and show warning there
         if not results or not self.output_layer:
             return
-        self.output_layer.removeSelection()
-        self.output_layer.select(feature.id())
         # close dialog if there is already one opened
         if self.inspect_dialog:
             self.inspect_dialog.close()
+        feature = self.output_layer.getFeature(feature_id)
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
-            review_fields=review_fields, parent=self,
-            crs=self.output_layer.crs().authid())
+            parent=self, crs=self.output_layer.crs().authid(),
+            review_fields=review_fields)
         accepted = self.inspect_dialog.show()
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
                             i=self.inspect_dialog.i, set_edited=True)
-        # when you close QGIS with the dialog opened, the actual layer is
-        # is already removed at this point
-        try:
-            self.output_layer.removeSelection()
-        except:
-            pass
+        self.canvas.refresh()
         self.inspect_dialog = None
 
-    def reverse_geocode(self, feature):
+    def reverse_geocode(self, feature_id, point):
         if not self.output_layer:
             return
-        self.output_layer.removeSelection()
-        self.output_layer.select(feature.id())
         crs = self.output_layer.crs().authid()
         url = config.api_url if config.use_api_url else None
+
+        current_geom = QgsGeometry.fromPointXY(point)
+        self.output_layer.changeGeometry(feature_id, current_geom)
+
+        feature = self.output_layer.getFeature(feature_id)
 
         bkg_geocoder = BKGGeocoder(key=config.api_key, srs=crs, url=url,
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
-        review_fields = [f for f in self.field_map.fields()
-                         if self.field_map.active(f)]
-
         rev_geocoding.error.connect(
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
         def done(feature, results):
             # only one opened dialog at a time
-            if self.reverse_dialog:
-                self.reverse_dialog.close()
-            # the first result will always be closest
-            # (meaning it is at exact position of requested feature)
-            preselect = 0
-            self.reverse_dialog = ReverseResultsDialog(
-                feature, results, self.canvas, preselect=preselect,
-                review_fields=review_fields, parent=self,
-                crs=self.output_layer.crs().authid())
-            accepted = self.reverse_dialog.show()
-            if accepted:
-                result = self.reverse_dialog.result
-                if result:
-                    self.set_result(
-                        feature, result, i=-1, set_edited=True,
-                        geom_only=self.reverse_dialog.geom_only,
-                        apply_adress=not self.reverse_dialog.geom_only
-                    )
-            try:
-                self.output_layer.removeSelection()
-            except:
-                pass
-            self.reverse_dialog = None
+            if not self.reverse_dialog:
+                review_fields = [f for f in self.field_map.fields()
+                                 if self.field_map.active(f)]
+                # remember the initial geometry
+                self._init_rev_geom = feature.geometry()
+                self.reverse_dialog = ReverseResultsDialog(
+                    feature, results, self.canvas, review_fields=review_fields,
+                    parent=self, crs=self.output_layer.crs().authid())
+                accepted = self.reverse_dialog.show()
+                if accepted:
+                    result = self.reverse_dialog.result
+                    # apply the geometry of the selected result
+                    # (no result is selected -> geometry of dragged point is
+                    # kept)
+                    if result:
+                        self.set_result(
+                            feature, result, i=-1, set_edited=True,
+                            geom_only=self.reverse_dialog.geom_only
+                            #,apply_adress=not self.reverse_dialog.geom_only
+                        )
+                else:
+                    # reset the geometry if rejected
+                    try:
+                        self.output_layer.changeGeometry(
+                            feature_id, self.reverse_picker.initial_geom)
+                    # catch error when quitting QGIS with dialog opened
+                    # (layer is already deleted at this point)
+                    except RuntimeError:
+                        pass
+                self.canvas.refresh()
+                self.reverse_dialog = None
+                self.reverse_picker.reset()
+            else:
+                # workaround for updating the feature position inside
+                # the dialog
+                self.reverse_dialog.feature.setGeometry(current_geom)
+                # update the result options in the dialog
+                self.reverse_dialog.update_results(results)
+
         rev_geocoding.feature_done.connect(done)
-        # ToDo: for some reason QGIS crashes while threading (with start())
-        rev_geocoding.work()
+        rev_geocoding.start()
 
     def show_attribute_table(self):
         if not self.output_layer:
@@ -300,6 +299,9 @@ class MainWidget(QDockWidget):
             if action.objectName() == 'mActionLayerSaveAs':
                 break
         action.trigger()
+
+    def unload(self):
+        pass
 
     def closeEvent(self, event):
         self.closingWidget.emit()
@@ -406,6 +408,11 @@ class MainWidget(QDockWidget):
         if not layer:
             return
 
+        self.reverse_picker_button.setEnabled(False)
+        self.inspect_picker_button.setEnabled(False)
+        self.export_csv_button.setEnabled(False)
+        self.attribute_table_button.setEnabled(False)
+
         active_count = self.field_map.count_active()
         if active_count == 0:
             QMessageBox.information(
@@ -415,30 +422,9 @@ class MainWidget(QDockWidget):
             return
 
         rs = config.rs if self.use_rs_check.isChecked() else None
-        features = layer.selectedFeatures() if config.selected_features_only \
-            else layer.getFeatures()
-        # we use it 2 times, this avoids using same FeatureIterator twice
-        features = [f for f in features]
-        area_wkt = None
-        if self.use_spatial_filter_check.isChecked():
-            spatial_layer = self.spatial_filter_combo.currentLayer()
-            if spatial_layer:
-                selected_only = self.spatial_selected_only_check.isChecked()
-                geometries = get_geometries(
-                    spatial_layer, selected=selected_only,
-                    crs=config.projection)
-                union = None
-                for geom in geometries:
-                    union = geom if not union else union.combine(geom)
-                area_wkt = union.asWkt()
 
-        url = config.api_url if config.use_api_url else None
-
-        bkg_geocoder = BKGGeocoder(key=config.api_key, srs=config.projection,
-                                   url=url, logic_link=config.logic_link, rs=rs,
-                                   area_wkt=area_wkt)
-        self.geocoding = Geocoding(bkg_geocoder, self.field_map,
-                                   features=features, parent=self)
+        features = layer.selectedFeatures() \
+            if config.selected_features_only else layer.getFeatures()
 
         if self.update_input_layer_check.isChecked():
             if layer.wkbType() != QgsWkbTypes.Point:
@@ -461,6 +447,30 @@ class MainWidget(QDockWidget):
             # cloned layer gets same mapping, it has the same fields
             cloned_field_map = self.field_map.copy(layer=self.output_layer)
             self.field_map_cache[self.output_layer.id()] = cloned_field_map
+            # take features of output layer as input to match the ids of the
+            # geocoding
+            features = [f for f in self.output_layer.getFeatures()]
+
+        area_wkt = None
+        if self.use_spatial_filter_check.isChecked():
+            spatial_layer = self.spatial_filter_combo.currentLayer()
+            if spatial_layer:
+                selected_only = self.spatial_selected_only_check.isChecked()
+                geometries = get_geometries(
+                    spatial_layer, selected=selected_only,
+                    crs=config.projection)
+                union = None
+                for geom in geometries:
+                    union = geom if not union else union.combine(geom)
+                area_wkt = union.asWkt()
+
+        url = config.api_url if config.use_api_url else None
+
+        bkg_geocoder = BKGGeocoder(key=config.api_key, srs=config.projection,
+                                   url=url, logic_link=config.logic_link, rs=rs,
+                                   area_wkt=area_wkt)
+        self.geocoding = Geocoding(bkg_geocoder, self.field_map,
+                                   features=features, parent=self)
 
         style_file = os.path.join(STYLE_PATH, 'bkggeocoder_treffer.qml')
         self.output_layer.loadNamedStyle(style_file)
@@ -521,7 +531,7 @@ class MainWidget(QDockWidget):
 
     def store_results(self, feature, results):
         if results:
-            results.sort(key=lambda x: x['properties']['score'])
+            results.sort(key=lambda x: x['properties']['score'], reverse=True)
             best = results[0]
         else:
             best = None
@@ -529,7 +539,7 @@ class MainWidget(QDockWidget):
         self.set_result(feature, best, i=0, n_results=len(results))
 
     def set_result(self, feature, result, i=0, n_results=None, geom_only=False,
-                   apply_adress=False, set_edited=False):
+                   set_edited=False):  #, apply_adress=False):
         '''
         bkg specific
         set result to feature of given layer
@@ -548,17 +558,19 @@ class MainWidget(QDockWidget):
             if not geom_only:
                 for prop in ['typ', 'text', 'score', 'treffer']:
                     value = properties.get(prop, None)
-                    # property gets prefix bkg_ in layer
-                    layer.changeAttributeValue(
-                        feat_id, fidx(f'bkg_{prop}'), value)
-                if apply_adress:
-                    for field in self.field_map.fields():
-                        if not self.field_map.active(field):
-                            continue
-                        value = properties.get(
-                            self.field_map.keyword(field), None)
+                    if value is not None:
+                        # property gets prefix bkg_ in layer
                         layer.changeAttributeValue(
-                            feat_id, fidx(field), value)
+                            feat_id, fidx(f'bkg_{prop}'), value)
+                #if apply_adress:
+                    #for field in self.field_map.fields():
+                        #if not self.field_map.active(field):
+                            #continue
+                        #value = properties.get(
+                            #self.field_map.keyword(field), None)
+                        #if value is not None:
+                            #layer.changeAttributeValue(
+                                #feat_id, fidx(field), value)
                 if n_results:
                     layer.changeAttributeValue(
                         feat_id, fidx('bkg_n_results'), n_results)
