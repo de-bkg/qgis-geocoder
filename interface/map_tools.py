@@ -84,10 +84,12 @@ class FeatureDragger(FeaturePicker):
         self.marker = None
         self.picked_feature = None
         self.dragging = False
+        self.initial_geom = None
 
     def reset(self):
         self.remove_marker()
         self.picked_feature = None
+        self.initial_geom = None
 
     def remove_marker(self):
         if not self.marker:
@@ -102,7 +104,9 @@ class FeatureDragger(FeaturePicker):
                 QgsMapToolIdentify.TopDownStopAtFirst)
             if len(features) == 0:
                 return
-            self.picked_feature = features[0].mFeature.id()
+            feature = features[0].mFeature
+            self.initial_geom = feature.geometry()
+            self.picked_feature = feature.id()
         # there is a feature -> drag it
         self.dragging = True
         self.canvas.setCursor(self.drag_cursor)

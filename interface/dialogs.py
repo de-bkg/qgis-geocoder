@@ -111,9 +111,8 @@ class InspectResultsDialog(Dialog):
         ])
         QgsProject.instance().addMapLayer(self.preview_layer)
 
-    def add_results(self, preselect=-1):
+    def add_results(self, preselect=-1, row_number=0):
 
-        grid = self.results_contents
         provider = self.preview_layer.dataProvider()
 
         for i, result in enumerate(self.results):
@@ -130,11 +129,11 @@ class InspectResultsDialog(Dialog):
             preview = QLabel()
             preview.setMaximumWidth(20)
             preview.setMinimumWidth(20)
-            grid.addWidget(preview, i, 0)
-            grid.addWidget(radio, i, 1)
+            self.results_contents.addWidget(preview, i+row_number, 0)
+            self.results_contents.addWidget(radio, i+row_number, 1)
             if self.show_score:
                 score = QLabel(f'Score {properties["score"]}')
-                grid.addWidget(score, i, 2)
+                self.results_contents.addWidget(score, i+row_number, 2)
             img_path = os.path.join(ICON_PATH, f'marker_{i+1}.png')
             if os.path.exists(img_path):
                 pixmap = QPixmap(img_path)
@@ -164,7 +163,9 @@ class InspectResultsDialog(Dialog):
         self.preview_layer.removeSelection()
         self.preview_layer.select(feature.id())
         self.result = result
+        self.zoom_to(feature)
 
+    def zoom_to(self, feature):
         # center map on point
         point = feature.geometry().asPoint()
         rect = QgsRectangle(point, point)
@@ -177,11 +178,11 @@ class InspectResultsDialog(Dialog):
         self.canvas.refresh()
 
     def accept(self):
-        QgsProject.instance().removeMapLayers([self.preview_layer.id()])
+        QgsProject.instance().removeMapLayer(self.preview_layer.id())
         super().accept()
 
     def reject(self):
-        QgsProject.instance().removeMapLayers([self.preview_layer.id()])
+        QgsProject.instance().removeMapLayer(self.preview_layer.id())
         super().reject()
 
     def showEvent(self, e):
@@ -194,10 +195,11 @@ class ReverseResultsDialog(InspectResultsDialog):
     show_score = False
 
     def __init__(self, feature, results, canvas, review_fields=[],
-                 parent=None, preselect=0, crs='EPSG:4326'):
-        super().__init__(feature, results, canvas, crs=crs,
+                 parent=None, preselect=-1, crs='EPSG:4326'):
+        super().__init__(feature, results, canvas, crs=crs, preselect=preselect,
                          review_fields=review_fields, parent=parent)
         self.results_label.setText('Nächstgelegene Adressen')
+        self.setWindowTitle('Nachbaradresssuche')
         self.accept_button.setText('Adresse und Koordinaten übernehmen')
         self.geom_only_button.setVisible(True)
         self.geom_only = False
@@ -206,7 +208,33 @@ class ReverseResultsDialog(InspectResultsDialog):
             self.accept()
         self.geom_only_button.clicked.connect(geom_only)
 
+    def add_results(self, preselect=-1):
+        # add a radio button for
+
+        point = self.feature.geometry().asPoint()
+        radio_label = ('Koordinaten der Markierung '
+                       f'({round(point.x(), 2)}, {round(point.y(), 2)})')
+        radio = QRadioButton(radio_label)
+        def toggled(checked):
+            # radio is checked -> no result selected
+            if checked:
+                self.result = None
+                self.i = -1
+                self.preview_layer.removeSelection()
+                self.zoom_to(self.feature)
+            self.accept_button.setDisabled(checked)
+        radio.toggled.connect(toggled)
+        # initially this option is checked
+        radio.setChecked(True)
+
+        self.results_contents.addWidget(radio, 0, 1)
+        super().add_results(preselect=-1, row_number=1)
+
     def update_results(self, results):
+        self.results = results
+        # lazy way to reset preview
+        QgsProject.instance().removeMapLayer(self.preview_layer.id())
         clear_layout(self.results_contents)
-        self.add_results(preselect=0)
+        self.setup_preview_layer()
+        self.add_results()
 

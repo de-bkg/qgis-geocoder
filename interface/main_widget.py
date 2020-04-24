@@ -227,38 +227,58 @@ class MainWidget(QDockWidget):
         crs = self.output_layer.crs().authid()
         url = config.api_url if config.use_api_url else None
 
+        current_geom = QgsGeometry.fromPointXY(point)
+        self.output_layer.changeGeometry(feature_id, current_geom)
+
         feature = self.output_layer.getFeature(feature_id)
 
         bkg_geocoder = BKGGeocoder(key=config.api_key, srs=crs, url=url,
                                    logic_link=config.logic_link)
-        # feature-geometries seem not to be thread-safe
-        # -> using Geocoder directly without worker here
-        try:
-            results = bkg_geocoder.reverse(point.x(), point.y())
-        except Exception as e:
-            QMessageBox.information(self, 'Fehler', e)
-            return
+        rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
+        rev_geocoding.error.connect(
+            lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
-        if not self.reverse_dialog:
-            # the first result will always be closest
-            # (meaning it is at exact position of requested feature)
-            preselect = 0
-            self.reverse_dialog = ReverseResultsDialog(
-                feature, results, self.canvas, preselect=preselect,
-                parent=self, crs=self.output_layer.crs().authid())
-            accepted = self.reverse_dialog.show()
-            if accepted:
-                result = self.reverse_dialog.result
-                if result:
-                    self.set_result(
-                        feature, result, i=-1, set_edited=True,
-                        geom_only=self.reverse_dialog.geom_only
-                        #,apply_adress=not self.reverse_dialog.geom_only
-                    )
-            self.canvas.refresh()
-            self.reverse_dialog = None
-        else:
-            self.reverse_dialog.update_results(results)
+        def done(feature, results):
+            # only one opened dialog at a time
+            if not self.reverse_dialog:
+                # remember the initial geometry
+                self._init_rev_geom = feature.geometry()
+                self.reverse_dialog = ReverseResultsDialog(
+                    feature, results, self.canvas,
+                    parent=self, crs=self.output_layer.crs().authid())
+                accepted = self.reverse_dialog.show()
+                if accepted:
+                    result = self.reverse_dialog.result
+                    # apply the geometry of the selected result
+                    # (no result is selected -> geometry of dragged point is
+                    # kept)
+                    if result:
+                        self.set_result(
+                            feature, result, i=-1, set_edited=True,
+                            geom_only=self.reverse_dialog.geom_only
+                            #,apply_adress=not self.reverse_dialog.geom_only
+                        )
+                else:
+                    # reset the geometry if rejected
+                    try:
+                        self.output_layer.changeGeometry(
+                            feature_id, self.reverse_picker.initial_geom)
+                    # catch error when quitting QGIS with dialog opened
+                    # (layer is already deleted at this point)
+                    except RuntimeError:
+                        pass
+                self.canvas.refresh()
+                self.reverse_dialog = None
+                self.reverse_picker.reset()
+            else:
+                # workaround for updating the feature position inside
+                # the dialog
+                self.reverse_dialog.feature.setGeometry(current_geom)
+                # update the result options in the dialog
+                self.reverse_dialog.update_results(results)
+
+        rev_geocoding.feature_done.connect(done)
+        rev_geocoding.start()
 
     def show_attribute_table(self):
         if not self.output_layer:
@@ -398,6 +418,9 @@ class MainWidget(QDockWidget):
 
         rs = config.rs if self.use_rs_check.isChecked() else None
 
+        features = layer.selectedFeatures() \
+            if config.selected_features_only else layer.getFeatures()
+
         if self.update_input_layer_check.isChecked():
             if layer.wkbType() != QgsWkbTypes.Point:
                 QMessageBox.information(
@@ -412,8 +435,6 @@ class MainWidget(QDockWidget):
                 return
             self.output_layer = layer
         else:
-            features = layer.selectedFeatures() \
-                if config.selected_features_only else layer.getFeatures()
             self.output_layer = clone_layer(
                 layer, name=f'{layer.name()}_ergebnisse',
                 srs=config.projection, features=features)
@@ -421,11 +442,10 @@ class MainWidget(QDockWidget):
             # cloned layer gets same mapping, it has the same fields
             cloned_field_map = self.field_map.copy(layer=self.output_layer)
             self.field_map_cache[self.output_layer.id()] = cloned_field_map
+            # take features of output layer as input to match the ids of the
+            # geocoding
+            features = [f for f in self.output_layer.getFeatures()]
 
-        # take features of output layer as input (either it is cloned
-        # and therefore contains all (selected) features anyway or it
-        # is the input layer itself)
-        features = [f for f in self.output_layer.getFeatures()]
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():
             spatial_layer = self.spatial_filter_combo.currentLayer()
