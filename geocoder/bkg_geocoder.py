@@ -73,11 +73,10 @@ class BKGGeocoder(Geocoder):
         for k in special:
             value = kwargs.pop(k)
             kwargs.update(self.special_kw[k].__func__(value))
-        query += logic.join(('{k}:"{v}"{s}'.format(k=k, v=v, s=suffix)
-                             for k, v in kwargs.items()
+        query += logic.join((f'{k}:({v}){suffix}' for k, v in kwargs.items()
                              if v))
         if self.rs:
-            query = f'({query}) AND rs:"{self.rs}"'
+            query = f'({query}) AND rs:{self.rs}'
         return query
 
     def query(self, *args, **kwargs):
