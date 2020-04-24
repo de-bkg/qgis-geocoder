@@ -26,6 +26,9 @@ class BKGGeocoder(Geocoder):
         'ortsteil': 'Ortsteil'
     }
 
+    special_characters = ['+', '&&', '||', '!', '(', ')', '{', '}',
+                          '[', ']', '^', '"', '~', '*', '?', ':']
+
     @staticmethod
     def split_code_city(value):
         res = {}
@@ -62,10 +65,16 @@ class BKGGeocoder(Geocoder):
     def get_url(key):
         return URL.format(key=key)
 
+    def _escape_special_chars(self, text):
+        for char in self.special_characters:
+            text = text.replace(char, r'\{}'.format(char))
+        return text
+
     def _build_params(self, *args, **kwargs):
         suffix = '~' if self.fuzzy else ''
         logic = f' {self.logic_link} '
-        query = logic.join([f'{a}{suffix}' for a in args if a]) or ''
+        query = logic.join([f'"{self._escape_special_chars(a)}"{suffix}'
+                            for a in args if a]) or ''
         if args and kwargs:
             query += logic
         # pop and process the special keywords
@@ -73,8 +82,8 @@ class BKGGeocoder(Geocoder):
         for k in special:
             value = kwargs.pop(k)
             kwargs.update(self.special_kw[k].__func__(value))
-        query += logic.join((f'{k}:({v}){suffix}' for k, v in kwargs.items()
-                             if v))
+        query += logic.join((f'{k}:({self._escape_special_chars(v)}){suffix}'
+                             for k, v in kwargs.items() if v))
         if self.rs:
             query = f'({query}) AND rs:{self.rs}'
         return query
