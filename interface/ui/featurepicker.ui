@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QGridLayout" name="feature_grid"/>
+    <layout class="QVBoxLayout" name="review_layout"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -63,7 +63,7 @@
            <x>0</x>
            <y>0</y>
            <width>272</width>
-           <height>215</height>
+           <height>217</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">

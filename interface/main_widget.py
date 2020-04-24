@@ -211,9 +211,12 @@ class MainWidget(QDockWidget):
         if self.inspect_dialog:
             self.inspect_dialog.close()
         feature = self.output_layer.getFeature(feature_id)
+        review_fields = [f for f in self.field_map.fields()
+                         if self.field_map.active(f)]
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
-            parent=self, crs=self.output_layer.crs().authid())
+            parent=self, crs=self.output_layer.crs().authid(),
+            review_fields=review_fields)
         accepted = self.inspect_dialog.show()
         if accepted:
             self.set_result(feature, self.inspect_dialog.result,
@@ -241,10 +244,12 @@ class MainWidget(QDockWidget):
         def done(feature, results):
             # only one opened dialog at a time
             if not self.reverse_dialog:
+                review_fields = [f for f in self.field_map.fields()
+                                 if self.field_map.active(f)]
                 # remember the initial geometry
                 self._init_rev_geom = feature.geometry()
                 self.reverse_dialog = ReverseResultsDialog(
-                    feature, results, self.canvas,
+                    feature, results, self.canvas, review_fields=review_fields,
                     parent=self, crs=self.output_layer.crs().authid())
                 accepted = self.reverse_dialog.show()
                 if accepted:
@@ -526,7 +531,7 @@ class MainWidget(QDockWidget):
 
     def store_results(self, feature, results):
         if results:
-            results.sort(key=lambda x: x['properties']['score'])
+            results.sort(key=lambda x: x['properties']['score'], reverse=True)
             best = results[0]
         else:
             best = None

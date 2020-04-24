@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QGridLayout)
+from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QGridLayout,
+                                 QFrame)
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
@@ -77,13 +78,31 @@ class InspectResultsDialog(Dialog):
         self.discard_button.clicked.connect(self.reject)
 
     def populate_review(self, review_fields):
+        if review_fields:
+            headline = QLabel('Geokodierungs-Parameter')
+            font = headline.font()
+            font.setUnderline(True)
+            headline.setFont(font)
+            self.review_layout.addWidget(headline)
+            grid = QGridLayout()
+            for i, field in enumerate(review_fields):
+                grid.addWidget(QLabel(field), i, 0)
+                value = self.feature.attribute(field)
+                grid.addWidget(QLabel(value), i, 1)
+            self.review_layout.addLayout(grid)
+            # horizontal line
+            line = QFrame()
+            line.setFrameShape(QFrame.HLine)
+            line.setFrameShadow(QFrame.Sunken)
+            self.review_layout.addWidget(line)
+
+        headline = QLabel('Anschrift laut Dienst')
+        font = headline.font()
+        font.setUnderline(True)
+        headline.setFont(font)
+        self.review_layout.addWidget(headline)
         bkg_text = self.feature.attribute('bkg_text')
-        self.feature_grid.addWidget(QLabel('Anschrift\nlaut Dienst'), 0, 0)
-        self.feature_grid.addWidget(QLabel(bkg_text), 0, 1)
-        for i, field in enumerate(review_fields):
-            self.feature_grid.addWidget(QLabel(field), i+1, 0)
-            value = self.feature.attribute(field)
-            self.feature_grid.addWidget(QLabel(value), i+1, 1)
+        self.review_layout.addWidget(QLabel(bkg_text))
 
     def setup_preview_layer(self):
         self.preview_layer = QgsVectorLayer(
