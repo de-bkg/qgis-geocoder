@@ -477,7 +477,8 @@ class MainWidget(QDockWidget):
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
-        style_file = os.path.join(STYLE_PATH, 'bkggeocoder_treffer.qml')
+        style_file = os.path.join(
+            STYLE_PATH, 'bkggeocoder_treffer+manuell_bearbeitet.qml')
         self.output_layer.loadNamedStyle(style_file)
 
         self.geocoding.message.connect(self.log)

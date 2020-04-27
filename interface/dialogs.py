@@ -169,12 +169,13 @@ class InspectResultsDialog(Dialog):
 
         self.preview_layer.commitChanges()
         extent = self.preview_layer.extent()
-        transform = QgsCoordinateTransform(
-            self.preview_layer.crs(),
-            self.canvas.mapSettings().destinationCrs(),
-            QgsProject.instance()
-        )
-        self.canvas.setExtent(transform.transform(extent))
+        if not extent.isEmpty():
+            transform = QgsCoordinateTransform(
+                self.preview_layer.crs(),
+                self.canvas.mapSettings().destinationCrs(),
+                QgsProject.instance()
+            )
+            self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
 
     def toggle_result(self, result, feature, i=0):
