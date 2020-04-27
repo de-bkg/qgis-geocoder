@@ -117,6 +117,7 @@ class InspectResultsDialog(Dialog):
             if os.path.exists(img_path):
                 symbol_layer = QgsRasterMarkerSymbolLayer()
                 symbol_layer.setPath(img_path)
+                symbol_layer.setSize(5)
                 symbol.appendSymbolLayer(symbol_layer)
             category.setSymbol(symbol)
             renderer.addCategory(category)
