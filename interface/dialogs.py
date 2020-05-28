@@ -38,22 +38,6 @@ class Dialog(QDialog):
         return self.exec_()
 
 
-class SaveCSVDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('save_csv.ui', modal=True, parent=parent)
-
-
-class OpenCSVDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('open_csv.ui', modal=True, parent=parent)
-
-
-class ProgressDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('progress.ui', modal=True, parent=parent)
-        self.close_button.clicked.connect(self.close)
-
-
 class InspectResultsDialog(Dialog):
     ui_file = 'featurepicker.ui'
     marker_img = 'marker_{}.png'
