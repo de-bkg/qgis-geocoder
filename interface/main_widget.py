@@ -263,16 +263,14 @@ class MainWidget(QDockWidget):
                             geom_only=self.reverse_dialog.geom_only
                             #,apply_adress=not self.reverse_dialog.geom_only
                         )
+                    self.output_layer.changeAttributeValue(
+                        feature_id, self.output_layer.fields().indexFromName(
+                            'manuell_bearbeitet'), True)
                 else:
                     # reset the geometry if rejected
                     try:
                         self.output_layer.changeGeometry(
                             feature_id, self.reverse_picker.initial_geom)
-                        self.output_layer.changeAttributeValue(
-                            feature_id,
-                            self.output_layer.fields().
-                            indexFromName('manuell_bearbeitet'),
-                            True)
                     # catch error when quitting QGIS with dialog opened
                     # (layer is already deleted at this point)
                     except RuntimeError:
@@ -397,10 +395,6 @@ class MainWidget(QDockWidget):
                 combo_idx = combo.findData(keyword)
                 combo.setCurrentIndex(combo_idx)
                 combo.setEnabled(checked)
-
-        #n_selected = layer.selectedFeatureCount()
-        #self.n_selected_label.setText(
-            #'({} Feature(s) selektiert)'.format(n_selected))
 
     def set_encoding(self, encoding):
         self.input_layer.dataProvider().setEncoding(encoding)
@@ -568,15 +562,6 @@ class MainWidget(QDockWidget):
                         # property gets prefix bkg_ in layer
                         layer.changeAttributeValue(
                             feat_id, fidx(f'bkg_{prop}'), value)
-                #if apply_adress:
-                    #for field in self.field_map.fields():
-                        #if not self.field_map.active(field):
-                            #continue
-                        #value = properties.get(
-                            #self.field_map.keyword(field), None)
-                        #if value is not None:
-                            #layer.changeAttributeValue(
-                                #feat_id, fidx(field), value)
                 if n_results:
                     layer.changeAttributeValue(
                         feat_id, fidx('bkg_n_results'), n_results)
