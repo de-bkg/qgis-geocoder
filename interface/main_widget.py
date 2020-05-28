@@ -36,8 +36,8 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
 from interface.map_tools import FeaturePicker, FeatureDragger
-from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
-                             OSMBackgroundLayer, get_geometries, clear_layout)
+from interface.utils import (clone_layer, TopPlusOpen, get_geometries,
+                             clear_layout)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH
@@ -102,12 +102,12 @@ class MainWidget(QDockWidget):
         self.setupUi()
         self.setup_config()
 
-        bg_grey = TerrestrisBackgroundLayer(groupname='Hintergrundkarten',
-                                            srs=config.projection)
-        bg_grey.draw(checked=False)
-        bg_osm = OSMBackgroundLayer(groupname='Hintergrundkarten',
-                                    srs=config.projection)
-        bg_osm.draw(checked=True)
+        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
+                              srs=config.projection)
+        bg_grey.draw('TopPlusOpen Graustufen', checked=False)
+        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
+                             srs=config.projection)
+        bg_osm.draw('TopPlusOpen', checked=True)
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
