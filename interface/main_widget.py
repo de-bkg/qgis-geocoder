@@ -104,10 +104,15 @@ class MainWidget(QDockWidget):
 
         bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
                               srs=config.projection)
-        bg_grey.draw('TopPlusOpen Graustufen', checked=False)
+        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=False)
         bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
                              srs=config.projection)
-        bg_osm.draw('TopPlusOpen', checked=True)
+        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=True)
+        for layer in [bg_osm, bg_grey]:
+            layer.layer.setTitle(
+                '© Bundesamt für Kartographie und Geodäsie 2020, '
+                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
+                'Datenquellen_TopPlus_Open.pdf')
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
