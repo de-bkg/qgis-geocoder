@@ -36,8 +36,8 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
 from interface.map_tools import FeaturePicker, FeatureDragger
-from interface.utils import (clone_layer, TerrestrisBackgroundLayer,
-                             OSMBackgroundLayer, get_geometries, clear_layout)
+from interface.utils import (clone_layer, TopPlusOpen, get_geometries,
+                             clear_layout)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH
@@ -102,12 +102,17 @@ class MainWidget(QDockWidget):
         self.setupUi()
         self.setup_config()
 
-        bg_grey = TerrestrisBackgroundLayer(groupname='Hintergrundkarten',
-                                            srs=config.projection)
-        bg_grey.draw(checked=False)
-        bg_osm = OSMBackgroundLayer(groupname='Hintergrundkarten',
-                                    srs=config.projection)
-        bg_osm.draw(checked=True)
+        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
+                              srs=config.projection)
+        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=False)
+        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
+                             srs=config.projection)
+        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=True)
+        for layer in [bg_osm, bg_grey]:
+            layer.layer.setTitle(
+                '© Bundesamt für Kartographie und Geodäsie 2020, '
+                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
+                'Datenquellen_TopPlus_Open.pdf')
 
     def setupUi(self):
         actions = self.iface.addLayerMenu().actions()
@@ -263,16 +268,14 @@ class MainWidget(QDockWidget):
                             geom_only=self.reverse_dialog.geom_only
                             #,apply_adress=not self.reverse_dialog.geom_only
                         )
+                    self.output_layer.changeAttributeValue(
+                        feature_id, self.output_layer.fields().indexFromName(
+                            'manuell_bearbeitet'), True)
                 else:
                     # reset the geometry if rejected
                     try:
                         self.output_layer.changeGeometry(
                             feature_id, self.reverse_picker.initial_geom)
-                        self.output_layer.changeAttributeValue(
-                            feature_id,
-                            self.output_layer.fields().
-                            indexFromName('manuell_bearbeitet'),
-                            True)
                     # catch error when quitting QGIS with dialog opened
                     # (layer is already deleted at this point)
                     except RuntimeError:
@@ -397,10 +400,6 @@ class MainWidget(QDockWidget):
                 combo_idx = combo.findData(keyword)
                 combo.setCurrentIndex(combo_idx)
                 combo.setEnabled(checked)
-
-        #n_selected = layer.selectedFeatureCount()
-        #self.n_selected_label.setText(
-            #'({} Feature(s) selektiert)'.format(n_selected))
 
     def set_encoding(self, encoding):
         self.input_layer.dataProvider().setEncoding(encoding)
@@ -568,15 +567,6 @@ class MainWidget(QDockWidget):
                         # property gets prefix bkg_ in layer
                         layer.changeAttributeValue(
                             feat_id, fidx(f'bkg_{prop}'), value)
-                #if apply_adress:
-                    #for field in self.field_map.fields():
-                        #if not self.field_map.active(field):
-                            #continue
-                        #value = properties.get(
-                            #self.field_map.keyword(field), None)
-                        #if value is not None:
-                            #layer.changeAttributeValue(
-                                #feat_id, fidx(field), value)
                 if n_results:
                     layer.changeAttributeValue(
                         feat_id, fidx('bkg_n_results'), n_results)

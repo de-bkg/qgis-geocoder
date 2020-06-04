@@ -197,26 +197,14 @@ class TileLayer(Layer):
             l.setExpanded(expanded)
 
 
-class TerrestrisBackgroundLayer(TileLayer):
+class TopPlusOpen(TileLayer):
 
-    def __init__(self, groupname='', prepend=False, srs='EPSG:4326'):
-
-        url = (f'crs={srs}&dpiMode=7&format=image/png'
-               '&layers=OSM-WMS&styles=&url=http://ows.terrestris.de/osm-gray/'
-               'service')
+    def __init__(self, groupname='', prepend=False, srs='EPSG:4326',
+                 greyscale=True):
+        layer = 'web_grau' if greyscale else 'web'
+        url = (f'contextualWMSLegend=0&crs={srs}&dpiMode=7&featureCount=10'
+               f'&format=image/png&layers={layer}&styles=default'
+               '&tileMatrixSet=EU_EPSG_25832_TOPPLUS'
+               '&url=https://sgx.geodatenzentrum.de/wmts_topplus_open/'
+               '1.0.0/WMTSCapabilities.xml')
         super().__init__(url, groupname=groupname, prepend=prepend)
-
-    def draw(self, checked=True):
-        super().draw('Terrestris', checked=checked, expanded=False)
-
-
-class OSMBackgroundLayer(TileLayer):
-
-    def __init__(self, groupname='', prepend=False, srs='EPSG:4326'):
-
-        url = ('type=xyz&url=https://a.tile.openstreetmap.org//{z}/{x}/{y}.png'
-               f'&crs={srs}')
-        super().__init__(url, groupname=groupname, prepend=prepend)
-
-    def draw(self, checked=True):
-        super().draw('OpenStreetMap', checked=checked)

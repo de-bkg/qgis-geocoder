@@ -38,22 +38,6 @@ class Dialog(QDialog):
         return self.exec_()
 
 
-class SaveCSVDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('save_csv.ui', modal=True, parent=parent)
-
-
-class OpenCSVDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('open_csv.ui', modal=True, parent=parent)
-
-
-class ProgressDialog(Dialog):
-    def __init__(self, parent=None):
-        super().__init__('progress.ui', modal=True, parent=parent)
-        self.close_button.clicked.connect(self.close)
-
-
 class InspectResultsDialog(Dialog):
     ui_file = 'featurepicker.ui'
     marker_img = 'marker_{}.png'
@@ -88,7 +72,7 @@ class InspectResultsDialog(Dialog):
             for i, field in enumerate(review_fields):
                 grid.addWidget(QLabel(field), i, 0)
                 value = self.feature.attribute(field)
-                grid.addWidget(QLabel(value), i, 1)
+                grid.addWidget(QLabel(str(value)), i, 1)
             self.review_layout.addLayout(grid)
             # horizontal line
             line = QFrame()
