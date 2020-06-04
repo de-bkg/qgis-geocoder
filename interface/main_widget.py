@@ -235,7 +235,14 @@ class MainWidget(QDockWidget):
         crs = self.output_layer.crs().authid()
         url = config.api_url if config.use_api_url else None
 
-        current_geom = QgsGeometry.fromPointXY(point)
+        output_crs = self.output_layer.crs()
+        # point geometry originates from clicking on canvas
+        transform = QgsCoordinateTransform(
+            self.canvas.mapSettings().destinationCrs(),
+            output_crs,
+            QgsProject.instance()
+        )
+        current_geom = QgsGeometry.fromPointXY(transform.transform(point))
         self.output_layer.changeGeometry(feature_id, current_geom)
 
         feature = self.output_layer.getFeature(feature_id)
@@ -255,7 +262,7 @@ class MainWidget(QDockWidget):
                 self._init_rev_geom = feature.geometry()
                 self.reverse_dialog = ReverseResultsDialog(
                     feature, results, self.canvas, review_fields=review_fields,
-                    parent=self, crs=self.output_layer.crs().authid())
+                    parent=self, crs=output_crs.authid())
                 accepted = self.reverse_dialog.show()
                 if accepted:
                     result = self.reverse_dialog.result
