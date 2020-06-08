@@ -1,23 +1,49 @@
 from qgis import utils
 from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis.PyQt.QtGui import QCursor, QColor
-from qgis.gui import (QgsMapToolEmitPoint, QgsMapToolIdentify, QgsVertexMarker)
-from qgis.core import (QgsFeature, QgsGeometry, QgsPointXY)
+from qgis.PyQt.Qt import QWidget
+from qgis.gui import (QgsMapToolEmitPoint, QgsMapToolIdentify, QgsVertexMarker,
+                      QgsMapCanvas)
+from qgis.core import (QgsGeometry, QgsPointXY, QgsVectorLayer)
 
 
 class MapTool:
     '''
     abstract class for tools triggered by clicking a certain ui element
+
+    Attributes
+    ----------
+    cursor : QCursor
+        the appearance of the cursor when hovering the map canvas while tool is
+        active
     '''
     cursor = QCursor(Qt.CrossCursor)
 
-    def __init__(self, ui_element, canvas=None):
+    def __init__(self, ui_element: QWidget, canvas: QgsMapCanvas=None):
+        '''
+        Parameters
+        ----------
+        ui_element : QWidget
+            clickable UI element, clicking on it will adctivate/deactivate this
+            tool
+        canvas : QgsMapCanvas, optional
+            the map canvas the tool will work on, defaults to the map canvas of
+            the QGIS UI
+        '''
         self.ui_element = ui_element
         self.canvas = canvas or utils.iface.mapCanvas()
         self.ui_element.clicked.connect(
             lambda checked: self.set_active(checked))
 
-    def set_active(self, active):
+    def set_active(self, active: bool):
+        '''
+        activate/deactivate the tool
+
+        Parameters
+        ----------
+        active : bool
+            activate tool if True, deactivate the tool if False
+        '''
         if active:
             self.canvas.setMapTool(self)
             self.canvas.mapToolSet.connect(self.disconnect)
@@ -29,43 +55,73 @@ class MapTool:
             self.ui_element.blockSignals(False)
 
     def disconnect(self, **kwargs):
+        '''
+        disconnect the tool from the map canvas
+        '''
         self.canvas.mapToolSet.disconnect(self.disconnect)
         self.set_active(False)
 
 
-class MapClickedTool(MapTool, QgsMapToolEmitPoint):
-    map_clicked = pyqtSignal(QgsGeometry)
-
-    def __init__(self, ui_element, target_epsg=25832, canvas=None):
-        MapTool.__init__(self, ui_element, target_epsg=target_epsg,
-                         canvas=canvas)
-        QgsMapToolEmitPoint.__init__(self, canvas=self.canvas)
-        self.canvasClicked.connect(self._map_clicked)
-
-    def _map_clicked(self, point, e):
-        geom = QgsGeometry.fromPointXY(point)
-        self.map_clicked.emit(self.transform_from_map(geom))
-
-
 class FeaturePicker(MapTool, QgsMapToolEmitPoint):
+    '''
+    tool for picking features on the map canvas by clicking
+
+    Attributes
+    ----------
+    feature_picked : pyqtSignal
+        emitted when a feature is clicked on the map canvas, feature id
+    '''
     feature_picked = pyqtSignal(int)
 
-    def __init__(self, ui_element, layers=[], canvas=None, draw_marker=False):
+    def __init__(self, ui_element: QWidget, layers: list=[],
+                 canvas: QgsMapCanvas=None):
+        '''
+        Parameters
+        ----------
+        ui_element : QWidget
+            clickable UI element, clicking on it will adctivate/deactivate this
+            tool
+        layers : list, optional
+            the layers containing the features that can be picked,
+            defaults to empty list (no layers)
+        canvas : QgsMapCanvas, optional
+            the map canvas the tool will work on, defaults to the map canvas of
+            the QGIS UI
+        '''
         MapTool.__init__(self, ui_element, canvas=canvas)
         QgsMapToolEmitPoint.__init__(self, canvas=self.canvas)
         self._layers = layers
 
-    def add_layer(self, layer):
+    def add_layer(self, layer: QgsVectorLayer):
+        '''
+        add a layer to pick features from
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            the layer containing the features that can be picked
+        '''
         if layer:
             self._layers.append(layer)
 
-    def set_layer(self, layer):
+    def set_layer(self, layer: QgsVectorLayer):
+        '''
+        sets a single layer to pick features from
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            the layer containing the features that can be picked
+        '''
         if not layer:
             self._layers = []
         else:
             self._layers = [layer]
 
     def canvasReleaseEvent(self, mouseEvent):
+        '''
+        override, emit first feature found on mouse release
+        '''
         if not self._layers:
             return
         features = QgsMapToolIdentify(self.canvas).identify(
@@ -76,63 +132,106 @@ class FeaturePicker(MapTool, QgsMapToolEmitPoint):
 
 
 class FeatureDragger(FeaturePicker):
+    '''
+    tool for moving features on the map canvas with drag & drop,
+    does not change the geometry of the dragged feature but draws a marker
+    at the new position and emits the geometry
+
+    Attributes
+    ----------
+    feature_dragged : pyqtSignal
+        emitted when a feature is dragged or clicked on the map canvas,
+        (feature id, release position)
+    drag_cursor : QCursor
+        the appearance of the cursor while dragging a feature
+    '''
     feature_dragged = pyqtSignal(int, QgsPointXY)
     drag_cursor = QCursor(Qt.DragMoveCursor)
 
-    def __init__(self, ui_element, layers=[], canvas=None):
+    def __init__(self, ui_element: QWidget, layers: list=[],
+                 canvas: QgsMapCanvas=None):
+        '''
+        Parameters
+        ----------
+        ui_element : QWidget
+            clickable UI element, clicking on it will adctivate/deactivate this
+            tool
+        layers : list, optional
+            the layers containing the features that can be picked,
+            defaults to empty list (no layers)
+        canvas : QgsMapCanvas, optional
+            the map canvas the tool will work on, defaults to the map canvas of
+            the QGIS UI
+        '''
         super().__init__(ui_element, layers=layers, canvas=canvas)
-        self.marker = None
-        self.picked_feature = None
-        self.dragging = False
-        self.initial_geom = None
+        self._marker = None
+        self._picked_feature = None
+        self._dragging = False
+        self._initial_geom = None
 
     def reset(self):
+        '''
+        reset the feature picker to it's initial state
+        '''
         self.remove_marker()
-        self.picked_feature = None
-        self.initial_geom = None
+        self._picked_feature = None
+        self._initial_geom = None
 
     def remove_marker(self):
-        if not self.marker:
+        '''
+        remove the marker from the map
+        '''
+        if not self._marker:
             return
-        self.canvas.scene().removeItem(self.marker)
-        self.marker = None
+        self.canvas.scene().removeItem(self._marker)
+        self._marker = None
 
     def canvasPressEvent(self, e):
-        if self.picked_feature is None:
+        '''
+        override, remember feature on click and move marker (create one if not
+        drawn yet)
+        '''
+        if self._picked_feature is None:
             features = QgsMapToolIdentify(self.canvas).identify(
                 e.pos().x(), e.pos().y(), self._layers,
                 QgsMapToolIdentify.TopDownStopAtFirst)
             if len(features) == 0:
                 return
             feature = features[0].mFeature
-            self.initial_geom = feature.geometry()
-            self.picked_feature = feature.id()
+            self._initial_geom = feature.geometry()
+            self._picked_feature = feature.id()
         # there is a feature -> drag it
-        self.dragging = True
+        self._dragging = True
         self.canvas.setCursor(self.drag_cursor)
         # not marked yet -> mark position
-        if not self.marker:
+        if not self._marker:
             color = QColor(0, 0, 255)
             color.setAlpha(100)
-            self.marker = QgsVertexMarker(self.canvas)
-            self.marker.setColor(color)
-            self.marker.setIconSize(10)
-            self.marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-            self.marker.setPenWidth(10)
+            self._marker = QgsVertexMarker(self.canvas)
+            self._marker.setColor(color)
+            self._marker.setIconSize(10)
+            self._marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+            self._marker.setPenWidth(10)
         point = self.toMapCoordinates(e.pos())
-        self.marker.setCenter(point)
+        self._marker.setCenter(point)
 
     def canvasMoveEvent(self, e):
-        if not self.marker or not self.dragging:
+        '''
+        override, move marker if mouse dragging is active and mouse is moved
+        '''
+        if not self._marker or not self._dragging:
             return
         # update position of marker while dragging
         point = self.toMapCoordinates(e.pos())
-        self.marker.setCenter(point)
+        self._marker.setCenter(point)
 
     def canvasReleaseEvent(self, mouseEvent):
-        self.dragging = False
-        if self.picked_feature is None:
+        '''
+        override, emit geometry of position of marker on mouse release
+        '''
+        self._dragging = False
+        if self._picked_feature is None:
             return
         self.canvas.setCursor(self.cursor)
-        point = self.toMapCoordinates(self.marker.pos().toPoint())
-        self.feature_dragged.emit(self.picked_feature, point)
+        point = self.toMapCoordinates(self._marker.pos().toPoint())
+        self.feature_dragged.emit(self._picked_feature, point)

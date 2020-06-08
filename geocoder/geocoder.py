@@ -352,6 +352,7 @@ class Worker(QThread):
 
     def kill(self):
         '''
+        call to abort geocoding
         '''
         self.is_killed = True
 
@@ -424,9 +425,15 @@ class Geocoding(Worker):
 
         return success
 
-    def process(self, feature):
+    def process(self, feature: QgsFeature):
         '''
         geocode a single feature
+
+        Parameters
+        ----------
+        feature : QgsFeature
+            the feature with address fields matching the field_map to find
+            point geometries for
         '''
         args, kwargs = self.field_map.to_args(feature)
         res = self.geocoder.query(*args, **kwargs)
@@ -457,7 +464,8 @@ class ReverseGeocoding(Geocoding):
     '''
 
     def __init__(self, geocoder: Geocoder,
-                 features: Union[QgsFeatureIterator, list], parent=None):
+                 features: Union[QgsFeatureIterator, list],
+                 parent: QObject=None):
         '''
         Parameters
         ----------
@@ -472,9 +480,14 @@ class ReverseGeocoding(Geocoding):
         self.geocoder = geocoder
         self.features = [f for f in features]
 
-    def process(self, feature):
+    def process(self, feature: QgsFeature):
         '''
         reverse geocode single features
+
+        Parameters
+        ----------
+        feature : QgsFeature
+            the feature with point geometry to find addresses for
         '''
         pnt = feature.geometry().asPoint()
         res = self.geocoder.reverse(pnt.x(), pnt.y())
