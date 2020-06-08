@@ -167,7 +167,6 @@ class FeatureDragger(FeaturePicker):
         self._marker = None
         self._picked_feature = None
         self._dragging = False
-        self._initial_geom = None
 
     def reset(self):
         '''
@@ -175,7 +174,6 @@ class FeatureDragger(FeaturePicker):
         '''
         self.remove_marker()
         self._picked_feature = None
-        self._initial_geom = None
 
     def remove_marker(self):
         '''
@@ -198,7 +196,6 @@ class FeatureDragger(FeaturePicker):
             if len(features) == 0:
                 return
             feature = features[0].mFeature
-            self._initial_geom = feature.geometry()
             self._picked_feature = feature.id()
         # there is a feature -> drag it
         self._dragging = True

@@ -159,6 +159,7 @@ class MainWidget(QDockWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer)
+        self._dragged_feature = None
 
     def setup_config(self):
         self.search_and_check.setChecked(config.logic_link == 'AND')
@@ -232,6 +233,23 @@ class MainWidget(QDockWidget):
     def reverse_geocode(self, feature_id, point):
         if not self.output_layer:
             return
+
+        dragged_feature = self.output_layer.getFeature(feature_id)
+
+        prev_dragged_id = (self._dragged_feature.id()
+                           if self._dragged_feature else None)
+        if feature_id != prev_dragged_id:
+            if self.reverse_dialog:
+                self.reverse_dialog.close()
+            # reset geometry of previously dragged feature
+            if prev_dragged_id is not None:
+                self.output_layer.changeGeometry(
+                    prev_dragged_id, self._init_drag_geom)
+            # remember initial geometry because geometry of dragged feature
+            # will be changed in place
+            self._init_drag_geom = dragged_feature.geometry()
+            self._dragged_feature = dragged_feature
+
         crs = self.output_layer.crs().authid()
         url = config.api_url if config.use_api_url else None
 
@@ -242,14 +260,15 @@ class MainWidget(QDockWidget):
             output_crs,
             QgsProject.instance()
         )
+
         current_geom = QgsGeometry.fromPointXY(transform.transform(point))
         self.output_layer.changeGeometry(feature_id, current_geom)
 
-        feature = self.output_layer.getFeature(feature_id)
-
+        dragged_feature = self.output_layer.getFeature(feature_id)
         bkg_geocoder = BKGGeocoder(key=config.api_key, srs=crs, url=url,
                                    logic_link=config.logic_link)
-        rev_geocoding = ReverseGeocoding(bkg_geocoder, [feature], parent=self)
+        rev_geocoding = ReverseGeocoding(bkg_geocoder, [dragged_feature],
+                                         parent=self)
         rev_geocoding.error.connect(
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
@@ -282,11 +301,12 @@ class MainWidget(QDockWidget):
                     # reset the geometry if rejected
                     try:
                         self.output_layer.changeGeometry(
-                            feature_id, self.reverse_picker.initial_geom)
+                            self._dragged_feature.id(), self._init_drag_geom)
                     # catch error when quitting QGIS with dialog opened
                     # (layer is already deleted at this point)
                     except RuntimeError:
                         pass
+                self._dragged_feature = None
                 self.canvas.refresh()
                 self.reverse_dialog = None
                 self.reverse_picker.reset()
