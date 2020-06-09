@@ -49,7 +49,7 @@ class BKGGeocoder(Geocoder):
         'plz_ort': split_code_city,
     }
 
-    def __init__(self, key='', url='', srs: str='EPSG:4326', logic_link='AND',
+    def __init__(self, key='', url='', crs: str='EPSG:4326', logic_link='AND',
                  rs='', fuzzy=False, area_wkt=None):
         if not key and not url:
             raise ValueError('at least one keyword out of "key" and "url" has '
@@ -59,7 +59,7 @@ class BKGGeocoder(Geocoder):
         self.fuzzy = fuzzy
         self.rs = rs
         self.area_wkt = area_wkt
-        super().__init__(url=url, srs=srs)
+        super().__init__(url=url, crs=crs)
 
     @staticmethod
     def get_url(key):
@@ -92,7 +92,7 @@ class BKGGeocoder(Geocoder):
         self.params = {}
         if self.area_wkt:
             self.params['geometry'] = self.area_wkt
-        self.params['srsname'] = self.srs
+        self.params['srsname'] = self.crs
         query = self._build_params(*args, **kwargs)
         if not query:
             raise Exception('keine Suchparameter gefunden')
@@ -107,7 +107,7 @@ class BKGGeocoder(Geocoder):
         params = {
             'lat': y,
             'lon': x,
-            'srsname': self.srs
+            'srsname': self.crs
         }
         self.r = requests.get(self.url, params=params)
         if self.r.status_code != 200:

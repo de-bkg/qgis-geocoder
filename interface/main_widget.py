@@ -103,10 +103,10 @@ class MainWidget(QDockWidget):
         self.setup_config()
 
         bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
-                              srs=config.projection)
+                              crs=config.projection)
         bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=False)
         bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
-                             srs=config.projection)
+                             crs=config.projection)
         bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=True)
         for layer in [bg_osm, bg_grey]:
             layer.layer.setTitle(
@@ -265,7 +265,7 @@ class MainWidget(QDockWidget):
         self.output_layer.changeGeometry(feature_id, current_geom)
 
         dragged_feature = self.output_layer.getFeature(feature_id)
-        bkg_geocoder = BKGGeocoder(key=config.api_key, srs=crs, url=url,
+        bkg_geocoder = BKGGeocoder(key=config.api_key, crs=crs, url=url,
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [dragged_feature],
                                          parent=self)
@@ -473,7 +473,7 @@ class MainWidget(QDockWidget):
         else:
             self.output_layer = clone_layer(
                 layer, name=f'{layer.name()}_ergebnisse',
-                srs=config.projection, features=features)
+                crs=config.projection, features=features)
             self.output_layer_ids.append(self.output_layer.id())
             # cloned layer gets same mapping, it has the same fields
             cloned_field_map = self.field_map.copy(layer=self.output_layer)
@@ -497,7 +497,7 @@ class MainWidget(QDockWidget):
 
         url = config.api_url if config.use_api_url else None
 
-        bkg_geocoder = BKGGeocoder(key=config.api_key, srs=config.projection,
+        bkg_geocoder = BKGGeocoder(key=config.api_key, crs=config.projection,
                                    url=url, logic_link=config.logic_link, rs=rs,
                                    area_wkt=area_wkt)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,

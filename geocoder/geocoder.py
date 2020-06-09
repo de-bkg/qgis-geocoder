@@ -269,17 +269,17 @@ class Geocoder:
     # keywords used in  and their display name for the ui
     keywords = {}
 
-    def __init__(self, url: str='', srs: str='EPSG:4326'):
+    def __init__(self, url: str='', crs: str='EPSG:4326'):
         '''
         Parameters
         ----------
         url : str, optional
             url of geocoding service
-        srs : str, optional
+        crs : str, optional
             code of projection, defaults to epsg 4326
         '''
         self.url = url
-        self.srs = srs
+        self.crs = crs
 
     def query(self, *args, **kwargs):
         '''

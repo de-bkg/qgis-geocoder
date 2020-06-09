@@ -4,7 +4,7 @@ from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.Qt import QWidget
 from qgis.gui import (QgsMapToolEmitPoint, QgsMapToolIdentify, QgsVertexMarker,
                       QgsMapCanvas)
-from qgis.core import (QgsGeometry, QgsPointXY, QgsVectorLayer)
+from qgis.core import (QgsPointXY, QgsVectorLayer)
 
 
 class MapTool:
