@@ -13,7 +13,7 @@ def clear_layout(layout):
         elif child.layout() is not None:
             clear_layout(child.layout())
 
-def clone_layer(layer, srs='EPSG:4326', name=None, features=None):
+def clone_layer(layer, crs='EPSG:4326', name=None, features=None):
     '''
     clone given layer, adds Point geometry with given srs
     optional names it
@@ -22,7 +22,7 @@ def clone_layer(layer, srs='EPSG:4326', name=None, features=None):
     features = features or layer.getFeatures()
     name = name or + f'{layer.name()}__clone'
 
-    clone = QgsVectorLayer(f'Point?crs={srs}', name, 'memory')
+    clone = QgsVectorLayer(f'Point?crs={crs}', name, 'memory')
 
     data = clone.dataProvider()
     attr = layer.dataProvider().fields().toList()
@@ -199,10 +199,10 @@ class TileLayer(Layer):
 
 class TopPlusOpen(TileLayer):
 
-    def __init__(self, groupname='', prepend=False, srs='EPSG:4326',
+    def __init__(self, groupname='', prepend=False, crs='EPSG:4326',
                  greyscale=True):
         layer = 'web_grau' if greyscale else 'web'
-        url = (f'contextualWMSLegend=0&crs={srs}&dpiMode=7&featureCount=10'
+        url = (f'contextualWMSLegend=0&crs={crs}&dpiMode=7&featureCount=10'
                f'&format=image/png&layers={layer}&styles=default'
                '&tileMatrixSet=EU_EPSG_25832_TOPPLUS'
                '&url=https://sgx.geodatenzentrum.de/wmts_topplus_open/'

@@ -26,7 +26,7 @@ __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject, QThread
 from qgis.core import QgsFeature, QgsFeatureIterator, QgsVectorLayer
-from typing import Union
+from typing import Union, List, Tuple
 import re
 import math
 import copy
@@ -43,8 +43,8 @@ class FieldMap:
     layer : QgsVectorLayer
         mapped vector layer
     '''
-    def __init__(self, layer: QgsVectorLayer, ignore: list=[],
-                 keywords: dict ={}):
+    def __init__(self, layer: QgsVectorLayer, ignore: List[str] = [],
+                 keywords: dict = {}):
         '''
         Parameters
         ----------
@@ -101,7 +101,7 @@ class FieldMap:
                 return False
         return True
 
-    def copy(self, layer: QgsVectorLayer=None) -> 'FieldMap':
+    def copy(self, layer: QgsVectorLayer = None) -> 'FieldMap':
         '''
         clone field map with current mapping,
 
@@ -119,7 +119,7 @@ class FieldMap:
         clone._mapping = copy.deepcopy(self._mapping)
         return clone
 
-    def fields(self) -> list:
+    def fields(self) -> List[str]:
         '''
         Returns
         -------
@@ -128,7 +128,8 @@ class FieldMap:
         '''
         return list(self._mapping.keys())
 
-    def set_field(self, field_name: str, keyword: str=None, active: bool=None):
+    def set_field(self, field_name: str, keyword: str = None,
+                  active: bool = None):
         '''
         set properties of a mapped field
 
@@ -147,7 +148,7 @@ class FieldMap:
         if active is not None:
             self.set_active(field_name, active=active)
 
-    def set_active(self, field_name: str, active: bool=True):
+    def set_active(self, field_name: str, active: bool = True):
         '''
         sets active status to field
 
@@ -206,7 +207,7 @@ class FieldMap:
         '''
         return self._mapping[field_name][1]
 
-    def to_args(self, feature: QgsFeature) -> tuple:
+    def to_args(self, feature: QgsFeature) -> Tuple[list, dict]:
         '''
         creates parameters out of the mapped (active) fields and current values
         to be used in geocoding, inactive fields and fields with no values are
@@ -269,7 +270,7 @@ class Geocoder:
     # keywords used in  and their display name for the ui
     keywords = {}
 
-    def __init__(self, url: str='', crs: str='EPSG:4326'):
+    def __init__(self, url: str = '', crs: str = 'EPSG:4326'):
         '''
         Parameters
         ----------
@@ -322,7 +323,7 @@ class Worker(QThread):
     message = pyqtSignal(str)
     progress = pyqtSignal(int)
 
-    def __init__(self, parent: QObject=None):
+    def __init__(self, parent: QObject = None):
         '''
         Parameters
         ----------
@@ -379,8 +380,8 @@ class Geocoding(Worker):
     feature_done = pyqtSignal(QgsFeature, list)
 
     def __init__(self, geocoder: Geocoder, field_map: FieldMap,
-                 features: Union[QgsFeatureIterator, list]=None,
-                 parent: QObject=None):
+                 features: Union[QgsFeatureIterator, List[QgsFeature]] = None,
+                 parent: QObject = None):
         '''
         Parameters
         ----------
@@ -464,7 +465,7 @@ class ReverseGeocoding(Geocoding):
     '''
 
     def __init__(self, geocoder: Geocoder,
-                 features: Union[QgsFeatureIterator, list],
+                 features: Union[QgsFeatureIterator, List[QgsFeature]],
                  parent: QObject=None):
         '''
         Parameters

@@ -70,6 +70,14 @@ class InspectResultsDialog(Dialog):
     '''
     dialog showing a feature with its attributes used for geocoding  and
     a list of pickable results of geocoding this feature
+
+    Attributes
+    ----------
+    i : bool
+        indicates whether third option was picked (take only the geometry)
+        or not
+    result : dict
+        the currently picked result
     '''
     ui_file = 'featurepicker.ui'
     marker_img = 'marker_{}.png'
