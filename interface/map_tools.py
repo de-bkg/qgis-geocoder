@@ -1,4 +1,5 @@
 from qgis import utils
+from typing import List
 from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.Qt import QWidget
@@ -19,7 +20,7 @@ class MapTool:
     '''
     cursor = QCursor(Qt.CrossCursor)
 
-    def __init__(self, ui_element: QWidget, canvas: QgsMapCanvas=None):
+    def __init__(self, ui_element: QWidget, canvas: QgsMapCanvas = None):
         '''
         Parameters
         ----------
@@ -54,7 +55,7 @@ class MapTool:
             self.ui_element.setChecked(False)
             self.ui_element.blockSignals(False)
 
-    def disconnect(self, **kwargs):
+    def disconnect(self, **kwargs: object):
         '''
         disconnect the tool from the map canvas
         '''
@@ -73,8 +74,8 @@ class FeaturePicker(MapTool, QgsMapToolEmitPoint):
     '''
     feature_picked = pyqtSignal(int)
 
-    def __init__(self, ui_element: QWidget, layers: list=[],
-                 canvas: QgsMapCanvas=None):
+    def __init__(self, ui_element: QWidget, layers: List[QgsVectorLayer] = [],
+                 canvas: QgsMapCanvas = None):
         '''
         Parameters
         ----------
@@ -83,7 +84,7 @@ class FeaturePicker(MapTool, QgsMapToolEmitPoint):
             tool
         layers : list, optional
             the layers containing the features that can be picked,
-            defaults to empty list (no layers)
+            defaults to not setting any layers
         canvas : QgsMapCanvas, optional
             the map canvas the tool will work on, defaults to the map canvas of
             the QGIS UI
@@ -148,8 +149,8 @@ class FeatureDragger(FeaturePicker):
     feature_dragged = pyqtSignal(int, QgsPointXY)
     drag_cursor = QCursor(Qt.DragMoveCursor)
 
-    def __init__(self, ui_element: QWidget, layers: list=[],
-                 canvas: QgsMapCanvas=None):
+    def __init__(self, ui_element: QWidget, layers: List[QgsVectorLayer] = [],
+                 canvas: QgsMapCanvas = None):
         '''
         Parameters
         ----------
@@ -158,7 +159,7 @@ class FeatureDragger(FeaturePicker):
             tool
         layers : list, optional
             the layers containing the features that can be picked,
-            defaults to empty list (no layers)
+            defaults to not setting any layers
         canvas : QgsMapCanvas, optional
             the map canvas the tool will work on, defaults to the map canvas of
             the QGIS UI

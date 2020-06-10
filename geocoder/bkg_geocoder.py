@@ -78,13 +78,13 @@ class BKGGeocoder(Geocoder):
             OR - one search term has to match
         rs : str, optional
             "Regionalschlüssel", restrict results to be in region matching this
-            key, defaults to empty string (no restriction)
+            key, defaults to no restriction
         area_wkt : str, optional
             wkt text describing a (multi-)polygon, restrict results to be in
-            this area, defaults to empty string (no restriction)
+            this area, defaults to no restriction
         fuzzy : bool, optional
             fuzzy search, the terms don't have to match exactly if set True,
-            defaults to False (no fuzzy search)
+            defaults to not using fuzzy search
         '''
         if not key and not url:
             raise ValueError('at least one keyword out of "key" and "url" has '

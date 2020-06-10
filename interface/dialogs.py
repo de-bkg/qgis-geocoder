@@ -32,9 +32,9 @@ class Dialog(QDialog):
         ui_file : str, optional
             path to QT-Designer xml file to load UI of dialog from,
             if only filename is given, the file is looked for in the standard
-            folder (UI_PATH), defaults to None
+            folder (UI_PATH), defaults to not using ui file
         modal : bool, optional
-            set dialog to modal, defaults to True
+            set dialog to modal if True, not modal if False, defaults to modal
         parent: QWidget, optional
             parent widget, defaults to None
         title: str, optional
@@ -100,17 +100,18 @@ class InspectResultsDialog(Dialog):
             the map canvas to preview the results on
         review_fields : list, optional
             list of field names of the given feature whose values are shown in
-            the dialog review section, defaults to empty list (no fields shown)
+            the dialog review section, defaults to not showing any fields
         preselect : int, optional
-            preselects a result on showing the dialog, defaults to -1 (no result
-            preselected)
+            preselects a result on showing the dialog, defaults to not
+            preselecting a result
         crs : str, optional
             code of projection of the geometries of the given features (feature
             and results), defaults to epsg 4326
         parent : QWidget, optional
             parent widget, defaults to None
         show_score : bool, optional
-            show the score of the results in the ui, defaults to True
+            show the score of the results in the ui, defaults to showing the
+            scores
         '''
         super().__init__(self.ui_file, modal=False, parent=parent)
         self.canvas = canvas
@@ -320,7 +321,7 @@ class ReverseResultsDialog(InspectResultsDialog):
             the map canvas to preview the results on
         review_fields : list, optional
             list of field names of the given feature whose values are shown in
-            the dialog review section, defaults to empty list (no fields shown)
+            the dialog review section, defaults to not showing any fields
         crs : str, optional
             code of projection of the geometries of the given features (feature
             and results), defaults to epsg 4326
