@@ -24,15 +24,16 @@
 
 import os
 
+from typing import List
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
 from qgis import utils
 from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
                        QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
-                       QgsVectorDataProvider, QgsWkbTypes,
-                       QgsCoordinateTransform, QgsProject)
+                       QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
+                       QgsCoordinateTransform, QgsProject, QgsFeature)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
-                                 QDockWidget)
+                                 QDockWidget, QWidget)
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
 from interface.map_tools import FeaturePicker, FeatureDragger
@@ -45,6 +46,7 @@ import datetime
 
 config = Config()
 
+# fields added to the input layer containing the properties of the results
 BKG_FIELDS = [
     ('bkg_n_results', QVariant.Int, 'int2'),
     ('bkg_i', QVariant.Double, 'int2'),
@@ -55,6 +57,7 @@ BKG_FIELDS = [
     ('manuell_bearbeitet', QVariant.Bool, 'bool')
 ]
 
+# "Regionalschlüssel" to filter "Bundesländer"
 RS_PRESETS = [
     ('Schleswig-Holstein', '01*'),
     ('Freie und Hansestadt Hamburg', '02*'),
@@ -76,18 +79,33 @@ RS_PRESETS = [
 
 
 class MainWidget(QDockWidget):
+    '''
+    the dockable main widget
+
+    Attributes
+    ----------
+    closingWidget : pyqtSignal
+        emitted when widget is closed in any way
+    '''
     ui_file = 'main_dockwidget.ui'
     closingWidget = pyqtSignal()
 
-    def __init__(self, parent=None):
-        """Constructor."""
+    def __init__(self, parent: QWidget = None):
         super(MainWidget, self).__init__(parent)
 
+        # currently selected output layer
         self.output_layer = None
+        # stores which layers are marked as output layers
         self.output_layer_ids = []
+
         self.input_layer = None
+        # cache all results for a layer, feature-ids as keys, geojson features
+        # as values
         self.result_cache = {}
+        # cache field-map settings for layers, layer-ids as keys,
+        # FieldMaps as values
         self.field_map_cache = {}
+
         self.inspect_dialog = None
         self.reverse_dialog = None
 
@@ -102,6 +120,7 @@ class MainWidget(QDockWidget):
         self.setupUi()
         self.setup_config()
 
+        # load background maps on start
         bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
                               crs=config.projection)
         bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=False)
@@ -115,27 +134,33 @@ class MainWidget(QDockWidget):
                 'Datenquellen_TopPlus_Open.pdf')
 
     def setupUi(self):
-        actions = self.iface.addLayerMenu().actions()
-        for action in actions:
-            if action.objectName() == 'mActionAddDelimitedText':
-                self.import_csv_action = action
-                break
-        self.import_csv_button.clicked.connect(self.import_csv_action.trigger)
+        '''
+        set up the ui, fill it with dynamic content and connect all interactive
+        ui elements with actions
+        '''
+        # connect buttons
+        self.import_csv_button.clicked.connect(self.import_csv)
         self.export_csv_button.clicked.connect(self.export_csv)
         self.attribute_table_button.clicked.connect(self.show_attribute_table)
         self.request_start_button.clicked.connect(self.bkg_geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
-        self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
-        self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
-        self.layer_combo.layerChanged.connect(self.change_layer)
 
+        # only vector layers as input
+        self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.layer_combo.layerChanged.connect(self.change_layer)
+        # only polygons can be used as a spatial filter
+        self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+
+        # input layer encodings
         for encoding in QgsVectorDataProvider.availableEncodings():
             self.encoding_combo.addItem(encoding)
         self.encoding_combo.currentTextChanged.connect(self.set_encoding)
 
+        # initially set the first layer in the combobox as input
         self.change_layer(self.layer_combo.currentLayer())
 
+        # "Regionalschlüssel" filter
         self.rs_combo.addItem('Eingabehilfe Bundesländer')
         self.rs_combo.model().item(0).setEnabled(False)
         for name, rs in RS_PRESETS:
@@ -145,29 +170,37 @@ class MainWidget(QDockWidget):
         self.rs_edit.editingFinished.connect(
             lambda: self.rs_combo.setCurrentIndex(0))
 
+        # connect map tools
         self.inspect_picker = FeaturePicker(
             self.inspect_picker_button, canvas=self.canvas)
         self.inspect_picker.feature_picked.connect(self.inspect_results)
         self.reverse_picker = FeatureDragger(
             self.reverse_picker_button, canvas=self.canvas)
-        self.reverse_picker.feature_dragged.connect(self.reverse_geocode)
+        self.reverse_picker.feature_dragged.connect(self.inspect_neighbours)
 
         self.reverse_picker_button.setEnabled(False)
         self.inspect_picker_button.setEnabled(False)
         self.export_csv_button.setEnabled(False)
         self.attribute_table_button.setEnabled(False)
 
+        # initialize the timer running when geocoding
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer)
         self._dragged_feature = None
 
     def setup_config(self):
+        '''
+        apply all settings from the config file to the ui, connect ui elements
+        of the config section to storing changes in this file
+        '''
+        # search options ('expert mode')
         self.search_and_check.setChecked(config.logic_link == 'AND')
         self.search_and_check.toggled.connect(
             lambda: setattr(config, 'logic_link', 'AND'))
         self.search_or_check.toggled.connect(
             lambda: setattr(config, 'logic_link', 'OR'))
 
+        # API key and url
         self.api_key_edit.setText(config.api_key)
         self.api_url_edit.setText(config.api_url)
         def api_key_edited():
@@ -186,28 +219,32 @@ class MainWidget(QDockWidget):
         self.api_key_check.toggled.connect(
             lambda checked: setattr(config, 'use_api_url', not checked))
 
+        # crs config
         crs = QgsCoordinateReferenceSystem(config.projection)
         self.output_projection_select.setCrs(crs)
-
         self.output_projection_select.crsChanged.connect(
             lambda crs: setattr(config, 'projection', crs.authid()))
 
+        # filters ("Regionalschlüssel" and spatial filter)
         self.selected_features_only_check.setChecked(
             config.selected_features_only)
         self.selected_features_only_check.toggled.connect(
             lambda checked: setattr(config, 'selected_features_only', checked))
-
         self.rs_edit.setText(config.rs)
         self.rs_edit.textChanged.connect(
             lambda text: setattr(config, 'rs', text))
-
         self.use_rs_check.setChecked(config.use_rs)
         self.use_rs_check.toggled.connect(
             lambda checked: setattr(config, 'use_rs', checked))
 
-    def inspect_results(self, feature_id):
+    def inspect_results(self, feature_id: int):
+        '''
+        open inspect dialog with results listed for feature with given id of
+        current output-layer
+        '''
         if not self.output_layer:
             return
+        # get the results for given feature id from the cache
         results = self.result_cache.get((self.output_layer.id(), feature_id),
                                         None)
         # ToDo: warning dialog or pass it to results diag and show warning there
@@ -217,6 +254,8 @@ class MainWidget(QDockWidget):
         if self.inspect_dialog:
             self.inspect_dialog.close()
         feature = self.output_layer.getFeature(feature_id)
+        # fields and their values that were active during search are shown
+        # in dialog
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
         self.inspect_dialog = InspectResultsDialog(
@@ -224,18 +263,22 @@ class MainWidget(QDockWidget):
             parent=self, crs=self.output_layer.crs().authid(),
             review_fields=review_fields)
         accepted = self.inspect_dialog.show()
+        # set picked result when user accepted
         if accepted:
-            self.set_result(feature, self.inspect_dialog.result,
+            self.set_bkg_result(feature, self.inspect_dialog.result,
                             i=self.inspect_dialog.i, set_edited=True)
         self.canvas.refresh()
         self.inspect_dialog = None
 
-    def reverse_geocode(self, feature_id, point):
+    def inspect_neighbours(self, feature_id: int, point: QgsPointXY):
+        '''
+        reverse geocode given point, open dialog to pick result from and apply
+        user choice to given dragged feature
+        '''
         if not self.output_layer:
             return
 
         dragged_feature = self.output_layer.getFeature(feature_id)
-
         prev_dragged_id = (self._dragged_feature.id()
                            if self._dragged_feature else None)
         if feature_id != prev_dragged_id:
@@ -254,16 +297,19 @@ class MainWidget(QDockWidget):
         url = config.api_url if config.use_api_url else None
 
         output_crs = self.output_layer.crs()
-        # point geometry originates from clicking on canvas
+        # point geometry originates from clicking on canvas ->
+        # transform into crs of feature
         transform = QgsCoordinateTransform(
             self.canvas.mapSettings().destinationCrs(),
             output_crs,
             QgsProject.instance()
         )
-
         current_geom = QgsGeometry.fromPointXY(transform.transform(point))
+
+        # apply the geometry to the feature
         self.output_layer.changeGeometry(feature_id, current_geom)
 
+        # request feature again, otherwise geometry remains be unchanged
         dragged_feature = self.output_layer.getFeature(feature_id)
         bkg_geocoder = BKGGeocoder(key=config.api_key, crs=crs, url=url,
                                    logic_link=config.logic_link)
@@ -273,6 +319,7 @@ class MainWidget(QDockWidget):
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
         def done(feature, results):
+            '''open dialog / set results when reverse geocoding is done'''
             # only one opened dialog at a time
             if not self.reverse_dialog:
                 review_fields = [f for f in self.field_map.fields()
@@ -289,7 +336,7 @@ class MainWidget(QDockWidget):
                     # (no result is selected -> geometry of dragged point is
                     # kept)
                     if result:
-                        self.set_result(
+                        self.set_bkg_result(
                             feature, result, i=-1, set_edited=True,
                             geom_only=self.reverse_dialog.geom_only
                             #,apply_adress=not self.reverse_dialog.geom_only
@@ -317,15 +364,22 @@ class MainWidget(QDockWidget):
                 # update the result options in the dialog
                 self.reverse_dialog.update_results(results)
 
+        # do the actual reverse geocoding
         rev_geocoding.feature_done.connect(done)
         rev_geocoding.start()
 
     def show_attribute_table(self):
+        '''
+        open the QGIS attribute table for current output layer
+        '''
         if not self.output_layer:
             return
         self.iface.showAttributeTable(self.output_layer)
 
     def export_csv(self):
+        '''
+        open the QGIS export dialog
+        '''
         if not self.output_layer:
             return
         self.iface.setActiveLayer(self.output_layer)
@@ -335,30 +389,54 @@ class MainWidget(QDockWidget):
                 break
         action.trigger()
 
+    def import_csv(self):
+        '''
+        open the QGIS import dialog with CSV preselected
+        '''
+        actions = self.iface.addLayerMenu().actions()
+        for action in actions:
+            if action.objectName() == 'mActionAddDelimitedText':
+                break
+        action.trigger()
+
     def unload(self):
+        # ToDo: is there sth. to close when unloading plugin?
         pass
 
     def closeEvent(self, event):
+        '''
+        override, emit closing signal
+        '''
         self.closingWidget.emit()
         event.accept()
 
     def show(self):
+        '''
+        open this widget
+        '''
+        # dock widget has to start docked
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
+
+        # undock it immediately and resize to content
         self.setFloating(True);
         self.resize(self.sizeHint().width(), self.sizeHint().height())
+        # set a fixed position, otherwise it is floating in a weird position
         geometry = self.geometry()
         self.setGeometry(500, 500, geometry.width(), geometry.height())
 
-    def log(self, text, color='black'):
+    def log(self, text: str, color: str = 'black'):
+        '''
+        display given text in the log section, defaults to black text
+        '''
         self.log_edit.insertHtml(
             f'<span style="color: {color}">{text}</span><br>')
         scrollbar = self.log_edit.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
-    def change_layer(self, layer, force_mapping=False):
+    def change_layer(self, layer: QgsVectorLayer):
         '''
-        add field checks depending on given layer to UI and preset
-        layer related UI elements
+        add field checks depending on given layer to UI and preset layer-related
+        UI elements
         '''
         if not layer:
             return
@@ -377,40 +455,50 @@ class MainWidget(QDockWidget):
             self.update_input_layer_check.setChecked(
                 layer.id() in self.output_layer_ids)
 
+        # set selected encoding in combobox to encoding of layer
         encoding = layer.dataProvider().encoding()
         self.encoding_combo.blockSignals(True)
         self.encoding_combo.setCurrentText(encoding)
         self.encoding_combo.blockSignals(False)
 
+        # get field map with previous settings if layer was already used as
+        # input before
         bkg_f = [f[0] for f in BKG_FIELDS]
         self.field_map = self.field_map_cache.get(layer.id(), None)
         if not self.field_map or not self.field_map.valid(layer):
+            # if no field map was set yet, create it with the known BKG
+            # keywords
             self.field_map = FieldMap(layer, ignore=bkg_f,
                                       keywords=BKGGeocoder.keywords)
             self.field_map_cache[layer.id()] = self.field_map
         # remove old widgets
         clear_layout(self.parameter_grid)
 
+        # create a list of checkable items out of the fields of the layer
         for i, field_name in enumerate(self.field_map.fields()):
             checkbox = QCheckBox()
             checkbox.setText(field_name)
+            # combobox for user-selection of a API-keyword matching the field
             combo = QComboBox()
             combo.addItem('Volltextsuche', None)
             for key, text in BKGGeocoder.keywords.items():
                 combo.addItem(text, key)
 
-            def checkbox_changed(state, combo, field_name):
+            def checkbox_changed(state: bool, combo: QComboBox,
+                                 field_name: str):
                 checked = state != 0
                 self.field_map.set_active(field_name, checked)
                 combo.setEnabled(checked)
+            # apply changes to field map and combobox on check-state change
             checkbox.stateChanged.connect(
                 lambda s, c=combo, f=field_name : checkbox_changed(s, c, f))
             # set initial check state
             checkbox_changed(self.field_map.active(field_name), combo,
                              field_name)
 
-            def combo_changed(idx, combo, field_name):
+            def combo_changed(idx: int, combo: QComboBox, field_name: str):
                 self.field_map.set_keyword(field_name, combo.itemData(idx))
+            # apply changes field map when selecting different keyword
             combo.currentIndexChanged.connect(
                 lambda i, c=combo, f=field_name : combo_changed(i, c, f))
             # set initial combo index
@@ -419,6 +507,7 @@ class MainWidget(QDockWidget):
 
             self.parameter_grid.addWidget(checkbox, i, 0)
             self.parameter_grid.addWidget(combo, i, 1)
+
             # initial state
             checked = self.field_map.active(field_name)
             keyword = self.field_map.keyword(field_name)
@@ -428,13 +517,19 @@ class MainWidget(QDockWidget):
                 combo.setCurrentIndex(combo_idx)
                 combo.setEnabled(checked)
 
-    def set_encoding(self, encoding):
+    def set_encoding(self, encoding: str):
+        '''
+        set encoding of input layer and redraw the parameter section
+        '''
         self.input_layer.dataProvider().setEncoding(encoding)
         self.input_layer.updateFields()
         # repopulate fields
-        self.change_layer(self.input_layer, force_mapping=True)
+        self.change_layer(self.input_layer)
 
     def bkg_geocode(self):
+        '''
+        start geocoding of input layer with current settings
+        '''
         layer = self.input_layer
         if not layer:
             return
@@ -509,7 +604,7 @@ class MainWidget(QDockWidget):
 
         self.geocoding.message.connect(self.log)
         self.geocoding.progress.connect(self.progress_bar.setValue)
-        self.geocoding.feature_done.connect(self.store_results)
+        self.geocoding.feature_done.connect(self.store_bkg_results)
         self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
         self.geocoding.finished.connect(self.geocoding_done)
 
@@ -532,6 +627,9 @@ class MainWidget(QDockWidget):
         self.geocoding.start()
 
     def update_timer(self):
+        '''
+        update the timer counting the time since starting the geocoding
+        '''
         delta = datetime.datetime.now() - self.start_time
         h, remainder = divmod(delta.seconds, 3600)
         m, s = divmod(remainder, 60)
@@ -539,11 +637,15 @@ class MainWidget(QDockWidget):
         self.elapsed_time_label.setText(timer_text)
 
     def geocoding_done(self, success: bool):
+        '''
+        update UI when geocoding is done
+        '''
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
             # select output layer as current layer
             self.layer_combo.setLayer(self.output_layer)
 
+        # zoom to extent of results
         extent = self.output_layer.extent()
         if not extent.isEmpty():
             transform = QgsCoordinateTransform(
@@ -554,6 +656,8 @@ class MainWidget(QDockWidget):
             self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
         self.timer.stop()
+
+        # update the states of the buttons
         self.request_start_button.setVisible(True)
         self.request_stop_button.setVisible(False)
         self.reverse_picker_button.setEnabled(True)
@@ -561,21 +665,23 @@ class MainWidget(QDockWidget):
         self.export_csv_button.setEnabled(True)
         self.attribute_table_button.setEnabled(True)
 
-    def store_results(self, feature, results):
+    def store_bkg_results(self, feature: QgsFeature, results: List[dict]):
+        '''
+        store the results (geojson features) per feature in the result cache
+        '''
         if results:
             results.sort(key=lambda x: x['properties']['score'], reverse=True)
             best = results[0]
         else:
             best = None
         self.result_cache[self.output_layer.id(), feature.id()] = results
-        self.set_result(feature, best, i=0, n_results=len(results))
+        self.set_bkg_result(feature, best, i=0, n_results=len(results))
 
-    def set_result(self, feature, result, i=0, n_results=None, geom_only=False,
-                   set_edited=False):  #, apply_adress=False):
+    def set_bkg_result(self, feature: QgsFeature, result: dict, i: int = 0,
+                       n_results: int = None, geom_only: bool = False,
+                       set_edited: bool = False):  #, apply_adress=False):
         '''
-        bkg specific
-        set result to feature of given layer
-        focus map canvas on feature if requested
+        set result of BKG geocoding to feature of current output layer
         '''
         layer = self.output_layer
         if not layer.isEditable():

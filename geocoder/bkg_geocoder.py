@@ -166,8 +166,8 @@ class BKGGeocoder(Geocoder):
         dict
             list of geojson features with "geometry" attribute as the geocoding
             result and "properties" containing "text" (description of found
-            address in BKG database) and "score" (the higher the better the
-            match)
+            address in BKG database),"typ", "treffer" and "score" (the higher
+            the better the match)
 
         Raises
         ----------

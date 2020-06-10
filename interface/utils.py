@@ -135,7 +135,7 @@ class Layer:
         '''
         parent = QgsProject.instance().layerTreeRoot()
         if self.groupname:
-            parent = Layer._add_group(self.groupname, prepend=self.prepend)
+            parent = Layer.add_group(self.groupname, prepend=self.prepend)
         return parent
 
     @property
