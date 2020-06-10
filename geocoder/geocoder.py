@@ -282,7 +282,7 @@ class Geocoder:
         self.url = url
         self.crs = crs
 
-    def query(self, *args, **kwargs):
+    def query(self, *args: object, **kwargs: object) -> dict:
         '''
         to be implemented by derived classes
 
@@ -297,9 +297,36 @@ class Geocoder:
         ----------
         list
             list of geojson features
+
+        Raises
+        ----------
+        Exception
+            API responds with a status code different from 200 (OK)
         '''
         raise NotImplementedError
 
+    def reverse(self, x: float, y: float) -> dict:
+        '''
+        to be implemented by derived classes
+
+        Parameters
+        ----------
+        x : int
+            x coordinate (longitude)
+        y : float
+            y coordinate (latitude)
+
+        Returns
+        ----------
+        list
+            list of geojson features
+
+        Raises
+        ----------
+        Exception
+            API responds with a status code different from 200 (OK)
+        '''
+        raise NotImplementedError
 
 class Worker(QThread):
     '''
