@@ -1,8 +1,35 @@
+# -*- coding: utf-8 -*-
+'''
+***************************************************************************
+    bkg_geocoder.py
+    ---------------------
+    Date                 : March 2020
+    Author               : Christoph Franke
+    Copyright            : (C) 2020 by Bundesamt für Kartographie und Geodäsie
+    Email                : franke at ggr-planung dot de
+***************************************************************************
+*                                                                         *
+*   This program is free software: you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+***************************************************************************
+
+implementation of the generic geocoding interface to work with the BKG
+geocoding API
+'''
+
+__author__ = 'Christoph Franke'
+__date__ = '16/03/2020'
+__copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
+
 import requests
 import re
 
 from geocoder.geocoder import Geocoder
 
+# default url to the BKG geocoding service, key has to be replaced
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
 
 

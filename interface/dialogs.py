@@ -1,4 +1,28 @@
 # -*- coding: utf-8 -*-
+'''
+***************************************************************************
+    dialogs.py
+    ---------------------
+    Date                 : October 2018
+    Author               : Christoph Franke
+    Copyright            : (C) 2020 by Bundesamt für Kartographie und Geodäsie
+    Email                : franke at ggr-planung dot de
+***************************************************************************
+*                                                                         *
+*   This program is free software: you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+***************************************************************************
+
+dialogs called by the main widget
+'''
+
+__author__ = 'Christoph Franke'
+__date__ = '30/10/2018'
+__copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
+
 from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QGridLayout,
                                  QFrame)
 from qgis.PyQt.Qt import QWidget

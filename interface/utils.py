@@ -1,3 +1,26 @@
+# -*- coding: utf-8 -*-
+'''
+***************************************************************************
+    utils.py
+    ---------------------
+    Date                 : April 2020
+    Copyright            : (C) 2020 by Christoph Franke
+    Email                : franke at ggr-planung dot de
+***************************************************************************
+*                                                                         *
+*   This program is free software: you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+***************************************************************************
+
+utility functions used by the UI
+'''
+
+__author__ = 'Christoph Franke'
+__date__ = '02/04/2020'
+
 from typing import List
 from qgis.core import (QgsVectorLayer, QgsProject, QgsCoordinateTransform,
                        QgsRasterLayer, QgsCoordinateReferenceSystem, QgsFeature)

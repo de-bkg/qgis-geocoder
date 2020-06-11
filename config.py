@@ -1,4 +1,27 @@
 # -*- coding: utf-8 -*-
+'''
+***************************************************************************
+    config.py
+    ---------------------
+    Date                 : October 2018
+    Copyright            : (C) 2018 by Christoph Franke
+    Email                : franke at ggr-planung dot de
+***************************************************************************
+*                                                                         *
+*   This program is free software: you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+***************************************************************************
+
+manages saving and loading settings made by user in UI
+contains main paths to additional data
+'''
+
+__author__ = 'Christoph Franke'
+__date__ = '30/10/2018'
+
 import json
 import os
 from os.path import expanduser

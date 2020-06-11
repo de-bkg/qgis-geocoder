@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 ***************************************************************************
-    database.py
+    geocoder.py
     ---------------------
     Date                 : March 2020
     Copyright            : (C) 2020 by Christoph Franke
@@ -14,15 +14,12 @@
 *   (at your option) any later version.                                   *
 *                                                                         *
 ***************************************************************************
-'''
 
-'''
-generic database interface and features using this interface
+generic geocoding interface
 '''
 
 __author__ = 'Christoph Franke'
 __date__ = '16/03/2020'
-__copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject, QThread
 from qgis.core import QgsFeature, QgsFeatureIterator, QgsVectorLayer
@@ -34,9 +31,9 @@ import copy
 
 class FieldMap:
     '''
-    map fields of QGIS vector layer to parameters as input for geocoders.
-    fields can be assigned to geocoding parameters and be set active,
-    meaning that they will be used as inputs for geocoding
+    Maps fields of a QGIS vector layer to parameters used as inputs for
+    geocoders. Fields can be assigned to geocoding API keywords and set
+    active, meaning that they will be used as inputs for geocoding.
 
     Attributes
     ----------
