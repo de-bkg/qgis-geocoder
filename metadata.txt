@@ -1,32 +1,20 @@
-# This file contains metadata for your plugin. Since
-# version 2.0 of QGIS this is the proper way to supply
-# information about a plugin. The old method of
-# embedding metadata in __init__.py will
-# is no longer supported since version 2.0.
-
-# This file should be included when you package your plugin.# Mandatory items:
-
 [general]
 name=BKG Geocoder
 qgisMinimumVersion=3.0
 description=Geokodierung mit der BKG API
-version=0.9.8
+version=1.0
 author=BKG
 email=franke@ggr-planung.de
 
-about=Plugin für die Geokodierung von Adressen mit Hilfe Schnittstelle des Bundesamtes für Kartographie und Geodäsie.
+about=Plugin für die Geokodierung von Adressen mit Hilfe der Schnittstelle des Bundesamtes für Kartographie und Geodäsie. Das Plugin benötigt einen Schlüssel
 
 tracker=https://github.com/ChrFr/qgis-geocoder/issues
 repository=https://github.com/ChrFr/qgis-geocoder
-# End of mandatory metadata
 
-# Recommended items:
-
-# Uncomment the following line and add your changelog:
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=geocode bkg
+tags=bkg,geocode,geokodierung,geocoder,geokoder
 
 homepage=https://www.bkg.bund.de/
 category=Plugins

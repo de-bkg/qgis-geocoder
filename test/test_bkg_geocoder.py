@@ -1,16 +1,10 @@
 # coding=utf-8
-"""BKG Geocoding API test.
-
-.. note:: This program is free software; you can redistribute it and/or modify
-     it under the terms of the GNU General Public License as published by
-     the Free Software Foundation; either version 2 of the License, or
-     (at your option) any later version.
-
+"""
+BKG Geocoding API test.
 """
 
-__author__ = 'franke@ggr-planung.de'
+__author__ = 'Christoph Franke'
 __date__ = '2020-03-24'
-__copyright__ = 'Copyright 2018, GGR'
 
 import unittest
 import sys
