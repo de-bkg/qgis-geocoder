@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 ***************************************************************************
-    database.py
+    geocoder.py
     ---------------------
     Date                 : March 2020
     Copyright            : (C) 2020 by Christoph Franke
@@ -14,19 +14,16 @@
 *   (at your option) any later version.                                   *
 *                                                                         *
 ***************************************************************************
-'''
 
-'''
-generic database interface and features using this interface
+generic geocoding interface
 '''
 
 __author__ = 'Christoph Franke'
 __date__ = '16/03/2020'
-__copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject, QThread
 from qgis.core import QgsFeature, QgsFeatureIterator, QgsVectorLayer
-from typing import Union
+from typing import Union, List, Tuple
 import re
 import math
 import copy
@@ -34,17 +31,17 @@ import copy
 
 class FieldMap:
     '''
-    map fields of QGIS vector layer to parameters as input for geocoders.
-    fields can be assigned to geocoding parameters and be set active,
-    meaning that they will be used as inputs for geocoding
+    Maps fields of a QGIS vector layer to parameters used as inputs for
+    geocoders. Fields can be assigned to geocoding API keywords and set
+    active, meaning that they will be used as inputs for geocoding.
 
     Attributes
     ----------
     layer : QgsVectorLayer
         mapped vector layer
     '''
-    def __init__(self, layer: QgsVectorLayer, ignore: list=[],
-                 keywords: dict ={}):
+    def __init__(self, layer: QgsVectorLayer, ignore: List[str] = [],
+                 keywords: dict = {}):
         '''
         Parameters
         ----------
@@ -101,7 +98,7 @@ class FieldMap:
                 return False
         return True
 
-    def copy(self, layer: QgsVectorLayer=None) -> 'FieldMap':
+    def copy(self, layer: QgsVectorLayer = None) -> 'FieldMap':
         '''
         clone field map with current mapping,
 
@@ -119,7 +116,7 @@ class FieldMap:
         clone._mapping = copy.deepcopy(self._mapping)
         return clone
 
-    def fields(self) -> list:
+    def fields(self) -> List[str]:
         '''
         Returns
         -------
@@ -128,7 +125,8 @@ class FieldMap:
         '''
         return list(self._mapping.keys())
 
-    def set_field(self, field_name: str, keyword: str=None, active: bool=None):
+    def set_field(self, field_name: str, keyword: str = None,
+                  active: bool = None):
         '''
         set properties of a mapped field
 
@@ -147,7 +145,7 @@ class FieldMap:
         if active is not None:
             self.set_active(field_name, active=active)
 
-    def set_active(self, field_name: str, active: bool=True):
+    def set_active(self, field_name: str, active: bool = True):
         '''
         sets active status to field
 
@@ -206,7 +204,7 @@ class FieldMap:
         '''
         return self._mapping[field_name][1]
 
-    def to_args(self, feature: QgsFeature) -> tuple:
+    def to_args(self, feature: QgsFeature) -> Tuple[list, dict]:
         '''
         creates parameters out of the mapped (active) fields and current values
         to be used in geocoding, inactive fields and fields with no values are
@@ -269,19 +267,19 @@ class Geocoder:
     # keywords used in  and their display name for the ui
     keywords = {}
 
-    def __init__(self, url: str='', srs: str='EPSG:4326'):
+    def __init__(self, url: str = '', crs: str = 'EPSG:4326'):
         '''
         Parameters
         ----------
         url : str, optional
             url of geocoding service
-        srs : str, optional
+        crs : str, optional
             code of projection, defaults to epsg 4326
         '''
         self.url = url
-        self.srs = srs
+        self.crs = crs
 
-    def query(self, *args, **kwargs):
+    def query(self, *args: object, **kwargs: object) -> dict:
         '''
         to be implemented by derived classes
 
@@ -296,9 +294,36 @@ class Geocoder:
         ----------
         list
             list of geojson features
+
+        Raises
+        ----------
+        Exception
+            API responds with a status code different from 200 (OK)
         '''
         raise NotImplementedError
 
+    def reverse(self, x: float, y: float) -> dict:
+        '''
+        to be implemented by derived classes
+
+        Parameters
+        ----------
+        x : int
+            x coordinate (longitude)
+        y : float
+            y coordinate (latitude)
+
+        Returns
+        ----------
+        list
+            list of geojson features
+
+        Raises
+        ----------
+        Exception
+            API responds with a status code different from 200 (OK)
+        '''
+        raise NotImplementedError
 
 class Worker(QThread):
     '''
@@ -322,7 +347,7 @@ class Worker(QThread):
     message = pyqtSignal(str)
     progress = pyqtSignal(int)
 
-    def __init__(self, parent: QObject=None):
+    def __init__(self, parent: QObject = None):
         '''
         Parameters
         ----------
@@ -352,6 +377,7 @@ class Worker(QThread):
 
     def kill(self):
         '''
+        call to abort geocoding
         '''
         self.is_killed = True
 
@@ -378,8 +404,8 @@ class Geocoding(Worker):
     feature_done = pyqtSignal(QgsFeature, list)
 
     def __init__(self, geocoder: Geocoder, field_map: FieldMap,
-                 features: Union[QgsFeatureIterator, list]=None,
-                 parent: QObject=None):
+                 features: Union[QgsFeatureIterator, List[QgsFeature]] = None,
+                 parent: QObject = None):
         '''
         Parameters
         ----------
@@ -424,9 +450,15 @@ class Geocoding(Worker):
 
         return success
 
-    def process(self, feature):
+    def process(self, feature: QgsFeature):
         '''
         geocode a single feature
+
+        Parameters
+        ----------
+        feature : QgsFeature
+            the feature with address fields matching the field_map to find
+            point geometries for
         '''
         args, kwargs = self.field_map.to_args(feature)
         res = self.geocoder.query(*args, **kwargs)
@@ -457,7 +489,8 @@ class ReverseGeocoding(Geocoding):
     '''
 
     def __init__(self, geocoder: Geocoder,
-                 features: Union[QgsFeatureIterator, list], parent=None):
+                 features: Union[QgsFeatureIterator, List[QgsFeature]],
+                 parent: QObject=None):
         '''
         Parameters
         ----------
@@ -472,9 +505,14 @@ class ReverseGeocoding(Geocoding):
         self.geocoder = geocoder
         self.features = [f for f in features]
 
-    def process(self, feature):
+    def process(self, feature: QgsFeature):
         '''
         reverse geocode single features
+
+        Parameters
+        ----------
+        feature : QgsFeature
+            the feature with point geometry to find addresses for
         '''
         pnt = feature.geometry().asPoint()
         res = self.geocoder.reverse(pnt.x(), pnt.y())

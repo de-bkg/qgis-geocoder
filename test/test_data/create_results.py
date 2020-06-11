@@ -28,7 +28,7 @@ REVERSE_FILES = ['mit_koordinaten.csv']
 
 if __name__ == "__main__":
 
-    geocoder = BKGGeocoder(UUID, srs='EPSG:25832')
+    geocoder = BKGGeocoder(UUID, crs='EPSG:25832')
     for fn, fields in GEOCODE_FILES.items():
         fp = os.path.join(os.path.dirname(__file__), fn)
         out_fp = f'{fp}.results.json'

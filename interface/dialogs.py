@@ -1,6 +1,31 @@
 # -*- coding: utf-8 -*-
+'''
+***************************************************************************
+    dialogs.py
+    ---------------------
+    Date                 : October 2018
+    Author               : Christoph Franke
+    Copyright            : (C) 2020 by Bundesamt für Kartographie und Geodäsie
+    Email                : franke at ggr-planung dot de
+***************************************************************************
+*                                                                         *
+*   This program is free software: you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+***************************************************************************
+
+dialogs called by the main widget
+'''
+
+__author__ = 'Christoph Franke'
+__date__ = '30/10/2018'
+__copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
+
 from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QGridLayout,
                                  QFrame)
+from qgis.PyQt.Qt import QWidget
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
@@ -9,8 +34,10 @@ from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
                        QgsCategorizedSymbolRenderer, QgsRendererCategory,
                        QgsMarkerSymbol, QgsRasterMarkerSymbolLayer,
                        QgsRectangle, QgsCoordinateTransform)
+from qgis.gui import QgsMapCanvas
 import os
 
+from typing import List
 from interface.utils import clear_layout
 from config import UI_PATH, Config, ICON_PATH
 
@@ -18,7 +45,26 @@ config = Config()
 
 
 class Dialog(QDialog):
-    def __init__(self, ui_file=None, modal=True, parent=None, title=None):
+    '''
+    Dialog
+    '''
+    def __init__(self, ui_file: str = None, modal: bool = True,
+                 parent: QWidget = None, title: str = None):
+        '''
+        Parameters
+        ----------
+        ui_file : str, optional
+            path to QT-Designer xml file to load UI of dialog from,
+            if only filename is given, the file is looked for in the standard
+            folder (UI_PATH), defaults to not using ui file
+        modal : bool, optional
+            set dialog to modal if True, not modal if False, defaults to modal
+        parent: QWidget, optional
+            parent widget, defaults to None
+        title: str, optional
+            replaces title of dialog if given, defaults to preset title
+        '''
+
         super().__init__(parent=parent)
         if title:
             self.setWindowTitle(title)
@@ -32,19 +78,65 @@ class Dialog(QDialog):
         self.setupUi()
 
     def setupUi(self):
+        '''
+        override for additional functionality
+        '''
         pass
 
     def show(self):
+        '''
+        override, show the dialog
+        '''
         return self.exec_()
 
 
 class InspectResultsDialog(Dialog):
+    '''
+    dialog showing a feature with its attributes used for geocoding  and
+    a list of pickable results of geocoding this feature
+
+    Attributes
+    ----------
+    i : bool
+        indicates whether third option was picked (take only the geometry)
+        or not
+    result : dict
+        the currently picked result
+    '''
     ui_file = 'featurepicker.ui'
     marker_img = 'marker_{}.png'
-    show_score = True
 
-    def __init__(self, feature, results, canvas, review_fields=[], preselect=-1,
-                 crs='EPSG:4326', parent=None):
+    def __init__(self, feature: QgsFeature, results: List[dict],
+                 canvas: QgsMapCanvas, review_fields: List[str] = [],
+                 preselect: int = -1, crs: str = 'EPSG:4326',
+                 parent: QWidget = None, show_score: bool = True):
+        '''
+        Parameters
+        ----------
+        feature : QWidget
+            the feature to show alternative results for
+        results : list
+            alternative results to given feature to let user pick from,
+            list of geojson features with "geometry" attribute and "properties"
+            containing "text" (description of feature) and "score" (the higher
+            the better ranking)
+        canvas : QgsMapCanvas
+            the map canvas to preview the results on
+        review_fields : list, optional
+            list of field names of the given feature whose values are shown in
+            the dialog review section, defaults to not showing any fields
+        preselect : int, optional
+            preselects a result on showing the dialog, defaults to not
+            preselecting a result
+        crs : str, optional
+            code of projection of the geometries of the given features (feature
+            and results), defaults to epsg 4326
+        parent : QWidget, optional
+            parent widget, defaults to None
+        show_score : bool, optional
+            show the score of the results in the ui, defaults to showing the
+            scores
+        '''
         super().__init__(self.ui_file, modal=False, parent=parent)
         self.canvas = canvas
         self.results = results
@@ -52,16 +144,21 @@ class InspectResultsDialog(Dialog):
         self.geom_only_button.setVisible(False)
         self.result = None
         self.i = -1
+        self.show_score = True
         self.crs = crs
 
-        self.populate_review(review_fields)
-        self.setup_preview_layer()
-        self.add_results(preselect=preselect)
+        self._populate_review(review_fields)
+        self._setup_preview_layer()
+        self._add_results(preselect=preselect)
 
         self.accept_button.clicked.connect(self.accept)
         self.discard_button.clicked.connect(self.reject)
 
-    def populate_review(self, review_fields):
+    def _populate_review(self, review_fields : List[str]):
+        '''
+        populate the review section of the inspected feature with given
+        fields and their current values
+        '''
         if review_fields:
             headline = QLabel('Geokodierungs-Parameter')
             font = headline.font()
@@ -88,7 +185,10 @@ class InspectResultsDialog(Dialog):
         bkg_text = self.feature.attribute('bkg_text')
         self.review_layout.addWidget(QLabel(bkg_text))
 
-    def setup_preview_layer(self):
+    def _setup_preview_layer(self):
+        '''
+        set up the layer to show the results on
+        '''
         self.preview_layer = QgsVectorLayer(
             f'Point?crs={self.crs}', 'results_tmp', 'memory')
 
@@ -115,8 +215,10 @@ class InspectResultsDialog(Dialog):
         ])
         QgsProject.instance().addMapLayer(self.preview_layer)
 
-    def add_results(self, preselect=-1, row_number=0):
-
+    def _add_results(self, preselect: int = -1, row_number: int = 0):
+        '''
+        adds results to the map canvas and to the result list of the dialog
+        '''
         provider = self.preview_layer.dataProvider()
 
         for i, result in enumerate(self.results):
@@ -145,9 +247,10 @@ class InspectResultsDialog(Dialog):
                     preview.size(), Qt.KeepAspectRatio,
                     Qt.SmoothTransformation))
 
+            #  results clicked in the dialog are highlighted on the map
             radio.toggled.connect(
                 lambda c, i=i, f=feature:
-                self.toggle_result(self.results[i], f, i=i))
+                self._toggle_result(i, f))
             if i == preselect:
                 radio.setChecked(True)
 
@@ -162,15 +265,21 @@ class InspectResultsDialog(Dialog):
             self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
 
-    def toggle_result(self, result, feature, i=0):
-        self.result = self.results[i]
-        self.i = i
+    def _toggle_result(self, n, feature: QgsFeature):
+        '''
+        toggle the of the inspected feature, take the n-th result as
+        currently picked result
+        '''
+        self.result = self.results[n]
+        self.i = n
         self.preview_layer.removeSelection()
         self.preview_layer.select(feature.id())
-        self.result = result
-        self.zoom_to(feature)
+        self._zoom_to(feature)
 
-    def zoom_to(self, feature):
+    def _zoom_to(self, feature):
+        '''
+        zoom to feature
+        '''
         # center map on point
         point = feature.geometry().asPoint()
         rect = QgsRectangle(point, point)
@@ -183,14 +292,23 @@ class InspectResultsDialog(Dialog):
         self.canvas.refresh()
 
     def accept(self):
+        '''
+        override clicking ok button
+        '''
         QgsProject.instance().removeMapLayer(self.preview_layer.id())
         super().accept()
 
     def reject(self):
+        '''
+        override clicking cancel button
+        '''
         QgsProject.instance().removeMapLayer(self.preview_layer.id())
         super().reject()
 
     def showEvent(self, e):
+        '''
+        override, adjust size on opening dialog
+        '''
         # exec() resets the modality
         self.setModal(False)
         self.adjustSize()
@@ -198,11 +316,46 @@ class InspectResultsDialog(Dialog):
 
 class ReverseResultsDialog(InspectResultsDialog):
     show_score = False
+    '''
+    dialog showing a feature with its attributes used for geocoding  and
+    a list of pickable results of geocoding this feature
+    dialog can be accepted (replace text and geometry with result), cancelled
+    or just the geometry can be taken as a third option
 
-    def __init__(self, feature, results, canvas, review_fields=[],
-                 parent=None, preselect=-1, crs='EPSG:4326'):
-        super().__init__(feature, results, canvas, crs=crs, preselect=preselect,
+    Attributes
+    ----------
+    geom_only : bool
+        indicates whether third option was picked (take only the geometry)
+        or not
+    '''
+
+    def __init__(self, feature: QgsFeature, results: List[dict],
+                 canvas: QgsMapCanvas, review_fields: List[str] = [],
+                 crs: str = 'EPSG:4326', parent: QWidget = None):
+        '''
+        Parameters
+        ----------
+        feature : QWidget
+            the feature to show reverse geocoded results for
+        results : list
+            results of reverse geocoding to given feature to let user pick from,
+            list of geojson features with "geometry" attribute and "properties"
+            containing "text" (description of feature)
+        canvas : QgsMapCanvas
+            the map canvas to preview the results on
+        review_fields : list, optional
+            list of field names of the given feature whose values are shown in
+            the dialog review section, defaults to not showing any fields
+        crs : str, optional
+            code of projection of the geometries of the given features (feature
+            and results), defaults to epsg 4326
+        parent : QWidget, optional
+            parent widget, defaults to None
+        '''
+        super().__init__(feature, results, canvas, crs=crs,
                          review_fields=review_fields, parent=parent)
+        # ui file was designed for the inspection of geocoding results,
+        # replace labels to match reverse geocoding
         self.results_label.setText('Nächstgelegene Adressen')
         self.setWindowTitle('Nachbaradresssuche')
         self.accept_button.setText('Adresse und Koordinaten übernehmen')
@@ -213,9 +366,11 @@ class ReverseResultsDialog(InspectResultsDialog):
             self.accept()
         self.geom_only_button.clicked.connect(geom_only)
 
-    def add_results(self, preselect=-1):
-        # add a radio button for
-
+    def _add_results(self, preselect: int = -1):
+        '''
+        override
+        '''
+        # add a radio button for the position the feature was dragged to
         point = self.feature.geometry().asPoint()
         radio_label = ('Koordinaten der Markierung '
                        f'({round(point.x(), 2)}, {round(point.y(), 2)})')
@@ -226,20 +381,30 @@ class ReverseResultsDialog(InspectResultsDialog):
                 self.result = None
                 self.i = -1
                 self.preview_layer.removeSelection()
-                self.zoom_to(self.feature)
+                self._zoom_to(self.feature)
             self.accept_button.setDisabled(checked)
         radio.toggled.connect(toggled)
         # initially this option is checked
         radio.setChecked(True)
 
         self.results_contents.addWidget(radio, 0, 1)
-        super().add_results(preselect=-1, row_number=1)
+        super()._add_results(preselect=-1, row_number=1)
 
-    def update_results(self, results):
+    def update_results(self, results: List[dict]):
+        '''
+        replace the currently listed results with the given ones
+
+        Parameters
+        ----------
+        results : list
+            results of reverse geocoding to given feature to let user pick from,
+            list of geojson features with "geometry" attribute and "properties"
+            containing "text" (description of feature)
+        '''
         self.results = results
         # lazy way to reset preview
         QgsProject.instance().removeMapLayer(self.preview_layer.id())
         clear_layout(self.results_contents)
-        self.setup_preview_layer()
-        self.add_results()
+        self._setup_preview_layer()
+        self._add_results()
 
