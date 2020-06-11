@@ -126,10 +126,10 @@ class MainWidget(QDockWidget):
         # load background maps on start
         bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
                               crs=config.projection)
-        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=False)
+        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
         bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
                              crs=config.projection)
-        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=True)
+        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
         for layer in [bg_osm, bg_grey]:
             layer.layer.setTitle(
                 '© Bundesamt für Kartographie und Geodäsie 2020, '
