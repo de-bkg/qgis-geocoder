@@ -466,6 +466,13 @@ class MainWidget(QDockWidget):
         '''
         if not layer:
             return
+        # set layer combo to given layer if it is not set to it
+        if self.layer_combo.currentLayer().id() != layer.id():
+            idx = -1
+            for idx in range(len(self.layer_combo)):
+                if self.layer_combo.layer(idx).id() == layer.id():
+                    break
+            self.layer_combo.setCurrentIndex(idx)
 
         self.input_layer = layer
 

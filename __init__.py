@@ -24,21 +24,16 @@
 """
 import sys
 import os
+from qgis.gui import QgisInterface
 
-try:
-    import wingdbstub
-    wingdbstub.Ensure()
-except:
-    pass
-
-# noinspection PyPep8Naming
-def classFactory(iface):  # pylint: disable=invalid-name
-    """Load BKGGeocoder class from file BKGGeocoder.
-
-    :param iface: A QGIS interface instance.
-    :type iface: QgsInterface
-    """
-    #
+def classFactory(iface: QgisInterface):
+    '''
+    load BKG geocoder plugin
+    '''
+    # workaround for package management, otherwise QGIS python would
+    # look for packages in wrong folder,
+    # requires restart on updating the plugin, because cached python files
+    # are not cleared properly
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from .bkg_geocoder_main import BKGGeocoderPlugin
     return BKGGeocoderPlugin(iface)
