@@ -241,6 +241,11 @@ class MainWidget(QDockWidget):
         '''
         open inspect dialog with results listed for feature with given id of
         current output-layer
+
+        Parameters
+        ----------
+        feature_id : int
+            id of the feature to inspect the results of
         '''
         if not self.output_layer:
             return
@@ -274,6 +279,14 @@ class MainWidget(QDockWidget):
         '''
         reverse geocode given point, open dialog to pick result from and apply
         user choice to given dragged feature
+
+        Parameters
+        ----------
+        feature_id : int
+            id of the feature to set the reverse geocoding results to,
+            was most likely dragged by user to new position
+        point : QgsPointXY
+            the position the feature was dragged to
         '''
         if not self.output_layer:
             return
@@ -426,7 +439,14 @@ class MainWidget(QDockWidget):
 
     def log(self, text: str, color: str = 'black'):
         '''
-        display given text in the log section, defaults to black text
+        display given text in the log section
+
+        Parameters
+        ----------
+        text : str,
+            the text to display in the log
+        color : str,
+            the color of the text, defaults to black
         '''
         self.log_edit.insertHtml(
             f'<span style="color: {color}">{text}</span><br>')
@@ -435,8 +455,14 @@ class MainWidget(QDockWidget):
 
     def change_layer(self, layer: QgsVectorLayer):
         '''
+        sets given layer to being the input of the geocoding,
         add field checks depending on given layer to UI and preset layer-related
         UI elements
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            the layer to change the UI to
         '''
         if not layer:
             return
@@ -520,6 +546,11 @@ class MainWidget(QDockWidget):
     def set_encoding(self, encoding: str):
         '''
         set encoding of input layer and redraw the parameter section
+
+        Parameters
+        ----------
+        encoding : str
+            the name of the encoding e.g. 'utf-8'
         '''
         self.input_layer.dataProvider().setEncoding(encoding)
         self.input_layer.updateFields()
@@ -639,6 +670,11 @@ class MainWidget(QDockWidget):
     def geocoding_done(self, success: bool):
         '''
         update UI when geocoding is done
+
+        Parameters
+        ----------
+        success : bool
+            whether the geocoding was run successfully without errors or not
         '''
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
@@ -668,6 +704,13 @@ class MainWidget(QDockWidget):
     def store_bkg_results(self, feature: QgsFeature, results: List[dict]):
         '''
         store the results (geojson features) per feature in the result cache
+
+        Parameters
+        ----------
+        feature : QgsFeature
+            the feature to store the results for
+        results : list
+            the geojson feature list of all matches returned by the BKG geocoder
         '''
         if results:
             results.sort(key=lambda x: x['properties']['score'], reverse=True)
@@ -677,11 +720,31 @@ class MainWidget(QDockWidget):
         self.result_cache[self.output_layer.id(), feature.id()] = results
         self.set_bkg_result(feature, best, i=0, n_results=len(results))
 
-    def set_bkg_result(self, feature: QgsFeature, result: dict, i: int = 0,
+    def set_bkg_result(self, feature: QgsFeature, result: dict, i: int = -1,
                        n_results: int = None, geom_only: bool = False,
                        set_edited: bool = False):  #, apply_adress=False):
         '''
-        set result of BKG geocoding to feature of current output layer
+        set result of BKG geocoding to given feature of current output layer (
+        including properties 'typ', 'text', 'score', 'treffer' and the geometry)
+
+        Parameters
+        ----------
+        feature : QgsFeature
+            the feature to set the result to
+        result : dict
+            the geojson response of the BKG geocoder whose attributes to apply
+            to the feature
+        i : int, optional
+            the index of the result in the list, -1 to indicate it is not in the
+            list, defaults to not in results list
+        n_results : int, optional
+            number of results returned by the BKG geocoder in total,
+            defaults to None
+        geom_only : bool, optional
+            only apply the geometry of the result to the feature, defaults to
+            applying all atributes
+        set_edited : bool, optional
+            mark feature as manually edited, defaults to mark as not edited
         '''
         layer = self.output_layer
         if not layer.isEditable():
