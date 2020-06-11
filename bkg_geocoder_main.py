@@ -102,7 +102,7 @@ class BKGGeocoderPlugin:
         for action in self.actions:
             self.iface.removePluginMenu('&BKG Geocoder', action)
             self.iface.removeToolBarIcon(action)
-        self.iface.removeCustomActionForLayerType(self.legendAction)
+        self.iface.removeCustomActionForLayerType(self.legend_action)
         self.iface.actionPan().trigger()
         # remove the toolbar
         if self.toolbar:
