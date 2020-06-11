@@ -1,12 +1,12 @@
 [general]
 name=BKG Geocoder
 qgisMinimumVersion=3.0
-description=Geokodierung mit der BKG API
+description=Geokodierung mit dem BKG Geokodierungsdienst
 version=1.0
-author=BKG
+author=Bundesamt für Kartographie und Geodäsie
 email=franke@ggr-planung.de
 
-about=Plugin für die Geokodierung von Adressen mit Hilfe der Schnittstelle des Bundesamtes für Kartographie und Geodäsie. Das Plugin benötigt einen Schlüssel
+about=Plugin für die Geokodierung von Adressen mit Hilfe des Geokodierungsdienstes des Bundesamtes für Kartographie und Geodäsie (BKG). Zur Nutzung des Geokodierungsdienstes ist ein Schlüssel notwendig, der vom BKG bezogen werden kann (www.bkg.bund.de).
 
 tracker=https://github.com/ChrFr/qgis-geocoder/issues
 repository=https://github.com/ChrFr/qgis-geocoder
