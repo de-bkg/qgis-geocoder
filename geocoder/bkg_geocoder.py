@@ -24,13 +24,49 @@ __author__ = 'Christoph Franke'
 __date__ = '16/03/2020'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
+from typing import List
 import requests
 import re
+from html.parser import HTMLParser
 
 from geocoder.geocoder import Geocoder
 
 # default url to the BKG geocoding service, key has to be replaced
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
+INDEX_URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/index.xml'
+
+
+class CRSParser(HTMLParser):
+    '''
+    parse OpenSearch description of BKG geocoding api to find supported
+    coordinate reference systems
+
+    HTMLParser is used for compatibility reasons to 3.4 (no lxml included)
+
+    Attributes
+    ----------
+    codes : list
+        list of available crs as tuples (code, pretty name), filled while
+        feeding the desctiption xml to this parser
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.codes = []
+
+    def handle_starttag(self, tag, attrs):
+        '''
+        override, append tags describing a supported crs to the codes list
+        '''
+        if tag.startswith('query'):
+            attrs = dict(attrs)
+            if 'bkg:srsname' in attrs:
+                self.codes.append((attrs['bkg:srsname'], attrs['title']))
+
+    def clean(self):
+        '''
+        reset the parser
+        '''
+        self.codes = []
 
 
 class BKGGeocoder(Geocoder):
@@ -139,6 +175,27 @@ class BKGGeocoder(Geocoder):
             service url corresponding to given key
         '''
         return URL.format(key=key)
+
+    @staticmethod
+    def get_crs(key: str) -> List[tuple]:
+        '''
+        request the supported coordinate reference sytems
+
+        Parameters
+        ----------
+        key : str
+            key provided by BKG for using the geocoding service
+
+        Returns
+        ----------
+        list
+            list of available crs as tuples (code, pretty name)
+        '''
+        url = INDEX_URL.format(key=key)
+        res = requests.get(url)
+        parser = CRSParser()
+        parser.feed(res.content.decode("utf-8"))
+        return parser.codes
 
     def _escape_special_chars(self, text) -> str:
         '''

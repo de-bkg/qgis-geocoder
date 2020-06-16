@@ -351,29 +351,7 @@ padding: 2px;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
-            <widget class="QgsProjectionSelectionWidget" name="output_projection_select">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Hier können Sie das gewünschte Ziel-Koordinatensystem angeben, in welches geokodiert werden soll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
+            <widget class="QComboBox" name="output_projection_combo"/>
            </item>
           </layout>
          </widget>
@@ -1183,11 +1161,6 @@ padding: 2px;
    <class>QgsMapLayerComboBox</class>
    <extends>QComboBox</extends>
    <header>qgsmaplayercombobox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QgsProjectionSelectionWidget</class>
-   <extends>QWidget</extends>
-   <header>qgsprojectionselectionwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -196,6 +196,8 @@ class MainWidget(QDockWidget):
         self.timer.timeout.connect(self.update_timer)
         self._dragged_feature = None
 
+        self.setup_crs()
+
     def setup_config(self):
         '''
         apply all settings from the config file to the ui, connect ui elements
@@ -229,9 +231,10 @@ class MainWidget(QDockWidget):
 
         # crs config
         crs = QgsCoordinateReferenceSystem(config.projection)
-        self.output_projection_select.setCrs(crs)
-        self.output_projection_select.crsChanged.connect(
-            lambda crs: setattr(config, 'projection', crs.authid()))
+        idx = self.output_projection_combo.findData(crs)
+        self.output_projection_combo.setCurrentIndex(idx)
+        self.output_projection_combo.currentIndexChanged.connect(
+            lambda crs: setattr(config, 'projection', crs.currentData()))
 
         # filters ("Regionalschlüssel" and spatial filter)
         self.selected_features_only_check.setChecked(
@@ -244,6 +247,17 @@ class MainWidget(QDockWidget):
         self.use_rs_check.setChecked(config.use_rs)
         self.use_rs_check.toggled.connect(
             lambda checked: setattr(config, 'use_rs', checked))
+
+    def setup_crs(self):
+        current_crs = self.output_projection_combo.currentData()
+        self.output_projection_combo.clear()
+        # fill crs combo
+        available_crs = BKGGeocoder.get_crs(config.api_key)
+        for code, name in available_crs:
+            self.output_projection_combo.addItem(name, code)
+        if current_crs:
+            idx = self.output_projection_combo.findData(current_crs)
+            self.output_projection_combo.setCurrentIndex(idx)
 
     def inspect_results(self, feature_id: int):
         '''
