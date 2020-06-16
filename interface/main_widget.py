@@ -26,6 +26,7 @@ __date__ = '16/12/2019'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 import os
+import webbrowser
 
 from typing import List
 from qgis.PyQt import uic
@@ -44,7 +45,7 @@ from interface.utils import (clone_layer, TopPlusOpen, get_geometries,
                              clear_layout)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from config import Config, STYLE_PATH, UI_PATH
+from config import Config, STYLE_PATH, UI_PATH, HELP_URL
 import datetime
 
 config = Config()
@@ -148,6 +149,9 @@ class MainWidget(QDockWidget):
         self.request_start_button.clicked.connect(self.bkg_geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
+        self.help_button.clicked.connect(self.show_help)
+        self.rsinfo_button.clicked.connect(
+            lambda: self.show_help(tag='regionalschluessel'))
 
         # only vector layers as input
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
@@ -784,3 +788,18 @@ class MainWidget(QDockWidget):
                 feat_id, fidx('bkg_score'), 0)
         layer.changeAttributeValue(
             feat_id, fidx('manuell_bearbeitet'), set_edited)
+
+    def show_help(self, tag: str = ''):
+        '''
+        open help website in browser
+
+        Parameters
+        ----------
+        tag : str
+            anchor of help page to jump to on opening the help website,
+            defaults to open first page
+        '''
+        url = HELP_URL
+        if tag:
+            url += f'#{tag}'
+        webbrowser.open(url, new=0)

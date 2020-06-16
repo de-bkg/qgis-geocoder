@@ -28,10 +28,16 @@ from os.path import expanduser
 
 from geocoder.bkg_geocoder import URL
 
+path = os.path.dirname(__file__)
+
 # data paths
-UI_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'ui')
-ICON_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'ui', 'icons')
-STYLE_PATH = os.path.join(os.path.dirname(__file__), 'interface', 'styles')
+UI_PATH = os.path.join(path, 'interface', 'ui')
+ICON_PATH = os.path.join(path, 'interface', 'ui', 'icons')
+STYLE_PATH = os.path.join(path, 'interface', 'styles')
+
+# url to help website, left out trailing 'file://', other wise webbrowser won't
+# open tags or pass query params whyever
+HELP_URL = f'{path}/help/Benutzerhandbuch.html'
 
 # path to config file location
 DEFAULT_FILE = os.path.join(expanduser("~"), "bkg_geocoder.cfg")
