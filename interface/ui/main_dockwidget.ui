@@ -78,7 +78,7 @@ padding: 2px;
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -483,7 +483,7 @@ padding: 2px;
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>icons/20190619_iconset_mob_wborders_info_2.png</normaloff>icons/20190619_iconset_mob_wborders_info_2.png</iconset>
+                 <normaloff>icons/20190619_iconset_mob_wborders_help_1.png</normaloff>icons/20190619_iconset_mob_wborders_help_1.png</iconset>
                </property>
               </widget>
              </item>
@@ -627,7 +627,7 @@ padding: 2px;
            <string>Expertenmodus</string>
           </property>
           <property name="collapsed">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>

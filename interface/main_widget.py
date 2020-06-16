@@ -39,7 +39,7 @@ from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget, QWidget)
 
-from interface.dialogs import ReverseResultsDialog, InspectResultsDialog
+from interface.dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from interface.map_tools import FeaturePicker, FeatureDragger
 from interface.utils import (clone_layer, TopPlusOpen, get_geometries,
                              clear_layout)
@@ -152,6 +152,7 @@ class MainWidget(QDockWidget):
         self.help_button.clicked.connect(self.show_help)
         self.rsinfo_button.clicked.connect(
             lambda: self.show_help(tag='regionalschluessel'))
+        self.about_button.clicked.connect(self.show_about)
 
         # only vector layers as input
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
@@ -803,3 +804,10 @@ class MainWidget(QDockWidget):
         if tag:
             url += f'#{tag}'
         webbrowser.open(url, new=0)
+
+    def show_about(self):
+        '''
+        show information about plugin in dialog
+        '''
+        about = Dialog(ui_file='about.ui', parent=self)
+        about.show()
