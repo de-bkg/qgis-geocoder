@@ -216,12 +216,15 @@ class MainWidget(QDockWidget):
         def api_key_edited():
             api_key = self.api_key_edit.text()
             setattr(config, 'api_key', api_key)
-            url = BKGGeocoder.get_url(api_key)
+            url = BKGGeocoder.get_service_url(api_key)
             self.api_url_edit.setText(url)
             setattr(config, 'api_url', url)
+            self.setup_crs()
         self.api_key_edit.editingFinished.connect(api_key_edited)
         self.api_url_edit.editingFinished.connect(
             lambda: setattr(config, 'api_url', self.api_url_edit.text()))
+        self.api_url_edit.editingFinished.connect(self.setup_crs)
+
         if config.use_api_url:
             self.api_url_check.setChecked(True)
         else:
@@ -230,11 +233,11 @@ class MainWidget(QDockWidget):
             lambda checked: setattr(config, 'use_api_url', not checked))
 
         # crs config
-        crs = QgsCoordinateReferenceSystem(config.projection)
-        idx = self.output_projection_combo.findData(crs)
+        idx = self.output_projection_combo.findData(config.projection)
         self.output_projection_combo.setCurrentIndex(idx)
         self.output_projection_combo.currentIndexChanged.connect(
-            lambda crs: setattr(config, 'projection', crs.currentData()))
+            lambda: setattr(config, 'projection',
+                            self.output_projection_combo.currentData()))
 
         # filters ("Regionalschlüssel" and spatial filter)
         self.selected_features_only_check.setChecked(
@@ -252,7 +255,8 @@ class MainWidget(QDockWidget):
         current_crs = self.output_projection_combo.currentData()
         self.output_projection_combo.clear()
         # fill crs combo
-        available_crs = BKGGeocoder.get_crs(config.api_key)
+        url = config.api_url if config.use_api_url else None
+        available_crs = BKGGeocoder.get_crs(key=config.api_key, url=url)
         for code, name in available_crs:
             self.output_projection_combo.addItem(name, code)
         if current_crs:
