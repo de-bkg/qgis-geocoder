@@ -267,12 +267,19 @@ class MainWidget(QDockWidget):
         self.style_browse_button.clicked.connect(browse_file)
 
     def apply_output_style(self):
+        '''
+        apply currently set style file to current output layer
+        '''
         if not self.output_layer:
             return
         self.canvas.refresh()
         self.output_layer.loadNamedStyle(config.output_style)
 
     def setup_crs(self):
+        '''
+        request service-url for available crs and populate crs-combobox with
+        retrieved values
+        '''
         current_crs = self.output_projection_combo.currentData()
         self.output_projection_combo.clear()
         # fill crs combo
