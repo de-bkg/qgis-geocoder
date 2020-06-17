@@ -562,7 +562,10 @@ class Request(QObject):
         '''
         super().__init__()
         self.synchronous = synchronous
-        self.manager = QgsNetworkAccessManager.instance()
+
+    @property
+    def _manager(self) -> QgsNetworkAccessManager:
+        return QgsNetworkAccessManager.instance()
 
     def get(self, url: str, params: dict = None,
             timeout: int = 10000, **kwargs) -> Reply:
@@ -653,8 +656,8 @@ class Request(QObject):
         '''
         request = QNetworkRequest(qurl)
         # newer versions of QGIS (3.6+) support synchronous requests
-        if hasattr(self.manager, 'blockingGet'):
-            reply = self.manager.blockingGet(request, forceRefresh=True)
+        if hasattr(self._manager, 'blockingGet'):
+            reply = self._manager.blockingGet(request, forceRefresh=True)
         # use blocking event loop for older versions
         else:
             loop = QEventLoop()
@@ -662,7 +665,7 @@ class Request(QObject):
             timer.setSingleShot(True)
             # reply or timeout break event loop, whoever comes first
             timer.timeout.connect(loop.quit)
-            reply = self.manager.get(request)
+            reply = self._manager.get(request)
             reply.finished.connect(loop.quit)
 
             timer.start(timeout)
@@ -692,7 +695,7 @@ class Request(QObject):
             if total > 0:
                 self.progress.emit(int(100*b/total))
 
-        self.reply = self.manager.get(request)
+        self.reply = self._manager.get(request)
         self.reply.error.connect(
             lambda: self.error.emit(self.reply.errorString()))
         self.reply.downloadProgress.connect(progress)
@@ -707,8 +710,8 @@ class Request(QObject):
         '''
         request = QNetworkRequest(qurl)
         # newer versions of QGIS (3.6+) support synchronous requests
-        if hasattr(self.manager, 'blockingPost'):
-            reply = self.manager.blockingPost(request, data, forceRefresh=True)
+        if hasattr(self._manager, 'blockingPost'):
+            reply = self._manager.blockingPost(request, data, forceRefresh=True)
         # use blocking event loop for older versions
         else:
             loop = QEventLoop()
@@ -716,7 +719,7 @@ class Request(QObject):
             timer.setSingleShot(True)
             # reply or timeout break event loop, whoever comes first
             timer.timeout.connect(loop.quit)
-            reply = self.manager.post(request, data)
+            reply = self._manager.post(request, data)
             reply.finished.connect(loop.quit)
 
             timer.start(timeout)
