@@ -32,12 +32,11 @@ from typing import List
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
 from qgis import utils
-from qgis.core import (QgsCoordinateReferenceSystem, QgsField,
-                       QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
+from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
                        QgsCoordinateTransform, QgsProject, QgsFeature)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
-                                 QDockWidget, QWidget)
+                                 QDockWidget, QWidget, QFileDialog)
 
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from interface.map_tools import FeaturePicker, FeatureDragger
@@ -216,7 +215,7 @@ class MainWidget(QDockWidget):
         def api_key_edited():
             api_key = self.api_key_edit.text()
             setattr(config, 'api_key', api_key)
-            url = BKGGeocoder.get_service_url(api_key)
+            url = BKGGeocoder.get_url(api_key)
             self.api_url_edit.setText(url)
             setattr(config, 'api_url', url)
             self.setup_crs()
@@ -250,6 +249,28 @@ class MainWidget(QDockWidget):
         self.use_rs_check.setChecked(config.use_rs)
         self.use_rs_check.toggled.connect(
             lambda checked: setattr(config, 'use_rs', checked))
+
+        # output layer style
+        self.layer_style_edit.setText(config.output_style)
+        self.layer_style_edit.editingFinished.connect(
+            lambda path: setattr(config, 'output_style', path))
+        self.layer_style_edit.editingFinished.connect(self.apply_output_style)
+
+        def browse_file():
+            path, sf = QFileDialog.getOpenFileName(
+                self, 'Layerstil wählen', filter="QGIS-Layerstildatei(*.qml)",
+                directory=STYLE_PATH)
+            if path:
+                self.layer_style_edit.setText(path)
+                config.output_style = path
+                self.apply_output_style()
+        self.style_browse_button.clicked.connect(browse_file)
+
+    def apply_output_style(self):
+        if not self.output_layer:
+            return
+        self.canvas.refresh()
+        self.output_layer.loadNamedStyle(config.output_style)
 
     def setup_crs(self):
         current_crs = self.output_projection_combo.currentData()
@@ -662,9 +683,7 @@ class MainWidget(QDockWidget):
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
-        style_file = os.path.join(
-            STYLE_PATH, 'bkggeocoder_treffer+manuell_bearbeitet.qml')
-        self.output_layer.loadNamedStyle(style_file)
+        self.apply_output_style()
 
         self.geocoding.message.connect(self.log)
         self.geocoding.progress.connect(self.progress_bar.setValue)

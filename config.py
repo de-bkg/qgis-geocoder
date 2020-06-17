@@ -78,6 +78,8 @@ class Config(object):
         'projection': 'EPSG:25832',
         'use_rs': False,
         'rs': '',
+        'output_style': os.path.join(
+            STYLE_PATH, 'bkggeocoder_treffer+manuell_bearbeitet.qml'),
     }
 
     _config = {}

@@ -154,7 +154,10 @@ class BKGGeocoder(Geocoder):
         if not key and not url:
             raise ValueError('at least one keyword out of "key" and "url" has '
                              'to be passed')
-        url = url or self.get_service_url(key)
+        url = url or self.get_url(key)
+        # users already might typed in url with 'geosearch' term in it
+        if 'geosearch' not in url:
+            url += '/geosearch'
         self.logic_link = logic_link
         self.fuzzy = fuzzy
         self.rs = rs
@@ -162,9 +165,9 @@ class BKGGeocoder(Geocoder):
         super().__init__(url=url, crs=crs)
 
     @staticmethod
-    def get_service_url(key: str) -> str:
+    def get_url(key: str) -> str:
         '''
-        create a geosearch-service-url for the given key
+        create a service-url for the given key
 
         Parameters
         ----------
@@ -177,9 +180,6 @@ class BKGGeocoder(Geocoder):
             service url corresponding to given key
         '''
         url = URL.format(key=key)
-        # users already might typed in url with 'geosearch' term in it
-        if 'geosearch' not in url:
-            url += '/geosearch'
         return url
 
     @staticmethod
@@ -200,8 +200,7 @@ class BKGGeocoder(Geocoder):
         list
             list of available crs as tuples (code, pretty name)
         '''
-        if not url:
-            url = URL.format(key=key)
+        url = url or URL.format(key=key)
         # in case users typed in url with the 'geosearch' term in it
         url = url.replace('geosearch', '')
         url += '/index.xml'

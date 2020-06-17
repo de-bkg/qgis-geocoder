@@ -13,10 +13,10 @@ from qgis.core import QgsVectorLayer, QgsPoint
 from unittest.mock import patch
 import json
 
+from utilities import get_qgis_app
 sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from utilities import get_qgis_app
 
 QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
 
