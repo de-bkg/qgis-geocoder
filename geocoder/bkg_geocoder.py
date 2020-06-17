@@ -25,15 +25,16 @@ __date__ = '16/03/2020'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 from typing import List
-import requests
 import re
 from html.parser import HTMLParser
 
 from geocoder.geocoder import Geocoder
+from interface.utils import Request
+
+requests = Request()
 
 # default url to the BKG geocoding service, key has to be replaced
-URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
-INDEX_URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/index.xml'
+URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
 
 
 class CRSParser(HTMLParser):
@@ -131,7 +132,8 @@ class BKGGeocoder(Geocoder):
         key : str, optional
             key provided by BKG (no url needed, url will be built with that)
         url : str, optional
-            complete service-url provided by BKG (no seperate key needed)
+            complete service-url provided by BKG (no seperate key needed),
+            higher priority than the key if both are given
         crs : str, optional
             code of projection the returned geometries will be in,
             defaults to epsg 4326
@@ -152,7 +154,7 @@ class BKGGeocoder(Geocoder):
         if not key and not url:
             raise ValueError('at least one keyword out of "key" and "url" has '
                              'to be passed')
-        url = url or self.get_url(key)
+        url = url or self.get_service_url(key)
         self.logic_link = logic_link
         self.fuzzy = fuzzy
         self.rs = rs
@@ -160,9 +162,9 @@ class BKGGeocoder(Geocoder):
         super().__init__(url=url, crs=crs)
 
     @staticmethod
-    def get_url(key: str) -> str:
+    def get_service_url(key: str) -> str:
         '''
-        create a service-url for the given key
+        create a geosearch-service-url for the given key
 
         Parameters
         ----------
@@ -174,27 +176,41 @@ class BKGGeocoder(Geocoder):
         str
             service url corresponding to given key
         '''
-        return URL.format(key=key)
+        url = URL.format(key=key)
+        # users already might typed in url with 'geosearch' term in it
+        if 'geosearch' not in url:
+            url += '/geosearch'
+        return url
 
     @staticmethod
-    def get_crs(key: str) -> List[tuple]:
+    def get_crs(url: str = '', key: str = '') -> List[tuple]:
         '''
         request the supported coordinate reference sytems
 
         Parameters
         ----------
-        key : str
-            key provided by BKG for using the geocoding service
+        key : str, optional
+            key provided by BKG (no url needed, url will be built with that)
+        url : str, optional
+            complete service-url provided by BKG (no seperate key needed),
+            higher priority than the key if both are given
 
         Returns
         ----------
         list
             list of available crs as tuples (code, pretty name)
         '''
-        url = INDEX_URL.format(key=key)
-        res = requests.get(url)
-        parser = CRSParser()
-        parser.feed(res.content.decode("utf-8"))
+        if not url:
+            url = URL.format(key=key)
+        # in case users typed in url with the 'geosearch' term in it
+        url = url.replace('geosearch', '')
+        url += '/index.xml'
+        try:
+            res = requests.get(url)
+            parser = CRSParser()
+            parser.feed(res.content.decode("utf-8"))
+        except ConnectionError:
+            return [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
         return parser.codes
 
     def _escape_special_chars(self, text) -> str:
@@ -236,7 +252,7 @@ class BKGGeocoder(Geocoder):
 
     def query(self, *args: object, **kwargs: object) -> dict:
         '''
-        query
+        query the service
 
         Parameters
         ----------
