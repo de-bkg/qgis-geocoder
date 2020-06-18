@@ -34,7 +34,9 @@ from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
 from qgis import utils
 from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
-                       QgsCoordinateTransform, QgsProject, QgsFeature)
+                       QgsCoordinateTransform, QgsProject, QgsFeature,
+                       QgsPalLayerSettings, QgsRuleBasedLabeling, QgsTextFormat,
+                       QgsTextBufferSettings)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget, QWidget, QFileDialog)
 
@@ -102,6 +104,7 @@ class MainWidget(QDockWidget):
         self.output_layer_ids = []
 
         self.input_layer = None
+        self.field_name = None
         # cache all results for a layer, feature-ids as keys, geojson features
         # as values
         self.result_cache = {}
@@ -266,6 +269,9 @@ class MainWidget(QDockWidget):
                 self.apply_output_style()
         self.style_browse_button.clicked.connect(browse_file)
 
+        # label field
+        self.label_field_combo.currentTextChanged.connect(self.apply_label)
+
     def apply_output_style(self):
         '''
         apply currently set style file to current output layer
@@ -274,6 +280,37 @@ class MainWidget(QDockWidget):
             return
         self.canvas.refresh()
         self.output_layer.loadNamedStyle(config.output_style)
+
+    def apply_label(self):
+        '''
+        apply the values of the currently selected field to the output layer
+        '''
+        self.field_name = self.label_field_combo.currentText()
+        if self.field_name == 'kein Label':
+            self.field_name = None
+
+        if not self.output_layer:
+            return
+        if not self.field_name:
+            self.output_layer.setLabelsEnabled(False)
+
+        settings = QgsPalLayerSettings()
+        settings.fieldName = self.field_name
+        settings.enabled = True
+        buffer = QgsTextBufferSettings()
+        buffer.setEnabled(True)
+        buffer.setSize(0.8)
+        text_format = QgsTextFormat()
+        text_format.setBuffer(buffer)
+        text_format.setSize(8)
+        settings.setFormat(text_format)
+        root = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
+        rule = QgsRuleBasedLabeling.Rule(settings)
+        root.appendChild(rule)
+        self.output_layer.setLabelsEnabled(True)
+        rules = QgsRuleBasedLabeling(root)
+        self.output_layer.setLabeling(rules)
+        self.canvas.refresh()
 
     def setup_crs(self):
         '''
@@ -604,6 +641,17 @@ class MainWidget(QDockWidget):
                 combo.setCurrentIndex(combo_idx)
                 combo.setEnabled(checked)
 
+        # label selection
+        self.label_field_combo.blockSignals(True)
+        self.label_field_combo.clear()
+        self.label_field_combo.addItem('kein Label')
+        for field in layer.fields():
+            self.label_field_combo.addItem(field.name())
+        self.label_field_combo.blockSignals(False)
+
+        # try to set prev. selected field
+        self.label_field_combo.setCurrentText(self.field_name)
+
     def set_encoding(self, encoding: str):
         '''
         set encoding of input layer and redraw the parameter section
@@ -613,6 +661,8 @@ class MainWidget(QDockWidget):
         encoding : str
             the name of the encoding e.g. 'utf-8'
         '''
+        if not self.input_layer:
+            return
         self.input_layer.dataProvider().setEncoding(encoding)
         self.input_layer.updateFields()
         # repopulate fields
@@ -668,6 +718,8 @@ class MainWidget(QDockWidget):
             # take features of output layer as input to match the ids of the
             # geocoding
             features = [f for f in self.output_layer.getFeatures()]
+
+        self.apply_label()
 
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():

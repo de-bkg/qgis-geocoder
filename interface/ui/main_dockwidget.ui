@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>394</width>
-    <height>501</height>
+    <height>524</height>
    </rect>
   </property>
   <property name="layoutDirection">
@@ -175,27 +175,47 @@ padding: 2px;
            <number>6</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Encoding: </string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="encoding_combo"/>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Labelfeld:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="label_field_combo"/>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Encoding: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="encoding_combo"/>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -279,7 +299,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>350</width>
-                <height>286</height>
+                <height>307</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -833,7 +853,11 @@ padding: 2px;
                 </size>
                </property>
                <property name="text">
-                <string>...</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>icons/20190619_iconset_mob_wborders_load_1.png</normaloff>icons/20190619_iconset_mob_wborders_load_1.png</iconset>
                </property>
               </widget>
              </item>
