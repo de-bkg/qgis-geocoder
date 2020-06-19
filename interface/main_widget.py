@@ -310,7 +310,7 @@ class MainWidget(QDockWidget):
         self.output_layer.setLabelsEnabled(True)
         rules = QgsRuleBasedLabeling(root)
         self.output_layer.setLabeling(rules)
-        self.canvas.refresh()
+        self.output_layer.reload()
 
     def setup_crs(self):
         '''
