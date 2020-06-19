@@ -108,7 +108,7 @@ class InspectResultsDialog(Dialog):
 
     def __init__(self, feature: QgsFeature, results: List[dict],
                  canvas: QgsMapCanvas, review_fields: List[str] = [],
-                 preselect: int = -1, crs: str = 'EPSG:4326',
+                 preselect: int = -1, crs: str = 'EPSG:4326', label: str = '',
                  parent: QWidget = None, show_score: bool = True):
         '''
         Parameters
@@ -131,6 +131,9 @@ class InspectResultsDialog(Dialog):
         crs : str, optional
             code of projection of the geometries of the given features (feature
             and results), defaults to epsg 4326
+        label : str, optional
+            title shown at the top of the dialog as a label,
+            defaults to no title
         parent : QWidget, optional
             parent widget, defaults to None
         show_score : bool, optional
@@ -146,6 +149,8 @@ class InspectResultsDialog(Dialog):
         self.i = -1
         self.show_score = True
         self.crs = crs
+
+        self.title_label.setText(label)
 
         self._populate_review(review_fields)
         self._setup_preview_layer()
@@ -331,7 +336,8 @@ class ReverseResultsDialog(InspectResultsDialog):
 
     def __init__(self, feature: QgsFeature, results: List[dict],
                  canvas: QgsMapCanvas, review_fields: List[str] = [],
-                 crs: str = 'EPSG:4326', parent: QWidget = None):
+                 crs: str = 'EPSG:4326', label: str = '',
+                 parent: QWidget = None):
         '''
         Parameters
         ----------
@@ -349,10 +355,13 @@ class ReverseResultsDialog(InspectResultsDialog):
         crs : str, optional
             code of projection of the geometries of the given features (feature
             and results), defaults to epsg 4326
+        label : str, optional
+            title shown at the top of the dialog as a label,
+            defaults to no title
         parent : QWidget, optional
             parent widget, defaults to None
         '''
-        super().__init__(feature, results, canvas, crs=crs,
+        super().__init__(feature, results, canvas, crs=crs, label=label,
                          review_fields=review_fields, parent=parent)
         # ui file was designed for the inspection of geocoding results,
         # replace labels to match reverse geocoding

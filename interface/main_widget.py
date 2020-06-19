@@ -354,10 +354,12 @@ class MainWidget(QDockWidget):
         # in dialog
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
+        label = (feature.attribute(self.field_name) if self.field_name
+                 else '')
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
             parent=self, crs=self.output_layer.crs().authid(),
-            review_fields=review_fields)
+            review_fields=review_fields, label=label)
         accepted = self.inspect_dialog.show()
         # set picked result when user accepted
         if accepted:
@@ -430,9 +432,11 @@ class MainWidget(QDockWidget):
                                  if self.field_map.active(f)]
                 # remember the initial geometry
                 self._init_rev_geom = feature.geometry()
+                label = (feature.attribute(self.field_name) if self.field_name
+                         else '')
                 self.reverse_dialog = ReverseResultsDialog(
                     feature, results, self.canvas, review_fields=review_fields,
-                    parent=self, crs=output_crs.authid())
+                    parent=self, crs=output_crs.authid(), label=label)
                 accepted = self.reverse_dialog.show()
                 if accepted:
                     result = self.reverse_dialog.result
