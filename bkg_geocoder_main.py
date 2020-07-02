@@ -27,11 +27,9 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsMapLayer, QgsVectorLayer
 from qgis.gui import QgisInterface
-import os.path
 
 # init resources
 from .resources import *
-
 from .interface.main_widget import MainWidget
 
 

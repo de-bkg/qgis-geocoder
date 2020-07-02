@@ -230,7 +230,7 @@ class Layer:
         return cls._nest_groups(next_parent, groupnames[1:], prepend=prepend)
 
     @classmethod
-    def find(self, label: str, groupname: str = '') -> List[QgsLayerTreeLayer]:
+    def find(cls, label: str, groupname: str = '') -> List[QgsLayerTreeLayer]:
         '''
         deep find tree layer by name in a group recursively
 

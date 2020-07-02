@@ -66,14 +66,14 @@ class Dialog(QDialog):
         '''
 
         super().__init__(parent=parent)
-        if title:
-            self.setWindowTitle(title)
-
         if ui_file:
             # look for file ui folder if not found
             ui_file = ui_file if os.path.exists(ui_file) \
                 else os.path.join(UI_PATH, ui_file)
             uic.loadUi(ui_file, self)
+        if title:
+            self.setWindowTitle(title)
+
         self.setModal(modal)
         self.setupUi()
 
