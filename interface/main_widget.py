@@ -104,7 +104,7 @@ class MainWidget(QDockWidget):
         self.output_layer_ids = []
 
         self.input_layer = None
-        self.field_name = None
+        self.label_field_name = None
         # cache all results for a layer, feature-ids as keys, geojson features
         # as values
         self.result_cache = {}
@@ -285,17 +285,17 @@ class MainWidget(QDockWidget):
         '''
         apply the values of the currently selected field to the output layer
         '''
-        self.field_name = self.label_field_combo.currentText()
-        if self.field_name == 'kein Label':
-            self.field_name = None
+        self.label_field_name = self.label_field_combo.currentText()
+        if self.label_field_name == 'kein Label':
+            self.label_field_name = None
 
         if not self.output_layer:
             return
-        if not self.field_name:
+        if not self.label_field_name:
             self.output_layer.setLabelsEnabled(False)
 
         settings = QgsPalLayerSettings()
-        settings.fieldName = self.field_name
+        settings.fieldName = self.label_field_name
         settings.enabled = True
         buffer = QgsTextBufferSettings()
         buffer.setEnabled(True)
@@ -323,7 +323,7 @@ class MainWidget(QDockWidget):
         url = config.api_url if config.use_api_url else None
         available_crs = BKGGeocoder.get_crs(key=config.api_key, url=url)
         for code, name in available_crs:
-            self.output_projection_combo.addItem(name, code)
+            self.output_projection_combo.addItem(f'{name} ({code})', code)
         if current_crs:
             idx = self.output_projection_combo.findData(current_crs)
             self.output_projection_combo.setCurrentIndex(idx)
@@ -354,7 +354,7 @@ class MainWidget(QDockWidget):
         # in dialog
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
-        label = (feature.attribute(self.field_name) if self.field_name
+        label = (feature.attribute(self.label_field_name) if self.label_field_name
                  else '')
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
@@ -432,7 +432,7 @@ class MainWidget(QDockWidget):
                                  if self.field_map.active(f)]
                 # remember the initial geometry
                 self._init_rev_geom = feature.geometry()
-                label = (feature.attribute(self.field_name) if self.field_name
+                label = (feature.attribute(self.label_field_name) if self.label_field_name
                          else '')
                 self.reverse_dialog = ReverseResultsDialog(
                     feature, results, self.canvas, review_fields=review_fields,
@@ -654,7 +654,7 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(False)
 
         # try to set prev. selected field
-        self.label_field_combo.setCurrentText(self.field_name)
+        self.label_field_combo.setCurrentText(self.label_field_name)
 
     def set_encoding(self, encoding: str):
         '''
@@ -748,9 +748,17 @@ class MainWidget(QDockWidget):
 
         self.apply_output_style()
 
-        self.geocoding.message.connect(self.log)
+        #self.geocoding.message.connect(self.log)
+
+        def feature_done(f, r):
+            label = f.attribute(self.label_field_name) if (self.label_field_name) \
+                else f'Feature {f.id()}'
+            message = (f'{label} -> <b>{len(r)} </b> Ergebnis(se)')
+            self.log(message)
+            self.store_bkg_results(f, r)
+
         self.geocoding.progress.connect(self.progress_bar.setValue)
-        self.geocoding.feature_done.connect(self.store_bkg_results)
+        self.geocoding.feature_done.connect(feature_done)
         self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
         self.geocoding.finished.connect(self.geocoding_done)
 

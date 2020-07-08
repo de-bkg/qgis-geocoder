@@ -190,7 +190,14 @@ padding: 2px;
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="label_field_combo"/>
+             <widget class="QComboBox" name="label_field_combo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item>
              <spacer name="horizontalSpacer_7">
@@ -213,7 +220,14 @@ padding: 2px;
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="encoding_combo"/>
+             <widget class="QComboBox" name="encoding_combo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -299,7 +313,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>350</width>
-                <height>307</height>
+                <height>315</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
