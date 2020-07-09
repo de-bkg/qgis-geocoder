@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>524</height>
+    <width>370</width>
+    <height>530</height>
    </rect>
   </property>
   <property name="layoutDirection">
@@ -103,20 +103,20 @@ padding: 2px;
           <item>
            <widget class="QgsMapLayerComboBox" name="layer_combo">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>256</width>
+              <width>0</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>300</width>
+              <width>16777215</width>
               <height>16777215</height>
              </size>
             </property>
@@ -138,6 +138,9 @@ padding: 2px;
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -192,7 +195,7 @@ padding: 2px;
             <item>
              <widget class="QComboBox" name="label_field_combo">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -203,6 +206,9 @@ padding: 2px;
              <spacer name="horizontalSpacer_7">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -222,7 +228,7 @@ padding: 2px;
             <item>
              <widget class="QComboBox" name="encoding_combo">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -312,8 +318,8 @@ padding: 2px;
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>350</width>
-                <height>315</height>
+                <width>326</width>
+                <height>313</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
