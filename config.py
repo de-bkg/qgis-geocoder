@@ -79,7 +79,7 @@ class Config(object):
         'use_rs': False,
         'rs': '',
         'output_style': os.path.join(
-            STYLE_PATH, 'bkggeocoder_treffer+manuell_bearbeitet.qml'),
+            STYLE_PATH, 'BKG_Layerstil_nach_Trefferguete.qml'),
     }
 
     _config = {}

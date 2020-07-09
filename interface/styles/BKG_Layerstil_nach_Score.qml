@@ -1,45 +1,15 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis styleCategories="Symbology|Labeling" version="3.12.3-București" labelsEnabled="1">
-  <renderer-v2 attr="IF (&quot;manuell_bearbeitet&quot; IS TRUE , 'manuell bearbeitet', &quot;bkg_treffer&quot;)" type="categorizedSymbol" symbollevels="0" forceraster="0" enableorderby="0">
-    <categories>
-      <category symbol="0" label="manuell bearbeitet" value="manuell bearbeitet" render="true"/>
-      <category symbol="1" label="Treffer" value="T" render="true"/>
-      <category symbol="2" label="Mehrdeutiger Treffer" value="M" render="true"/>
-      <category symbol="3" label="Fehler (Gesamtgüte &lt;95%)" value="F" render="true"/>
-      <category symbol="4" label="Fehler (Typ ungleich Haus)" value="" render="true"/>
-    </categories>
+  <renderer-v2 attr="bkg_score" type="graduatedSymbol" symbollevels="1" forceraster="0" graduatedMethod="GraduatedColor" enableorderby="0">
+    <ranges>
+      <range upper="10.000000000000000" lower="0.990000000000000" symbol="0" label="Exakter Treffer" render="true"/>
+      <range upper="0.990000000000000" lower="0.950000000000000" symbol="1" label="Sicherer Treffer" render="true"/>
+      <range upper="0.950000000000000" lower="0.900000000000000" symbol="2" label="Gutes Ergebnis" render="true"/>
+      <range upper="0.900000000000000" lower="0.000000000000000" symbol="3" label="Schlechtes Ergebnis" render="true"/>
+    </ranges>
     <symbols>
       <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="0">
-        <layer pass="0" class="SimpleMarker" locked="0" enabled="1">
-          <prop v="0" k="angle"/>
-          <prop v="45,153,45,255" k="color"/>
-          <prop v="1" k="horizontal_anchor_point"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="circle" k="name"/>
-          <prop v="0,0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="255,255,255,255" k="outline_color"/>
-          <prop v="solid" k="outline_style"/>
-          <prop v="0.2" k="outline_width"/>
-          <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="diameter" k="scale_method"/>
-          <prop v="3.2" k="size"/>
-          <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
-          <prop v="MM" k="size_unit"/>
-          <prop v="1" k="vertical_anchor_point"/>
-          <data_defined_properties>
-            <Option type="Map">
-              <Option type="QString" value="" name="name"/>
-              <Option name="properties"/>
-              <Option type="QString" value="collection" name="type"/>
-            </Option>
-          </data_defined_properties>
-        </layer>
-      </symbol>
-      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="1">
-        <layer pass="0" class="SimpleMarker" locked="0" enabled="1">
+        <layer pass="1" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="89,179,89,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -67,8 +37,37 @@
           </data_defined_properties>
         </layer>
       </symbol>
+      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="1">
+        <layer pass="2" class="SimpleMarker" locked="0" enabled="1">
+          <prop v="0" k="angle"/>
+          <prop v="167,204,92,255" k="color"/>
+          <prop v="1" k="horizontal_anchor_point"/>
+          <prop v="bevel" k="joinstyle"/>
+          <prop v="circle" k="name"/>
+          <prop v="0,0" k="offset"/>
+          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
+          <prop v="MM" k="offset_unit"/>
+          <prop v="77,77,77,255" k="outline_color"/>
+          <prop v="solid" k="outline_style"/>
+          <prop v="0.2" k="outline_width"/>
+          <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
+          <prop v="MM" k="outline_width_unit"/>
+          <prop v="diameter" k="scale_method"/>
+          <prop v="2.4" k="size"/>
+          <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
+          <prop v="MM" k="size_unit"/>
+          <prop v="1" k="vertical_anchor_point"/>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option type="QString" value="" name="name"/>
+              <Option name="properties"/>
+              <Option type="QString" value="collection" name="type"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
       <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="2">
-        <layer pass="1" class="SimpleMarker" locked="0" enabled="1">
+        <layer pass="3" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="230,230,0,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -97,36 +96,7 @@
         </layer>
       </symbol>
       <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="3">
-        <layer pass="2" class="SimpleMarker" locked="0" enabled="1">
-          <prop v="0" k="angle"/>
-          <prop v="217,159,43,255" k="color"/>
-          <prop v="1" k="horizontal_anchor_point"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="circle" k="name"/>
-          <prop v="0,0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="77,77,77,255" k="outline_color"/>
-          <prop v="solid" k="outline_style"/>
-          <prop v="0.2" k="outline_width"/>
-          <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="diameter" k="scale_method"/>
-          <prop v="2.4" k="size"/>
-          <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
-          <prop v="MM" k="size_unit"/>
-          <prop v="1" k="vertical_anchor_point"/>
-          <data_defined_properties>
-            <Option type="Map">
-              <Option type="QString" value="" name="name"/>
-              <Option name="properties"/>
-              <Option type="QString" value="collection" name="type"/>
-            </Option>
-          </data_defined_properties>
-        </layer>
-      </symbol>
-      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="4">
-        <layer pass="3" class="SimpleMarker" locked="0" enabled="1">
+        <layer pass="4" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="204,61,61,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -159,7 +129,7 @@
       <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="0">
         <layer pass="0" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
-          <prop v="204,61,61,255" k="color"/>
+          <prop v="89,179,89,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
           <prop v="bevel" k="joinstyle"/>
           <prop v="circle" k="name"/>
@@ -186,6 +156,20 @@
         </layer>
       </symbol>
     </source-symbol>
+    <colorramp type="gradient" name="[source]">
+      <prop v="255,255,255,255" k="color1"/>
+      <prop v="255,0,0,255" k="color2"/>
+      <prop v="0" k="discrete"/>
+      <prop v="gradient" k="rampType"/>
+    </colorramp>
+    <classificationMethod id="EqualInterval">
+      <symmetricMode astride="0" enabled="0" symmetrypoint="0"/>
+      <labelFormat format="%1 - %2" labelprecision="4" trimtrailingzeroes="1"/>
+      <parameters>
+        <Option/>
+      </parameters>
+      <extraInformation/>
+    </classificationMethod>
     <rotation/>
     <sizescale/>
   </renderer-v2>
@@ -198,7 +182,7 @@
           <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="markerSymbol">
             <layer pass="0" class="SimpleMarker" locked="0" enabled="1">
               <prop v="0" k="angle"/>
-              <prop v="225,89,137,255" k="color"/>
+              <prop v="190,178,151,255" k="color"/>
               <prop v="1" k="horizontal_anchor_point"/>
               <prop v="bevel" k="joinstyle"/>
               <prop v="circle" k="name"/>
@@ -270,8 +254,8 @@
     </settings>
   </labeling>
   <blendMode>0</blendMode>
-  <featureBlendMode>0</featureBlendMode>  
-  <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="&quot;bkg_treffer&quot;">
+  <featureBlendMode>0</featureBlendMode>
+  <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="&quot;bkg_score&quot;">
     <columns>
       <column type="field" hidden="0" name="fid" width="-1"/>
       <column type="field" hidden="0" name="bkg_text" width="416"/>
@@ -338,20 +322,20 @@
   </fieldConfiguration>
   <conditionalstyles>
     <rowstyles>
-      <style text_color="#000000" name="treffer_treffer" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'T'" background_color="#98d998" text_color_alpha="255">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      <style text_color_alpha="255" name="Exakter Treffer" background_color="#59b359" background_color_alpha="255" rule=" &quot;bkg_score&quot; >= 0.99" text_color="#000000">
+        <font description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
       </style>
-      <style name="treffer_fehler" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'F'" background_color="#e6bc68">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      <style name="Sicherer Treffer" background_color="#a7cc5c" background_color_alpha="255" rule="&quot;bkg_score&quot; &lt; 0.99 AND &quot;bkg_score&quot; >= 0.95">
+        <font description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
       </style>
-      <style name="treffer_mehrdeutig" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'M'" background_color="#e6e672">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      <style name="Gutes Ergebnis" background_color="#e6e600" background_color_alpha="255" rule="&quot;bkg_score&quot; &lt; 0.95 AND &quot;bkg_score&quot; >= 0.9">
+        <font description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
       </style>
-      <style text_color="#000000" name="treffer_kein_treffer" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; IS NULL OR &quot;bkg_treffer&quot; = ''" background_color="#e68a8a" text_color_alpha="255">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      <style text_color_alpha="255" name="Schlechtes Ergebnis" background_color="#cc3d3d" background_color_alpha="255" rule=" &quot;bkg_score&quot; IS NULL OR &quot;bkg_score&quot; &lt; 0.9" text_color="#000000">
+        <font description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
       </style>
-      <style name="maunell bearbeitet" background_color_alpha="255" rule=" &quot;manuell_bearbeitet&quot; IS TRUE" background_color="#65cc65">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,1,0,0,0,0"/>
+      <style name="manuell_bearbeitet" background_color="#2d992d" background_color_alpha="255" rule=" &quot;manuell_bearbeitet&quot; IS TRUE">
+        <font description="MS Shell Dlg 2,8.25,-1,5,50,1,0,0,0,0" style=""/>
       </style>
     </rowstyles>
     <fieldstyles/>
