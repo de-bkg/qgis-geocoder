@@ -1,15 +1,15 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis styleCategories="Symbology|AttributeTable" version="3.4.11-Madeira">
-  <renderer-v2 type="categorizedSymbol" attr="bkg_treffer" symbollevels="1" forceraster="0" enableorderby="0">
+<qgis styleCategories="Symbology|Labeling" version="3.12.3-București" labelsEnabled="1">
+  <renderer-v2 attr="bkg_treffer" type="categorizedSymbol" symbollevels="1" forceraster="0" enableorderby="0">
     <categories>
-      <category label="Treffer" render="true" symbol="0" value="T"/>
-      <category label="Mehrdeutiger Treffer" render="true" symbol="1" value="M"/>
-      <category label="Fehler (Gesamtgüte &lt;95%)" render="true" symbol="2" value="F"/>
-      <category label="Fehler (Typ ungleich Haus)" render="true" symbol="3" value=""/>
+      <category symbol="0" label="Treffer" value="T" render="true"/>
+      <category symbol="1" label="Mehrdeutiger Treffer" value="M" render="true"/>
+      <category symbol="2" label="Fehler (Gesamtgüte &lt;95%)" value="F" render="true"/>
+      <category symbol="3" label="Fehler (Typ ungleich Haus)" value="" render="true"/>
     </categories>
     <symbols>
-      <symbol type="marker" alpha="1" clip_to_extent="1" force_rhr="0" name="0">
-        <layer enabled="1" pass="0" class="SimpleMarker" locked="0">
+      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="0">
+        <layer pass="0" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="89,179,89,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -30,15 +30,15 @@
           <prop v="1" k="vertical_anchor_point"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol type="marker" alpha="1" clip_to_extent="1" force_rhr="0" name="1">
-        <layer enabled="1" pass="1" class="SimpleMarker" locked="0">
+      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="1">
+        <layer pass="1" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="230,230,0,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -59,15 +59,15 @@
           <prop v="1" k="vertical_anchor_point"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol type="marker" alpha="1" clip_to_extent="1" force_rhr="0" name="2">
-        <layer enabled="1" pass="2" class="SimpleMarker" locked="0">
+      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="2">
+        <layer pass="2" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="217,159,43,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -88,15 +88,15 @@
           <prop v="1" k="vertical_anchor_point"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol type="marker" alpha="1" clip_to_extent="1" force_rhr="0" name="3">
-        <layer enabled="1" pass="3" class="SimpleMarker" locked="0">
+      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="3">
+        <layer pass="3" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="204,61,61,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -117,17 +117,17 @@
           <prop v="1" k="vertical_anchor_point"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </symbols>
     <source-symbol>
-      <symbol type="marker" alpha="1" clip_to_extent="1" force_rhr="0" name="0">
-        <layer enabled="1" pass="0" class="SimpleMarker" locked="0">
+      <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="0">
+        <layer pass="0" class="SimpleMarker" locked="0" enabled="1">
           <prop v="0" k="angle"/>
           <prop v="204,61,61,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
@@ -148,9 +148,9 @@
           <prop v="1" k="vertical_anchor_point"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -159,48 +159,87 @@
     <rotation/>
     <sizescale/>
   </renderer-v2>
+  <labeling type="simple">
+    <settings calloutType="simple">
+      <text-style useSubstitutions="0" fontSize="8" fontKerning="1" fontLetterSpacing="0" fontWordSpacing="0" namedStyle="Standard" textColor="9,5,255,255" fontSizeMapUnitScale="3x:0,0,0,0,0,0" previewBkgrdColor="255,255,255,255" fontSizeUnit="Point" textOrientation="horizontal" textOpacity="1" isExpression="1" fontUnderline="0" fontFamily="MS Shell Dlg 2" fontStrikeout="0" multilineHeight="1" fontCapitals="0" fieldName="''" fontItalic="0" blendMode="0" fontWeight="50">
+        <text-buffer bufferDraw="1" bufferJoinStyle="128" bufferColor="255,255,255,255" bufferNoFill="1" bufferBlendMode="0" bufferSize="0.8" bufferSizeMapUnitScale="3x:0,0,0,0,0,0" bufferOpacity="1" bufferSizeUnits="MM"/>
+        <text-mask maskType="0" maskOpacity="1" maskSizeMapUnitScale="3x:0,0,0,0,0,0" maskSizeUnits="MM" maskSize="1,5" maskEnabled="0" maskedSymbolLayers="" maskJoinStyle="128"/>
+        <background shapeRadiiY="0" shapeRadiiUnit="MM" shapeOffsetX="0" shapeBorderWidthMapUnitScale="3x:0,0,0,0,0,0" shapeJoinStyle="64" shapeFillColor="255,255,255,255" shapeOffsetMapUnitScale="3x:0,0,0,0,0,0" shapeOffsetUnit="MM" shapeRadiiX="0" shapeBorderWidthUnit="MM" shapeType="0" shapeOffsetY="0" shapeRotationType="0" shapeBlendMode="0" shapeBorderColor="128,128,128,255" shapeRotation="0" shapeOpacity="1" shapeRadiiMapUnitScale="3x:0,0,0,0,0,0" shapeSVGFile="" shapeSizeUnit="MM" shapeSizeX="0" shapeDraw="0" shapeSizeY="0" shapeBorderWidth="0" shapeSizeType="0" shapeSizeMapUnitScale="3x:0,0,0,0,0,0">
+          <symbol clip_to_extent="1" force_rhr="0" type="marker" alpha="1" name="markerSymbol">
+            <layer pass="0" class="SimpleMarker" locked="0" enabled="1">
+              <prop v="0" k="angle"/>
+              <prop v="145,82,45,255" k="color"/>
+              <prop v="1" k="horizontal_anchor_point"/>
+              <prop v="bevel" k="joinstyle"/>
+              <prop v="circle" k="name"/>
+              <prop v="0,0" k="offset"/>
+              <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
+              <prop v="MM" k="offset_unit"/>
+              <prop v="35,35,35,255" k="outline_color"/>
+              <prop v="solid" k="outline_style"/>
+              <prop v="0" k="outline_width"/>
+              <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
+              <prop v="MM" k="outline_width_unit"/>
+              <prop v="diameter" k="scale_method"/>
+              <prop v="2" k="size"/>
+              <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
+              <prop v="MM" k="size_unit"/>
+              <prop v="1" k="vertical_anchor_point"/>
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option type="QString" value="" name="name"/>
+                  <Option name="properties"/>
+                  <Option type="QString" value="collection" name="type"/>
+                </Option>
+              </data_defined_properties>
+            </layer>
+          </symbol>
+        </background>
+        <shadow shadowRadius="1,5" shadowRadiusAlphaOnly="0" shadowBlendMode="6" shadowOffsetGlobal="1" shadowRadiusMapUnitScale="3x:0,0,0,0,0,0" shadowOpacity="0,7" shadowDraw="0" shadowOffsetMapUnitScale="3x:0,0,0,0,0,0" shadowOffsetAngle="135" shadowOffsetUnit="MM" shadowUnder="0" shadowRadiusUnit="MM" shadowScale="100" shadowColor="0,0,0,255" shadowOffsetDist="1"/>
+        <dd_properties>
+          <Option type="Map">
+            <Option type="QString" value="" name="name"/>
+            <Option name="properties"/>
+            <Option type="QString" value="collection" name="type"/>
+          </Option>
+        </dd_properties>
+        <substitutions/>
+      </text-style>
+      <text-format formatNumbers="0" autoWrapLength="0" leftDirectionSymbol="&lt;" plussign="0" rightDirectionSymbol=">" decimals="3" multilineAlign="3" wrapChar="" addDirectionSymbol="0" reverseDirectionSymbol="0" useMaxLineLengthForAutoWrap="1" placeDirectionSymbol="0"/>
+      <placement quadOffset="4" maxCurvedCharAngleOut="-25" xOffset="0" repeatDistanceUnits="MM" centroidInside="0" overrunDistanceMapUnitScale="3x:0,0,0,0,0,0" distMapUnitScale="3x:0,0,0,0,0,0" geometryGeneratorType="PointGeometry" rotationAngle="0" placementFlags="10" overrunDistance="0" fitInPolygonOnly="0" offsetUnits="MM" labelOffsetMapUnitScale="3x:0,0,0,0,0,0" offsetType="0" dist="0" priority="5" layerType="PointGeometry" centroidWhole="0" predefinedPositionOrder="TR,TL,BR,BL,R,L,TSR,BSR" maxCurvedCharAngleIn="25" overrunDistanceUnit="MM" placement="0" repeatDistance="0" preserveRotation="1" repeatDistanceMapUnitScale="3x:0,0,0,0,0,0" geometryGeneratorEnabled="0" geometryGenerator="" yOffset="0" distUnits="MM"/>
+      <rendering fontMinPixelSize="3" obstacleFactor="1" scaleMin="0" fontLimitPixelSize="0" obstacle="1" minFeatureSize="0" obstacleType="1" zIndex="0" scaleVisibility="0" maxNumLabels="2000" drawLabels="1" limitNumLabels="0" labelPerPart="0" fontMaxPixelSize="10000" displayAll="0" upsidedownLabels="0" scaleMax="0" mergeLines="0"/>
+      <dd_properties>
+        <Option type="Map">
+          <Option type="QString" value="" name="name"/>
+          <Option name="properties"/>
+          <Option type="QString" value="collection" name="type"/>
+        </Option>
+      </dd_properties>
+      <callout type="simple">
+        <Option type="Map">
+          <Option type="QString" value="pole_of_inaccessibility" name="anchorPoint"/>
+          <Option type="Map" name="ddProperties">
+            <Option type="QString" value="" name="name"/>
+            <Option name="properties"/>
+            <Option type="QString" value="collection" name="type"/>
+          </Option>
+          <Option type="bool" value="false" name="drawToAllParts"/>
+          <Option type="QString" value="0" name="enabled"/>
+          <Option type="QString" value="&lt;symbol clip_to_extent=&quot;1&quot; force_rhr=&quot;0&quot; type=&quot;line&quot; alpha=&quot;1&quot; name=&quot;symbol&quot;>&lt;layer pass=&quot;0&quot; class=&quot;SimpleLine&quot; locked=&quot;0&quot; enabled=&quot;1&quot;>&lt;prop v=&quot;square&quot; k=&quot;capstyle&quot;/>&lt;prop v=&quot;5;2&quot; k=&quot;customdash&quot;/>&lt;prop v=&quot;3x:0,0,0,0,0,0&quot; k=&quot;customdash_map_unit_scale&quot;/>&lt;prop v=&quot;MM&quot; k=&quot;customdash_unit&quot;/>&lt;prop v=&quot;0&quot; k=&quot;draw_inside_polygon&quot;/>&lt;prop v=&quot;bevel&quot; k=&quot;joinstyle&quot;/>&lt;prop v=&quot;60,60,60,255&quot; k=&quot;line_color&quot;/>&lt;prop v=&quot;solid&quot; k=&quot;line_style&quot;/>&lt;prop v=&quot;0.3&quot; k=&quot;line_width&quot;/>&lt;prop v=&quot;MM&quot; k=&quot;line_width_unit&quot;/>&lt;prop v=&quot;0&quot; k=&quot;offset&quot;/>&lt;prop v=&quot;3x:0,0,0,0,0,0&quot; k=&quot;offset_map_unit_scale&quot;/>&lt;prop v=&quot;MM&quot; k=&quot;offset_unit&quot;/>&lt;prop v=&quot;0&quot; k=&quot;ring_filter&quot;/>&lt;prop v=&quot;0&quot; k=&quot;use_custom_dash&quot;/>&lt;prop v=&quot;3x:0,0,0,0,0,0&quot; k=&quot;width_map_unit_scale&quot;/>&lt;data_defined_properties>&lt;Option type=&quot;Map&quot;>&lt;Option type=&quot;QString&quot; value=&quot;&quot; name=&quot;name&quot;/>&lt;Option name=&quot;properties&quot;/>&lt;Option type=&quot;QString&quot; value=&quot;collection&quot; name=&quot;type&quot;/>&lt;/Option>&lt;/data_defined_properties>&lt;/layer>&lt;/symbol>" name="lineSymbol"/>
+          <Option type="double" value="0" name="minLength"/>
+          <Option type="QString" value="3x:0,0,0,0,0,0" name="minLengthMapUnitScale"/>
+          <Option type="QString" value="MM" name="minLengthUnit"/>
+          <Option type="double" value="0" name="offsetFromAnchor"/>
+          <Option type="QString" value="3x:0,0,0,0,0,0" name="offsetFromAnchorMapUnitScale"/>
+          <Option type="QString" value="MM" name="offsetFromAnchorUnit"/>
+          <Option type="double" value="0" name="offsetFromLabel"/>
+          <Option type="QString" value="3x:0,0,0,0,0,0" name="offsetFromLabelMapUnitScale"/>
+          <Option type="QString" value="MM" name="offsetFromLabelUnit"/>
+        </Option>
+      </callout>
+    </settings>
+  </labeling>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
-  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="&quot;Straßen-OM&quot;">
-    <columns>
-      <column type="field" width="-1" name="fid" hidden="0"/>
-      <column type="field" width="-1" name="PLZ" hidden="0"/>
-      <column type="field" width="-1" name="Ort" hidden="0"/>
-      <column type="field" width="-1" name="Orts-OM" hidden="0"/>
-      <column type="field" width="-1" name="Straße" hidden="0"/>
-      <column type="field" width="-1" name="Straßen-OM" hidden="0"/>
-      <column type="field" width="-1" name="Hausnummer" hidden="0"/>
-      <column type="field" width="-1" name="Alphateil" hidden="0"/>
-      <column type="field" width="-1" name="Hausnummernzusatz" hidden="0"/>
-      <column type="field" width="-1" name="Status" hidden="0"/>
-      <column type="field" width="-1" name="Hecht" hidden="0"/>
-      <column type="field" width="-1" name="Ort_alt" hidden="0"/>
-      <column type="field" width="-1" name="bkg_feature_id" hidden="0"/>
-      <column type="field" width="-1" name="bkg_n_results" hidden="0"/>
-      <column type="field" width="-1" name="bkg_i" hidden="0"/>
-      <column type="field" width="-1" name="bkg_typ" hidden="0"/>
-      <column type="field" width="-1" name="bkg_text" hidden="0"/>
-      <column type="field" width="-1" name="bkg_score" hidden="0"/>
-      <column type="actions" width="-1" hidden="1"/>
-      <column type="field" width="-1" name="bkg_treffer" hidden="0"/>
-    </columns>
-  </attributetableconfig>
-  <conditionalstyles>
-    <rowstyles>
-      <style rule=" &quot;bkg_treffer&quot; = 'T'" background_color="#98d998" background_color_alpha="255" text_color_alpha="255" text_color="#000000" name="treffer_treffer">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
-      </style>
-      <style rule=" &quot;bkg_treffer&quot; = 'F'" background_color="#e6bc68" background_color_alpha="255" text_color_alpha="0" text_color="#000000" name="treffer_fehler">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
-      </style>
-      <style rule=" &quot;bkg_treffer&quot; = 'M'" background_color="#e6e672" background_color_alpha="255" text_color_alpha="0" text_color="#000000" name="treffer_mehrdeutig">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
-      </style>
-      <style rule=" &quot;bkg_treffer&quot; IS NULL OR &quot;bkg_treffer&quot; = ''" background_color="#e68a8a" background_color_alpha="255" text_color_alpha="255" text_color="#000000" name="treffer_kein_treffer">
-        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
-      </style>
-    </rowstyles>
-    <fieldstyles/>
-  </conditionalstyles>
   <layerGeometryType>0</layerGeometryType>
 </qgis>
