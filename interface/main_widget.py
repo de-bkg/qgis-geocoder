@@ -111,6 +111,8 @@ class MainWidget(QDockWidget):
         # cache field-map settings for layers, layer-ids as keys,
         # FieldMaps as values
         self.field_map_cache = {}
+        # cache label fields, layer-ids as keys, field name as values
+        self.label_cache = {}
 
         self.inspect_dialog = None
         self.reverse_dialog = None
@@ -291,6 +293,7 @@ class MainWidget(QDockWidget):
         self.label_field_name = self.label_field_combo.currentText()
         if self.label_field_name == 'kein Label':
             self.label_field_name = None
+        self.label_cache[self.input_layer.id()] = self.label_field_name
         if not self.output_layer:
             return
         if not self.label_field_name:
@@ -359,8 +362,8 @@ class MainWidget(QDockWidget):
         # in dialog
         review_fields = [f for f in self.field_map.fields()
                          if self.field_map.active(f)]
-        label = (feature.attribute(self.label_field_name) if self.label_field_name
-                 else '')
+        label = (feature.attribute(self.label_field_name)
+                 if self.label_field_name else '')
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
             parent=self, crs=self.output_layer.crs().authid(),
@@ -437,8 +440,8 @@ class MainWidget(QDockWidget):
                                  if self.field_map.active(f)]
                 # remember the initial geometry
                 self._init_rev_geom = feature.geometry()
-                label = (feature.attribute(self.label_field_name) if self.label_field_name
-                         else '')
+                label = (feature.attribute(self.label_field_name)
+                         if self.label_field_name else '')
                 self.reverse_dialog = ReverseResultsDialog(
                     feature, results, self.canvas, review_fields=review_fields,
                     parent=self, crs=output_crs.authid(), label=label)
@@ -659,7 +662,10 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(False)
 
         # try to set prev. selected field
-        self.label_field_combo.setCurrentText(self.label_field_name)
+        label_field = self.label_cache.get(layer.id())
+        if label_field is None and self.output_layer:
+            label_field = self.label_cache.get(self.output_layer.id())
+        self.label_field_combo.setCurrentText(label_field)
 
     def set_encoding(self, encoding: str):
         '''
@@ -724,6 +730,8 @@ class MainWidget(QDockWidget):
             # cloned layer gets same mapping, it has the same fields
             cloned_field_map = self.field_map.copy(layer=self.output_layer)
             self.field_map_cache[self.output_layer.id()] = cloned_field_map
+            self.label_cache[self.output_layer.id()] =\
+                self.label_cache[self.input_layer.id()]
             # take features of output layer as input to match the ids of the
             # geocoding
             features = [f for f in self.output_layer.getFeatures()]
@@ -756,8 +764,8 @@ class MainWidget(QDockWidget):
         #self.geocoding.message.connect(self.log)
 
         def feature_done(f, r):
-            label = f.attribute(self.label_field_name) if (self.label_field_name) \
-                else f'Feature {f.id()}'
+            label = f.attribute(self.label_field_name) \
+                if (self.label_field_name) else f'Feature {f.id()}'
             message = (f'{label} -> <b>{len(r)} </b> Ergebnis(se)')
             self.log(message)
             self.store_bkg_results(f, r)
@@ -819,6 +827,7 @@ class MainWidget(QDockWidget):
             )
             self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
+        self.output_layer.reload()
         self.timer.stop()
 
         # update the states of the buttons
