@@ -299,8 +299,8 @@
       <column type="field" hidden="0" name="bkg_score" width="120"/>
       <column type="field" hidden="0" name="bkg_treffer" width="250"/>
       <column type="field" hidden="0" name="bkg_n_results" width="200"/>
+      <column type="field" hidden="0" name="bkg_i" width="-1"/>
       <column type="field" hidden="0" name="manuell_bearbeitet" width="200"/>
-      <column type="field" hidden="1" name="bkg_i" width="-1"/>
       <column type="actions" hidden="1" width="-1"/>
     </columns>
   </attributetableconfig>  
@@ -319,8 +319,8 @@
     <alias field="bkg_score" index="3" name="Score"/>
     <alias field="bkg_treffer" index="4" name="Treffer"/>
     <alias field="bkg_n_results" index="5" name="Anzahl der Ergebnisse"/>
-    <alias field="manuell_bearbeitet" index="6" name="Manuell bearbeitet"/>
-    <alias field="bkg_i" index="7" name=""/>
+    <alias field="bkg_i" index="6" name="Ergebnisindex"/>
+    <alias field="manuell_bearbeitet" index="7" name="Manuell bearbeitet"/>
   </aliases>
   <fieldConfiguration>
     <field name="bkg_treffer">
