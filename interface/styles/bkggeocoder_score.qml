@@ -255,5 +255,90 @@
   </labeling>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
+  <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="&quot;bkg_score&quot;">
+    <columns>
+      <column type="field" hidden="0" name="fid" width="-1"/>
+      <column type="field" hidden="0" name="bkg_text" width="416"/>
+      <column type="field" hidden="0" name="bkg_typ" width="150"/>
+      <column type="field" hidden="0" name="bkg_score" width="120"/>
+      <column type="field" hidden="0" name="bkg_treffer" width="250"/>
+      <column type="field" hidden="0" name="bkg_n_results" width="200"/>
+      <column type="field" hidden="0" name="manuell_bearbeitet" width="200"/>
+      <column type="field" hidden="1" name="bkg_i" width="-1"/>
+      <column type="actions" hidden="1" width="-1"/>
+    </columns>
+  </attributetableconfig>  
+  <editable>
+    <field editable="0" name="bkg_i"/>
+    <field editable="0" name="bkg_n_results"/>
+    <field editable="1" name="bkg_score"/>
+    <field editable="1" name="bkg_text"/>
+    <field editable="1" name="bkg_treffer"/>
+    <field editable="1" name="bkg_typ"/>
+    <field editable="1" name="manuell_bearbeitet"/>
+  </editable>
+  <aliases>
+    <alias field="bkg_text" index="1" name="Anschrift laut Dienst"/>
+    <alias field="bkg_typ" index="2" name="Typ"/>
+    <alias field="bkg_score" index="3" name="Score"/>
+    <alias field="bkg_treffer" index="4" name="Treffer"/>
+    <alias field="bkg_n_results" index="5" name="Anzahl der Ergebnisse"/>
+    <alias field="manuell_bearbeitet" index="6" name="Manuell bearbeitet"/>
+    <alias field="bkg_i" index="7" name=""/>
+  </aliases>
+  <fieldConfiguration>
+    <field name="bkg_treffer">
+      <editWidget type="ValueMap">
+        <config>
+          <Option type="Map">
+            <Option type="List" name="map">
+              <Option type="Map">
+                <Option value="T" type="QString" name="Treffer"/>
+              </Option>
+              <Option type="Map">
+                <Option value="M" type="QString" name="Mehrdeutiger Treffer"/>
+              </Option>
+              <Option type="Map">
+                <Option value="F" type="QString" name="Fehler (Gesamtgüte &lt;95%)"/>
+              </Option>
+              <Option type="Map">
+                <Option value="" type="QString" name="Fehler (Typ ungleich Haus)"/>
+              </Option>
+            </Option>
+          </Option>
+        </config>
+      </editWidget>
+    </field>
+    <field name="manuell_bearbeitet">
+      <editWidget type="CheckBox">
+        <config>
+          <Option type="Map">
+            <Option value="" type="QString" name="CheckedState"/>
+            <Option value="" type="QString" name="UncheckedState"/>
+          </Option>
+        </config>
+      </editWidget>
+    </field>
+  </fieldConfiguration>
+  <conditionalstyles>
+    <rowstyles>
+      <style text_color="#000000" name="treffer_treffer" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'T'" background_color="#98d998" text_color_alpha="255">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style name="treffer_fehler" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'F'" background_color="#e6bc68">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style name="treffer_mehrdeutig" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'M'" background_color="#e6e672">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style text_color="#000000" name="treffer_kein_treffer" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; IS NULL OR &quot;bkg_treffer&quot; = ''" background_color="#e68a8a" text_color_alpha="255">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style name="maunell bearbeitet" background_color_alpha="255" rule=" &quot;manuell_bearbeitet&quot; IS TRUE" background_color="#65cc65">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,1,0,0,0,0"/>
+      </style>
+    </rowstyles>
+    <fieldstyles/>
+  </conditionalstyles>
   <layerGeometryType>0</layerGeometryType>
 </qgis>
