@@ -43,7 +43,7 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 from interface.dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from interface.map_tools import FeaturePicker, FeatureDragger
 from interface.utils import (clone_layer, TopPlusOpen, get_geometries,
-                             clear_layout)
+                             clear_layout, Layer)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from config import Config, STYLE_PATH, UI_PATH, HELP_URL
@@ -53,13 +53,13 @@ config = Config()
 
 # fields added to the input layer containing the properties of the results
 BKG_FIELDS = [
-    ('bkg_n_results', QVariant.Int, 'int2'),
-    ('bkg_i', QVariant.Double, 'int2'),
-    ('bkg_typ', QVariant.String, 'text'),
-    ('bkg_text', QVariant.String, 'text'),
-    ('bkg_score', QVariant.Double, 'float8'),
-    ('bkg_treffer', QVariant.String, 'text'),
-    ('manuell_bearbeitet', QVariant.Bool, 'bool')
+    ('bkg_n_results', 'Anzahl der Ergebnisse', QVariant.Int, 'int2'),
+    ('bkg_i', 'Ergebnisindex', QVariant.Double, 'int2'),
+    ('bkg_typ', 'Typ', QVariant.String, 'text'),
+    ('bkg_text', 'Anschrift laut Dienst', QVariant.String, 'text'),
+    ('bkg_score', 'Score', QVariant.Double, 'float8'),
+    ('bkg_treffer', 'Treffer', QVariant.String, 'text'),
+    ('manuell_bearbeitet', 'Manuell bearbeitet', QVariant.Bool, 'bool')
 ]
 
 # "Regionalschlüssel" to filter "Bundesländer"
@@ -272,7 +272,7 @@ class MainWidget(QDockWidget):
         self.style_browse_button.clicked.connect(browse_file)
 
         # label field
-        self.label_field_combo.currentTextChanged.connect(self.apply_label)
+        self.label_field_combo.currentIndexChanged.connect(self.apply_label)
 
     def apply_output_style(self):
         '''
@@ -290,9 +290,7 @@ class MainWidget(QDockWidget):
         apply the label of the currently selected label field to the output
         layer
         '''
-        self.label_field_name = self.label_field_combo.currentText()
-        if self.label_field_name == 'kein Label':
-            self.label_field_name = None
+        self.label_field_name = self.label_field_combo.currentData()
         self.label_cache[self.input_layer.id()] = self.label_field_name
         if not self.output_layer:
             return
@@ -428,7 +426,7 @@ class MainWidget(QDockWidget):
         bkg_geocoder = BKGGeocoder(key=config.api_key, crs=crs, url=url,
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [dragged_feature],
-                                         parent=self)
+                                         parent=self, show_score=False)
         rev_geocoding.error.connect(
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
@@ -657,15 +655,19 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(True)
         self.label_field_combo.clear()
         self.label_field_combo.addItem('kein Label')
+        aliases = {n: a for n, a, q, d in BKG_FIELDS}
         for field in layer.fields():
-            self.label_field_combo.addItem(field.name())
+            field_name = field.name()
+            alias = aliases.get(field_name)
+            self.label_field_combo.addItem(alias or field_name, field_name)
         self.label_field_combo.blockSignals(False)
 
         # try to set prev. selected field
         label_field = self.label_cache.get(layer.id())
         if label_field is None and self.output_layer:
             label_field = self.label_cache.get(self.output_layer.id())
-        self.label_field_combo.setCurrentText(label_field)
+        idx = self.label_field_combo.findData(label_field)
+        self.label_field_combo.setCurrentIndex(max(idx, 0))
 
     def set_encoding(self, encoding: str):
         '''
@@ -709,6 +711,7 @@ class MainWidget(QDockWidget):
         features = layer.selectedFeatures() \
             if config.selected_features_only else layer.getFeatures()
 
+        # input layer is flagged as output layer
         if self.update_input_layer_check.isChecked():
             if layer.wkbType() != QgsWkbTypes.Point:
                 QMessageBox.information(
@@ -722,10 +725,16 @@ class MainWidget(QDockWidget):
                      u'Start abgebrochen...'))
                 return
             self.output_layer = layer
+        # create output layer as a clone of input layer
         else:
             self.output_layer = clone_layer(
                 layer, name=f'{layer.name()}_ergebnisse',
                 crs=config.projection, features=features)
+            QgsProject.instance().addMapLayer(self.output_layer, False)
+            # add output to same group as input layer
+            tree_layer = QgsProject.instance().layerTreeRoot().findLayer(layer)
+            group = tree_layer.parent()
+            group.insertLayer(0, self.output_layer)
             self.output_layer_ids.append(self.output_layer.id())
             # cloned layer gets same mapping, it has the same fields
             cloned_field_map = self.field_map.copy(layer=self.output_layer)
@@ -781,7 +790,7 @@ class MainWidget(QDockWidget):
         self.tab_widget.setCurrentIndex(2)
 
         field_names = self.output_layer.fields().names()
-        add_fields = [QgsField(n, q, d) for n, q, d in BKG_FIELDS
+        add_fields = [QgsField(n, q, d) for n, a, q, d in BKG_FIELDS
                       if n not in field_names]
         self.output_layer.dataProvider().addAttributes(add_fields)
         self.output_layer.updateFields()

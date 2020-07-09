@@ -88,7 +88,6 @@ def clone_layer(layer: QgsVectorLayer, crs: str = 'EPSG:4326', name: str = None,
     data.addAttributes(attr)
     clone.updateFields()
     data.addFeatures([f for f in features])
-    QgsProject.instance().addMapLayer(clone)
     return clone
 
 def get_geometries(layer: QgsVectorLayer, selected: bool = False,
