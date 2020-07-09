@@ -426,7 +426,7 @@ class MainWidget(QDockWidget):
         bkg_geocoder = BKGGeocoder(key=config.api_key, crs=crs, url=url,
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [dragged_feature],
-                                         parent=self, show_score=False)
+                                         parent=self)
         rev_geocoding.error.connect(
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
 
@@ -450,6 +450,7 @@ class MainWidget(QDockWidget):
                     # (no result is selected -> geometry of dragged point is
                     # kept)
                     if result:
+                        result['properties']['score'] = 1
                         self.set_bkg_result(
                             feature, result, i=-1, set_edited=True,
                             geom_only=self.reverse_dialog.geom_only

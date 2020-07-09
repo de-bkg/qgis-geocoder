@@ -147,7 +147,7 @@ class InspectResultsDialog(Dialog):
         self.geom_only_button.setVisible(False)
         self.result = None
         self.i = -1
-        self.show_score = True
+        self.show_score = show_score
         self.crs = crs
 
         self.title_label.setText(str(label))
@@ -320,7 +320,6 @@ class InspectResultsDialog(Dialog):
 
 
 class ReverseResultsDialog(InspectResultsDialog):
-    show_score = False
     '''
     dialog showing a feature with its attributes used for geocoding  and
     a list of pickable results of geocoding this feature
@@ -337,7 +336,7 @@ class ReverseResultsDialog(InspectResultsDialog):
     def __init__(self, feature: QgsFeature, results: List[dict],
                  canvas: QgsMapCanvas, review_fields: List[str] = [],
                  crs: str = 'EPSG:4326', label: str = '',
-                 parent: QWidget = None):
+                 parent: QWidget = None, show_score: bool = False):
         '''
         Parameters
         ----------
@@ -360,9 +359,13 @@ class ReverseResultsDialog(InspectResultsDialog):
             defaults to no title
         parent : QWidget, optional
             parent widget, defaults to None
+        show_score : bool, optional
+            show the score of the results in the ui, defaults to not showing the
+            scores
         '''
         super().__init__(feature, results, canvas, crs=crs, label=label,
-                         review_fields=review_fields, parent=parent)
+                         review_fields=review_fields, parent=parent,
+                         show_score=show_score)
         # ui file was designed for the inspection of geocoding results,
         # replace labels to match reverse geocoding
         self.results_label.setText('Nächstgelegene Adressen')
