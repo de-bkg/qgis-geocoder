@@ -2,7 +2,7 @@
 <qgis styleCategories="Symbology|Labeling" version="3.12.3-București" labelsEnabled="1">
   <renderer-v2 attr="IF (&quot;manuell_bearbeitet&quot; IS TRUE , 'manuell bearbeitet', &quot;bkg_treffer&quot;)" type="categorizedSymbol" symbollevels="0" forceraster="0" enableorderby="0">
     <categories>
-      <category symbol="0" label="manuell bearbeitet" value="manuell bearbeitet" render="true"/>
+      <category symbol="0" label="Manuell bearbeitet" value="manuell bearbeitet" render="true"/>
       <category symbol="1" label="Treffer" value="T" render="true"/>
       <category symbol="2" label="Mehrdeutiger Treffer" value="M" render="true"/>
       <category symbol="3" label="Fehler (Gesamtgüte &lt;95%)" value="F" render="true"/>
