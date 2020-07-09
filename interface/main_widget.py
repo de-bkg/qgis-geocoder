@@ -35,8 +35,8 @@ from qgis import utils
 from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
                        QgsCoordinateTransform, QgsProject, QgsFeature,
-                       QgsPalLayerSettings, QgsRuleBasedLabeling, QgsTextFormat,
-                       QgsTextBufferSettings)
+                       QgsPalLayerSettings, QgsTextFormat,
+                       QgsTextBufferSettings, QgsVectorLayerSimpleLabeling)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget, QWidget, QFileDialog)
 
@@ -280,36 +280,41 @@ class MainWidget(QDockWidget):
             return
         self.canvas.refresh()
         self.output_layer.loadNamedStyle(config.output_style)
+        if self.label_field_name:
+            self.apply_label()
 
     def apply_label(self):
         '''
-        apply the values of the currently selected field to the output layer
+        apply the label of the currently selected label field to the output
+        layer
         '''
         self.label_field_name = self.label_field_combo.currentText()
         if self.label_field_name == 'kein Label':
             self.label_field_name = None
-
         if not self.output_layer:
             return
         if not self.label_field_name:
             self.output_layer.setLabelsEnabled(False)
+            self.output_layer.reload()
+            return
 
-        settings = QgsPalLayerSettings()
-        settings.fieldName = self.label_field_name
-        settings.enabled = True
-        buffer = QgsTextBufferSettings()
-        buffer.setEnabled(True)
-        buffer.setSize(0.8)
-        text_format = QgsTextFormat()
-        text_format.setBuffer(buffer)
-        text_format.setSize(8)
-        settings.setFormat(text_format)
-        root = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
-        rule = QgsRuleBasedLabeling.Rule(settings)
-        root.appendChild(rule)
         self.output_layer.setLabelsEnabled(True)
-        rules = QgsRuleBasedLabeling(root)
-        self.output_layer.setLabeling(rules)
+        labeling = self.output_layer.labeling()
+        if not labeling:
+            settings = QgsPalLayerSettings()
+            settings.enabled = True
+            buffer = QgsTextBufferSettings()
+            buffer.setEnabled(True)
+            buffer.setSize(0.8)
+            text_format = QgsTextFormat()
+            text_format.setBuffer(buffer)
+            text_format.setSize(8)
+            settings.setFormat(text_format)
+            labeling = QgsVectorLayerSimpleLabeling(settings)
+        settings = labeling.settings()
+        settings.fieldName = self.label_field_name
+        labeling.setSettings(settings)
+        self.output_layer.setLabeling(labeling)
         self.output_layer.reload()
 
     def setup_crs(self):
