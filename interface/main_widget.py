@@ -55,10 +55,10 @@ config = Config()
 BKG_FIELDS = [
     ('bkg_n_results', 'Anzahl der Ergebnisse', QVariant.Int, 'int2'),
     ('bkg_i', 'Ergebnisindex', QVariant.Double, 'int2'),
-    ('bkg_typ', 'Typ', QVariant.String, 'text'),
+    ('bkg_typ', 'Klassifizierung', QVariant.String, 'text'),
     ('bkg_text', 'Anschrift laut Dienst', QVariant.String, 'text'),
     ('bkg_score', 'Score', QVariant.Double, 'float8'),
-    ('bkg_treffer', 'Treffer', QVariant.String, 'text'),
+    ('bkg_treffer', 'Trefferbewertung', QVariant.String, 'text'),
     ('manuell_bearbeitet', 'Manuell bearbeitet', QVariant.Bool, 'bool')
 ]
 

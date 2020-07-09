@@ -301,9 +301,9 @@
   </editable>
   <aliases>
     <alias field="bkg_text" index="1" name="Anschrift laut Dienst"/>
-    <alias field="bkg_typ" index="2" name="Typ"/>
+    <alias field="bkg_typ" index="2" name="Klassifizierung"/>
     <alias field="bkg_score" index="3" name="Score"/>
-    <alias field="bkg_treffer" index="4" name="Treffer"/>
+    <alias field="bkg_treffer" index="4" name="Trefferbewertung"/>
     <alias field="bkg_n_results" index="5" name="Anzahl der Ergebnisse"/>
     <alias field="bkg_i" index="6" name="Ergebnisindex"/>
     <alias field="manuell_bearbeitet" index="7" name="Manuell bearbeitet"/>
@@ -325,6 +325,31 @@
               </Option>
               <Option type="Map">
                 <Option value="" type="QString" name="Fehler (Typ ungleich Haus)"/>
+              </Option>
+            </Option>
+          </Option>
+        </config>
+      </editWidget>
+    </field>
+    <field name="bkg_typ">
+      <editWidget type="ValueMap">
+        <config>
+          <Option type="Map">
+            <Option type="List" name="map">
+              <Option type="Map">
+                <Option value="Haus" type="QString" name="Haus"/>
+              </Option>
+              <Option type="Map">
+                <Option value="Straße" type="QString" name="Straße"/>
+              </Option>
+              <Option type="Map">
+                <Option value="Ort" type="QString" name="Ort"/>
+              </Option>
+              <Option type="Map">
+                <Option value="PLZ" type="QString" name="PLZ"/>
+              </Option>
+              <Option type="Map">
+                <Option value="Geoname" type="QString" name="Geoname"/>
               </Option>
             </Option>
           </Option>
