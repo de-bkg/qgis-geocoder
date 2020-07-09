@@ -238,7 +238,67 @@
         </Option>
       </callout>
     </settings>
-  </labeling>
+  </labeling>  
+  <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="&quot;bkg_treffer&quot;">
+    <columns>
+      <column type="field" hidden="0" name="bkg_n_results" width="-1"/>
+      <column type="field" hidden="0" name="bkg_i" width="-1"/>
+      <column type="field" hidden="0" name="bkg_typ" width="-1"/>
+      <column type="field" hidden="0" name="bkg_text" width="416"/>
+      <column type="field" hidden="0" name="bkg_score" width="71"/>
+      <column type="actions" hidden="1" width="-1"/>
+      <column type="field" hidden="0" name="bkg_treffer" width="79"/>
+      <column type="field" hidden="0" name="name" width="239"/>
+      <column type="field" hidden="0" name="plz" width="-1"/>
+      <column type="field" hidden="0" name="ort" width="131"/>
+      <column type="field" hidden="0" name="quelle" width="-1"/>
+      <column type="field" hidden="0" name="manuell_bearbeitet" width="-1"/>
+      <column type="field" hidden="0" name="schulform" width="-1"/>
+      <column type="field" hidden="0" name="strasse_nr" width="200"/>
+      <column type="field" hidden="0" name="stufen" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_gesamt" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe1" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe2" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe3" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe4" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe5" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe6" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe7" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe8" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe9" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe10" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe11" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe12" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_stufe13" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_sekI" width="-1"/>
+      <column type="field" hidden="0" name="anz_schueler_sekII" width="-1"/>
+      <column type="field" hidden="0" name="anz_lehrer" width="-1"/>
+      <column type="field" hidden="0" name="anz_sonstiges_personal" width="-1"/>
+      <column type="field" hidden="0" name="anz_mitarbeiter_gesamt" width="-1"/>
+      <column type="field" hidden="0" name="anmerkungen" width="-1"/>
+      <column type="field" hidden="0" name="fid" width="-1"/>
+    </columns>
+  </attributetableconfig>
+  <conditionalstyles>
+    <rowstyles>
+      <style text_color="#000000" name="treffer_treffer" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'T'" background_color="#98d998" text_color_alpha="255">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style name="treffer_fehler" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'F'" background_color="#e6bc68">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style name="treffer_mehrdeutig" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; = 'M'" background_color="#e6e672">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style text_color="#000000" name="treffer_kein_treffer" background_color_alpha="255" rule=" &quot;bkg_treffer&quot; IS NULL OR &quot;bkg_treffer&quot; = ''" background_color="#e68a8a" text_color_alpha="255">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0"/>
+      </style>
+      <style name="maunell bearbeitet" background_color_alpha="255" rule=" &quot;manuell_bearbeitet&quot; IS TRUE" background_color="#65cc65">
+        <font style="" description="MS Shell Dlg 2,8.25,-1,5,50,1,0,0,0,0"/>
+      </style>
+    </rowstyles>
+    <fieldstyles/>
+  </conditionalstyles>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>0</layerGeometryType>
