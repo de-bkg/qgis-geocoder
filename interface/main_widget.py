@@ -731,7 +731,7 @@ class MainWidget(QDockWidget):
             cloned_field_map = self.field_map.copy(layer=self.output_layer)
             self.field_map_cache[self.output_layer.id()] = cloned_field_map
             self.label_cache[self.output_layer.id()] =\
-                self.label_cache[self.input_layer.id()]
+                self.label_cache.get(self.input_layer.id())
             # take features of output layer as input to match the ids of the
             # geocoding
             features = [f for f in self.output_layer.getFeatures()]
