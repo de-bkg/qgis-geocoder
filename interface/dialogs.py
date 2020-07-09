@@ -150,7 +150,7 @@ class InspectResultsDialog(Dialog):
         self.show_score = True
         self.crs = crs
 
-        self.title_label.setText(label)
+        self.title_label.setText(str(label))
 
         self._populate_review(review_fields)
         self._setup_preview_layer()
