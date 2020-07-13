@@ -46,7 +46,7 @@ from interface.utils import (clone_layer, TopPlusOpen, get_geometries,
                              clear_layout, Layer)
 from geocoder.bkg_geocoder import BKGGeocoder
 from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from config import Config, STYLE_PATH, UI_PATH, HELP_URL
+from config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
 import datetime
 
 config = Config()
@@ -942,4 +942,5 @@ class MainWidget(QDockWidget):
         show information about plugin in dialog
         '''
         about = Dialog(ui_file='about.ui', parent=self)
+        about.version_label.setText(str(VERSION))
         about.show()

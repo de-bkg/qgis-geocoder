@@ -30,6 +30,8 @@ from geocoder.bkg_geocoder import URL
 
 path = os.path.dirname(__file__)
 
+VERSION = '1.0.9'
+
 # data paths
 UI_PATH = os.path.join(path, 'interface', 'ui')
 ICON_PATH = os.path.join(path, 'interface', 'ui', 'icons')
