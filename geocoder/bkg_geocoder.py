@@ -24,7 +24,7 @@ __author__ = 'Christoph Franke'
 __date__ = '16/03/2020'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
-from typing import List
+from typing import List, Tuple
 import re
 from html.parser import HTMLParser
 
@@ -183,7 +183,7 @@ class BKGGeocoder(Geocoder):
         return url
 
     @staticmethod
-    def get_crs(url: str = '', key: str = '') -> List[tuple]:
+    def get_crs(url: str = '', key: str = '') -> Tuple[bool, List[tuple]]:
         '''
         request the supported coordinate reference sytems
 
@@ -197,8 +197,9 @@ class BKGGeocoder(Geocoder):
 
         Returns
         ----------
-        list
-            list of available crs as tuples (code, pretty name)
+        tuple
+            tuple of success and list of available crs as tuples (code,
+            pretty name)
         '''
         url = url or URL.format(key=key)
         # in case users typed in url with the 'geosearch' term in it
@@ -209,8 +210,8 @@ class BKGGeocoder(Geocoder):
             parser = CRSParser()
             parser.feed(res.content.decode("utf-8"))
         except ConnectionError:
-            return [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
-        return parser.codes
+            return False, [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
+        return True, parser.codes
 
     def _escape_special_chars(self, text) -> str:
         '''

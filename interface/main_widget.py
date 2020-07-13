@@ -327,7 +327,12 @@ class MainWidget(QDockWidget):
         self.output_projection_combo.clear()
         # fill crs combo
         url = config.api_url if config.use_api_url else None
-        available_crs = BKGGeocoder.get_crs(key=config.api_key, url=url)
+        success, available_crs = BKGGeocoder.get_crs(key=config.api_key,
+                                                     url=url)
+        msg = '' if success else ('Der eingegebene Schlüssel bzw. die URL ist '
+                                  'nicht gültig')
+        self.key_error_label.setText(msg)
+        self.key_error_label.setVisible(not success)
         for code, name in available_crs:
             self.output_projection_combo.addItem(f'{name} ({code})', code)
         if current_crs:
