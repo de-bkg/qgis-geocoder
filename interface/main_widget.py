@@ -842,10 +842,10 @@ class MainWidget(QDockWidget):
                 self.canvas.setExtent(transform.transform(extent))
             self.canvas.refresh()
             self.output_layer.reload()
-        else:
-            self.progress_bar.setValue(0)
-            QgsProject.instance().removeMapLayer(self.output_layer.id())
-            self.output_layer = None
+        #else:
+            #self.progress_bar.setValue(0)
+            #QgsProject.instance().removeMapLayer(self.output_layer.id())
+            #self.output_layer = None
         self.timer.stop()
 
         # update the states of the buttons
