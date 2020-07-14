@@ -30,7 +30,7 @@ from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
 
 from geocoder.geocoder import Geocoder
-from interface.utils import Request
+from interface.utils import Request, Reply
 
 requests = Request()
 
@@ -298,7 +298,7 @@ class BKGGeocoder(Geocoder):
         Raises
         ----------
         RuntimeError
-            critical error (no parameters, no access to service),
+            critical error (no parameters, no access to service/url),
             it is recommended to abort geocoding
         ValueError
             request got through but parameters were malformed,
@@ -313,25 +313,46 @@ class BKGGeocoder(Geocoder):
             raise RuntimeError('keine Suchparameter gefunden')
         self.params['query'] = query
         self.r = requests.get(self.url, params=self.params)
+        self.raise_on_error(self.r)
+        return self.r.json()['features']
+
+    def raise_on_error(self, reply: Reply):
+        '''
+        raise errors if reply is not valid
+        (valid only with HTML status code 200)
+
+        Parameters
+        ----------
+        reply : Reply
+            BKG service reply
+
+        Raises
+        ----------
+        RuntimeError
+            no access to service/url
+        ValueError
+            malformed request parameters
+        '''
         # depending on error json or xml is returned from API
-        if self.r.status_code == 400:
+        if reply.status_code == 400:
             # json response if parameters were malformed
             try:
-                res_json = self.r.json()
+                res_json = reply.json()
                 code = res_json.get('exceptionCode')
                 message = self.exception_codes.get(code)
                 raise ValueError(message)
             # xml response if service could not be accessed
             except JSONDecodeError:
                 parser = ErrorCodeParser()
-                parser.feed(self.r.content.decode('utf-8'))
+                parser.feed(reply.content.decode('utf-8'))
                 message = self.exception_codes.get(parser.error)
                 raise RuntimeError(message)
-        if self.r.status_code == 500:
+        if reply.status_code == 500:
             raise ValueError('interner Serverfehler')
-        if self.r.status_code == None:
+        if reply.status_code == None:
             raise RuntimeError('Service nicht erreichbar')
-        return self.r.json()['features']
+        if reply.status_code != 200:
+            raise ValueError('unbekannter Fehler')
 
     def reverse(self, x: float, y: float) -> list:
         '''
@@ -353,8 +374,10 @@ class BKGGeocoder(Geocoder):
 
         Raises
         ----------
-        Exception
-            API responds with a status code different from 200 (OK)
+        RuntimeError
+            no access to service/url
+        ValueError
+            malformed request parameters
         '''
         params = {
             'lat': y,
@@ -362,8 +385,7 @@ class BKGGeocoder(Geocoder):
             'srsname': self.crs
         }
         self.r = requests.get(self.url, params=params)
-        if self.r.status_code != 200:
-            raise Exception(self.r.text)
+        self.raise_on_error(self.r)
         return self.r.json()['features']
 
 
