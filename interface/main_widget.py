@@ -831,18 +831,20 @@ class MainWidget(QDockWidget):
             self.log('Geokodierung erfolgreich abgeschlossen')
             # select output layer as current layer
             self.layer_combo.setLayer(self.output_layer)
-
-        # zoom to extent of results
-        extent = self.output_layer.extent()
-        if not extent.isEmpty():
-            transform = QgsCoordinateTransform(
-                self.output_layer.crs(),
-                self.canvas.mapSettings().destinationCrs(),
-                QgsProject.instance()
-            )
-            self.canvas.setExtent(transform.transform(extent))
-        self.canvas.refresh()
-        self.output_layer.reload()
+            # zoom to extent of results
+            extent = self.output_layer.extent()
+            if not extent.isEmpty():
+                transform = QgsCoordinateTransform(
+                    self.output_layer.crs(),
+                    self.canvas.mapSettings().destinationCrs(),
+                    QgsProject.instance()
+                )
+                self.canvas.setExtent(transform.transform(extent))
+            self.canvas.refresh()
+            self.output_layer.reload()
+        else:
+            self.progress_bar.setValue(0)
+            QgsProject.instance().removeMapLayer(self.output_layer.id())
         self.timer.stop()
 
         # update the states of the buttons

@@ -368,6 +368,7 @@ class Worker(QThread):
             self.finished.emit(result)
         except Exception as e:
             self.error.emit(str(e))
+            self.finished.emit(False)
 
     def work(self):
         '''
@@ -441,13 +442,13 @@ class Geocoding(Worker):
                 break
             try:
                 self.process(feature)
-            except Exception as e:
-                success = False
+            except ValueError as e:
                 self.error.emit(f'Feature {feature.id()} -> {e}')
+            except RuntimeError as e:
+                raise e
             finally:
                 progress = math.floor(100 * (i + 1) / count)
                 self.progress.emit(progress)
-
         return success
 
     def process(self, feature: QgsFeature):

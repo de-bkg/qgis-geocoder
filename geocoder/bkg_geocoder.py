@@ -27,6 +27,7 @@ __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 from typing import List, Tuple
 import re
 from html.parser import HTMLParser
+from json.decoder import JSONDecodeError
 
 from geocoder.geocoder import Geocoder
 from interface.utils import Request
@@ -35,6 +36,19 @@ requests = Request()
 
 # default url to the BKG geocoding service, key has to be replaced
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
+
+
+class ErrorCodeParser(HTMLParser):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.error = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'serviceexception':
+            attrs = dict(attrs)
+            self.error = attrs.get('code')
+            return
 
 
 class CRSParser(HTMLParser):
@@ -85,6 +99,9 @@ class BKGGeocoder(Geocoder):
         can be used by splitting the input into seperate supported keywords
     special_characters : list
         control characters that should be escaped if not used as such
+    exception_codes : dict
+        possible error codes returned by the API on error and the translated
+        messages
     '''
 
     keywords = {
@@ -101,6 +118,15 @@ class BKGGeocoder(Geocoder):
         'bundesland': 'Bundesland',
         'ortsteil': 'Ortsteil'
     }
+
+    exception_codes = {
+        'ERROR_UNKNOWN_IDENT': 'Falsche UUID',
+        'ERROR_UNKNOWN_SERVICE': 'Unbekannter Service',
+        'NOACCESS_SERVICE': 'Kein Zugriff',
+        'MissingParameterValue': 'Fehlende Parameter',
+        'InvalidParameterValue': 'Ungültiger Parameterwert'
+    }
+
     special_characters = ['+', '&&', '||', '!', '(', ')', '{', '}',
                           '[', ']', '^', '"', '~', '*', '?', ':']
 
@@ -271,9 +297,12 @@ class BKGGeocoder(Geocoder):
 
         Raises
         ----------
-        Exception
-            API responds with a status code different from 200 (OK) or no
-            search terms are given
+        RuntimeError
+            critical error (no parameters, no access to service),
+            it is recommended to abort geocoding
+        ValueError
+            request got through but parameters were malformed,
+            may still work for different features
         '''
         self.params = {}
         if self.area_wkt:
@@ -281,12 +310,27 @@ class BKGGeocoder(Geocoder):
         self.params['srsname'] = self.crs
         query = self._build_params(*args, **kwargs)
         if not query:
-            raise Exception('keine Suchparameter gefunden')
+            raise RuntimeError('keine Suchparameter gefunden')
         self.params['query'] = query
         self.r = requests.get(self.url, params=self.params)
-        # ToDo raise specific errors
-        if self.r.status_code != 200:
-            raise Exception(self.r.text)
+        # depending on error json or xml is returned from API
+        if self.r.status_code == 400:
+            # json response if parameters were malformed
+            try:
+                res_json = self.r.json()
+                code = res_json.get('exceptionCode')
+                message = self.exception_codes.get(code)
+                raise ValueError(message)
+            # xml response if service could not be accessed
+            except JSONDecodeError:
+                parser = ErrorCodeParser()
+                parser.feed(self.r.content.decode('utf-8'))
+                message = self.exception_codes.get(parser.error)
+                raise RuntimeError(message)
+        if self.r.status_code == 500:
+            raise ValueError('interner Serverfehler')
+        if self.r.status_code == None:
+            raise RuntimeError('Service nicht erreichbar')
         return self.r.json()['features']
 
     def reverse(self, x: float, y: float) -> list:
