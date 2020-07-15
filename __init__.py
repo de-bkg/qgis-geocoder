@@ -25,10 +25,10 @@ __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 from qgis.gui import QgisInterface
 
-from .bkg_geocoder_main import BKGGeocoderPlugin
 
 def classFactory(iface: QgisInterface):
     '''
     load BKG geocoder plugin
     '''
+    from .bkg_geocoder_main import BKGGeocoderPlugin
     return BKGGeocoderPlugin(iface)
