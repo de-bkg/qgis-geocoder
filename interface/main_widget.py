@@ -519,8 +519,7 @@ class MainWidget(QDockWidget):
         action.trigger()
 
     def unload(self):
-        self.iface.removeDockWidget(self)
-        self.deleteLater()
+        pass
 
     def closeEvent(self, event):
         '''

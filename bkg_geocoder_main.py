@@ -47,8 +47,6 @@ class BKGGeocoderPlugin:
         '''
 
         self.iface = iface
-        self.actions = []
-        self.menu = '&BKG Geocoder'
         self.toolbar = self.iface.addToolBar(u'BKGGeocoder')
         self.toolbar.setObjectName(u'BKGGeocoder')
 
@@ -64,10 +62,10 @@ class BKGGeocoderPlugin:
         # toolbar icon
         icon_path = ':/plugins/bkg_geocoder/icon.png'
         icon = QIcon(icon_path)
-        action = QAction(icon, 'BKG Geocoder', self.iface.mainWindow())
-        action.triggered.connect(lambda: self.run())
-        self.toolbar.addAction(action)
-        self.iface.addPluginToVectorMenu('Geokodierung', action)
+        self.action = QAction(icon, 'BKG Geocoder', self.iface.mainWindow())
+        self.action.triggered.connect(lambda: self.run())
+        self.toolbar.addAction(self.action)
+        self.iface.addPluginToVectorMenu('Geokodierung', self.action)
 
         # open dialog on right click feature in legend
         self.legend_action = QAction(icon,
@@ -86,7 +84,6 @@ class BKGGeocoderPlugin:
         '''
         override, close UI on closing plugin
         '''
-
         # disconnects
         self.mainwidget.closingWidget.disconnect(self.onClosePlugin)
         self.mainwidget.close()
@@ -97,9 +94,8 @@ class BKGGeocoderPlugin:
         '''
         remove the plugin and its UI from the QGIS interface
         '''
-        for action in self.actions:
-            self.iface.removePluginMenu('&BKG Geocoder', action)
-            self.iface.removeToolBarIcon(action)
+        self.iface.removePluginVectorMenu('Geokodierung', self.action)
+        self.iface.removeToolBarIcon(self.action)
         self.iface.removeCustomActionForLayerType(self.legend_action)
         self.iface.actionPan().trigger()
         # remove the toolbar
@@ -108,7 +104,7 @@ class BKGGeocoderPlugin:
         # remove widget
         if self.mainwidget:
             self.mainwidget.close()
-            self.mainwidget.unload()
+            self.iface.removeDockWidget(self.mainwidget)
             self.mainwidget.deleteLater()
             self.mainwidget = None
         self.pluginIsActive = False
