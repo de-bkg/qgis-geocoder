@@ -43,10 +43,10 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
 from .utils import (clone_layer, TopPlusOpen, get_geometries,
-                             clear_layout)
-from ..geocoder.bkg_geocoder import BKGGeocoder
-from ..geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from ..config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
+                    clear_layout)
+from bkggeocoder.geocoder.bkg_geocoder import BKGGeocoder
+from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
+from bkggeocoder.config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
 import datetime
 
 config = Config()

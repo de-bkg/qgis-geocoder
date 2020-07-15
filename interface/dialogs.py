@@ -38,8 +38,8 @@ from qgis.gui import QgsMapCanvas
 import os
 
 from typing import List
-from ..interface.utils import clear_layout
-from ..config import UI_PATH, Config, ICON_PATH
+from bkggeocoder.interface.utils import clear_layout
+from bkggeocoder.config import UI_PATH, Config, ICON_PATH
 
 config = Config()
 

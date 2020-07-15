@@ -30,7 +30,7 @@ from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
 
 from .geocoder import Geocoder
-from ..interface.utils import Request, Reply
+from bkggeocoder.interface.utils import Request, Reply
 
 requests = Request()
 
