@@ -40,13 +40,13 @@ from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget, QWidget, QFileDialog)
 
-from interface.dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
-from interface.map_tools import FeaturePicker, FeatureDragger
-from interface.utils import (clone_layer, TopPlusOpen, get_geometries,
-                             clear_layout, Layer)
-from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
+from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
+from .map_tools import FeaturePicker, FeatureDragger
+from .utils import (clone_layer, TopPlusOpen, get_geometries,
+                             clear_layout)
+from ..geocoder.bkg_geocoder import BKGGeocoder
+from ..geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
+from ..config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
 import datetime
 
 config = Config()
@@ -97,7 +97,6 @@ class MainWidget(QDockWidget):
 
     def __init__(self, parent: QWidget = None):
         super(MainWidget, self).__init__(parent)
-
         # currently selected output layer
         self.output_layer = None
         # stores which layers are marked as output layers
@@ -520,8 +519,8 @@ class MainWidget(QDockWidget):
         action.trigger()
 
     def unload(self):
-        # ToDo: is there sth. to close when unloading plugin?
-        pass
+        self.iface.removeDockWidget(self)
+        self.deleteLater()
 
     def closeEvent(self, event):
         '''

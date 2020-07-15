@@ -29,8 +29,8 @@ import re
 from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
 
-from geocoder.geocoder import Geocoder
-from interface.utils import Request, Reply
+from .geocoder import Geocoder
+from ..interface.utils import Request, Reply
 
 requests = Request()
 

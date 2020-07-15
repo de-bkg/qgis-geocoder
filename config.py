@@ -26,7 +26,7 @@ import json
 import os
 from os.path import expanduser
 
-from geocoder.bkg_geocoder import URL
+from .geocoder.bkg_geocoder import URL
 
 path = os.path.dirname(__file__)
 
