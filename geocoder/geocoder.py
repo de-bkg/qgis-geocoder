@@ -170,6 +170,7 @@ class FieldMap:
         keyword : str
             keyword used in geocoding
         '''
+        self._mapping[field_name][1] = keyword
 
     def active(self, field_name: str):
         '''
