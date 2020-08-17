@@ -97,7 +97,6 @@ class BKGGeocoderPlugin:
         self.iface.removePluginVectorMenu('Geokodierung', self.action)
         self.iface.removeToolBarIcon(self.action)
         self.iface.removeCustomActionForLayerType(self.legend_action)
-        self.iface.actionPan().trigger()
         # remove the toolbar
         if self.toolbar:
             del self.toolbar
@@ -127,6 +126,7 @@ class BKGGeocoderPlugin:
             # Create the dockwidget (after translation) and keep reference
             self.mainwidget = MainWidget()
 
+        self.pluginIsActive = True
         # connect to provide cleanup on closing of dockwidget
         self.mainwidget.closingWidget.connect(self.onClosePlugin)
         if layer:
