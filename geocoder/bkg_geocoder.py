@@ -121,7 +121,8 @@ class BKGGeocoder(Geocoder):
     }
 
     exception_codes = {
-        'ERROR_UNKNOWN_IDENT': 'Falsche UUID',
+        'ERROR_UNKNOWN_IDENT': ('Falsche UUID oder fehlende Zugriffsrechte auf '
+                                'den Geokodierungsdienst'),
         'ERROR_UNKNOWN_SERVICE': 'Unbekannter Service',
         'NOACCESS_SERVICE': 'Kein Zugriff',
         'MissingParameterValue': 'Fehlende Parameter',
