@@ -79,6 +79,7 @@ class Config(object):
         'selected_features_only': False,
         'projection': 'EPSG:25832',
         'use_rs': False,
+        'debug': False,
         'rs': '',
         'output_style': os.path.join(
             STYLE_PATH, 'BKG_Layerstil_nach_Trefferbewertung.qml'),

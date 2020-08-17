@@ -276,7 +276,7 @@ class BKGGeocoder(Geocoder):
             query = f'({query}) AND rs:{self.rs}'
         return query
 
-    def query(self, *args: object, **kwargs: object) -> dict:
+    def query(self, *args: object, **kwargs: object) -> Reply:
         '''
         query the service
 
@@ -289,11 +289,11 @@ class BKGGeocoder(Geocoder):
 
         Returns
         ----------
-        dict
-            list of geojson features with "geometry" attribute as the geocoding
-            result and "properties" containing "text" (description of found
-            address in BKG database),"typ", "treffer" and "score" (the higher
-            the better the match)
+        Reply
+            the reply of the geocoding API, contains a list of geojson features
+            with "geometry" attribute of the matched address "properties"
+            containing "text" (description of found address in BKG database),
+            "typ", "treffer" and "score" (the higher the better the match)
 
         Raises
         ----------
@@ -312,9 +312,9 @@ class BKGGeocoder(Geocoder):
         if not query:
             raise RuntimeError('keine Suchparameter gefunden')
         self.params['query'] = query
-        self.r = requests.get(self.url, params=self.params)
-        self.raise_on_error(self.r)
-        return self.r.json()['features']
+        self.reply = requests.get(self.url, params=self.params)
+        self.raise_on_error(self.reply)
+        return self.reply
 
     def raise_on_error(self, reply: Reply):
         '''
@@ -354,7 +354,7 @@ class BKGGeocoder(Geocoder):
         if reply.status_code != 200:
             raise ValueError('unbekannter Fehler')
 
-    def reverse(self, x: float, y: float) -> list:
+    def reverse(self, x: float, y: float) -> Reply:
         '''
         query
 
@@ -367,10 +367,11 @@ class BKGGeocoder(Geocoder):
 
         Returns
         ----------
-        list
-            list of geojson features with "geometry" attribute of the matched
-            address "properties" containing "text" attribute (description of
-            the found address) in order of distance to queried point
+        Reply
+            the reply of the geocoding API, contains a list of geojson features
+            with "geometry" attribute of the matched address "properties"
+            containing "text" attribute (description of the found address)
+            in order of distance to queried point
 
         Raises
         ----------
@@ -384,8 +385,8 @@ class BKGGeocoder(Geocoder):
             'lon': x,
             'srsname': self.crs
         }
-        self.r = requests.get(self.url, params=params)
-        self.raise_on_error(self.r)
-        return self.r.json()['features']
+        self.reply = requests.get(self.url, params=params)
+        self.raise_on_error(self.reply)
+        return self.reply
 
 

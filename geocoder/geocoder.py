@@ -24,6 +24,7 @@ __date__ = '16/03/2020'
 from qgis.PyQt.QtCore import pyqtSignal, QObject, QThread
 from qgis.core import QgsFeature, QgsFeatureIterator, QgsVectorLayer
 from typing import Union, List, Tuple
+from bkggeocoder.interface.utils import Reply
 import re
 import math
 import copy
@@ -279,8 +280,9 @@ class Geocoder:
         '''
         self.url = url
         self.crs = crs
+        self.reply = None
 
-    def query(self, *args: object, **kwargs: object) -> dict:
+    def query(self, *args: object, **kwargs: object) -> Reply:
         '''
         to be implemented by derived classes
 
@@ -293,8 +295,8 @@ class Geocoder:
 
         Returns
         ----------
-        list
-            list of geojson features
+        Reply
+            the reply of the gecoding API
 
         Raises
         ----------
@@ -316,8 +318,8 @@ class Geocoder:
 
         Returns
         ----------
-        list
-            list of geojson features
+        Reply
+            the reply of the gecoding API
 
         Raises
         ----------
@@ -400,10 +402,10 @@ class Geocoding(Worker):
         emitted on progress, progress in percent
     feature_done : pyqtSignal
         emitted when feature is done,
-        (processed feature, list of geocoded geojson features)
+        (processed feature, Reply of geocoding API)
     '''
 
-    feature_done = pyqtSignal(QgsFeature, list)
+    feature_done = pyqtSignal(QgsFeature, Reply)
 
     def __init__(self, geocoder: Geocoder, field_map: FieldMap,
                  features: Union[QgsFeatureIterator, List[QgsFeature]] = None,
@@ -437,6 +439,7 @@ class Geocoding(Worker):
         success = True
         count = len(self.features)
         for i, feature in enumerate(self.features):
+            self.geocoder.reply = None
             if self.is_killed:
                 success = False
                 self.error.emit('Anfrage abgebrochen')
@@ -448,6 +451,9 @@ class Geocoding(Worker):
             except RuntimeError as e:
                 raise e
             finally:
+                if self.geocoder.reply:
+                    self.message.emit(f'Feature {feature.id()} '
+                                      f'{self.geocoder.reply.url}')
                 progress = math.floor(100 * (i + 1) / count)
                 self.progress.emit(progress)
         return success
@@ -463,10 +469,9 @@ class Geocoding(Worker):
             point geometries for
         '''
         args, kwargs = self.field_map.to_args(feature)
+        message = (f'Feature {feature.id()} done')
         res = self.geocoder.query(*args, **kwargs)
         self.feature_done.emit(feature, res)
-        message = (f'Feature {feature.id()} -> '
-                   f'<b>{len(res)} </b> Ergebnis(se)')
         self.message.emit(message)
 
 
@@ -487,7 +492,7 @@ class ReverseGeocoding(Geocoding):
         emitted on progress, progress in percent
     feature_done : pyqtSignal
         emitted when feature is done,
-        (processed feature, list of geojson features with addresses)
+        (processed feature, Reply of geocoding API)
     '''
 
     def __init__(self, geocoder: Geocoder,
@@ -517,8 +522,7 @@ class ReverseGeocoding(Geocoding):
             the feature with point geometry to find addresses for
         '''
         pnt = feature.geometry().asPoint()
+        message = (f'Feature {feature.id()} done')
         res = self.geocoder.reverse(pnt.x(), pnt.y())
         self.feature_done.emit(feature, res)
-        message = (f'Feature {feature.id()} -> '
-                   f'<b>{len(res)} </b> Ergebnis(se)')
         self.message.emit(message)

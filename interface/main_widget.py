@@ -34,8 +34,8 @@ from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
 from qgis import utils
 from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
-                       QgsCoordinateTransform, QgsProject, QgsFeature,
-                       QgsPalLayerSettings, QgsTextFormat,
+                       QgsCoordinateTransform, QgsProject, QgsFeature, Qgis,
+                       QgsPalLayerSettings, QgsTextFormat, QgsMessageLog,
                        QgsTextBufferSettings, QgsVectorLayerSimpleLabeling)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget, QWidget, QFileDialog)
@@ -265,6 +265,9 @@ class MainWidget(QDockWidget):
         self.use_rs_check.setChecked(config.use_rs)
         self.use_rs_check.toggled.connect(
             lambda checked: setattr(config, 'use_rs', checked))
+        self.debug_check.setChecked(config.debug)
+        self.debug_check.toggled.connect(
+            lambda checked: setattr(config, 'debug', checked))
 
         # output layer style
         self.layer_style_edit.setText(config.output_style)
@@ -386,7 +389,7 @@ class MainWidget(QDockWidget):
         # set picked result when user accepted
         if accepted:
             self.set_bkg_result(feature, self.inspect_dialog.result,
-                            i=self.inspect_dialog.i, set_edited=True)
+                                i=self.inspect_dialog.i, set_edited=True)
         self.canvas.refresh()
         self.inspect_dialog = None
 
@@ -445,6 +448,8 @@ class MainWidget(QDockWidget):
                                          parent=self)
         rev_geocoding.error.connect(
             lambda msg: QMessageBox.information(self, 'Fehler', msg))
+        rev_geocoding.message.connect(
+            lambda msg: self.log(msg, debug_only=True))
 
         def done(feature, results):
             '''open dialog / set results when reverse geocoding is done'''
@@ -554,19 +559,26 @@ class MainWidget(QDockWidget):
         geometry = self.geometry()
         self.setGeometry(500, 500, geometry.width(), geometry.height())
 
-    def log(self, text: str, color: str = 'black'):
+    def log(self, text: str, level: int = Qgis.Info, debug_only=False):
         '''
         display given text in the log section
 
         Parameters
         ----------
-        text : str,
+        text : str
             the text to display in the log
-        color : str,
-            the color of the text, defaults to black
+        color : int, optional
+            the qgis message level, defaults to Info
         '''
-        self.log_edit.insertHtml(
-            f'<span style="color: {color}">{text}</span><br>')
+        color = 'black' if level == Qgis.Info else 'red' \
+            if level == Qgis.Critical else 'orange'
+        # don't show debug messages in log section
+        if not debug_only:
+            self.log_edit.insertHtml(
+                f'<span style="color: {color}">{text}</span><br>')
+        # always show critical messages in debug log, others only in debug mode
+        if level == Qgis.Critical or config.debug:
+            QgsMessageLog.logMessage(text, 'BKG Geocoder', level=level)
         scrollbar = self.log_edit.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
@@ -786,18 +798,21 @@ class MainWidget(QDockWidget):
 
         self.apply_output_style()
 
-        #self.geocoding.message.connect(self.log)
+        self.geocoding.message.connect(
+            lambda msg: self.log(msg, debug_only=True))
 
         def feature_done(f, r):
             label = f.attribute(self.label_field_name) \
                 if (self.label_field_name) else f'Feature {f.id()}'
-            message = (f'{label} -> <b>{len(r)} </b> Ergebnis(se)')
-            self.log(message)
-            self.store_bkg_results(f, r)
+            results = r.json()['features']
+            message = (f'{label} -> <b>{len(results)} </b> Ergebnis(se)')
+            self.log(message, level=Qgis.Info)
+            self.store_bkg_results(f, results)
 
         self.geocoding.progress.connect(self.progress_bar.setValue)
         self.geocoding.feature_done.connect(feature_done)
-        self.geocoding.error.connect(lambda msg: self.log(msg, color='red'))
+        self.geocoding.error.connect(
+            lambda msg: self.log(msg, level=Qgis.Critical))
         self.geocoding.finished.connect(self.geocoding_done)
 
         self.inspect_picker.set_layer(self.output_layer)
