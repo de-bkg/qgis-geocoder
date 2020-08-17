@@ -2,7 +2,7 @@
 name=BKG Geocoder
 qgisMinimumVersion=3.0
 description=Geokodierung mit dem BKG Geokodierungsdienst
-version=1.0.9
+version=1.1
 author=Bundesamt für Kartographie und Geodäsie
 email=gis@ggr-planung.de
 
@@ -12,6 +12,29 @@ tracker=https://github.com/ChrFr/qgis-geocoder/issues
 repository=https://github.com/ChrFr/qgis-geocoder
 
 # changelog=
+      1.1
+      ---------
+      Neue Features
+      - Anzeige eines auswählbaren Labels für Features in Karte und Dialogen
+      - alternative Stile für Ergebnislayer auswählbar
+      - integrierte Hilfeseite
+      - Unterstützung von Proxies
+      - dynamische Liste der verfügbaren Koordinatenbezugssysteme
+
+      Bugfixes
+      - Fehler bei Zuweisung der Adressfelder behoben
+      - Reload nach Update des Plugins
+      - Projektion der Hintergrundlayer
+
+      Sonstiges
+      - Überarbeitung der Layerstile und Ergebnistabellen
+      - erweiterte Fehlerbehandlung
+      - neues Icon in Symbolleiste
+      - Überprüfung des Schlüssels nach Eingabe
+
+      1.0
+      ---------
+      erste stabile Version
 
 # Tags are comma separated with spaces allowed
 tags=bkg,geocode,geokodierung,geocoder,geokoder
