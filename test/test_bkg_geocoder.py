@@ -7,18 +7,20 @@ __author__ = 'Christoph Franke'
 __date__ = '2020-03-24'
 
 import unittest
-import sys
 import os
+import sys
 from qgis.core import QgsVectorLayer, QgsPoint
 from unittest.mock import patch
 import json
 
-sys.path.append(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])
-from geocoder.bkg_geocoder import BKGGeocoder
-from geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from utilities import get_qgis_app
+sys.path.append(os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), '..', '..'))
 
+from utilities import get_qgis_app
 QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
+
+from bkggeocoder.geocoder.bkg_geocoder import BKGGeocoder
+from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 
 # bkg key from environment variable (security reasons)
 UUID = os.environ.get('BKG_UUID')

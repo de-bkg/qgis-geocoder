@@ -48,7 +48,7 @@ class MapTool:
         Parameters
         ----------
         ui_element : QWidget
-            clickable UI element, clicking on it will adctivate/deactivate this
+            clickable UI element, clicking it will activate/deactivate this
             tool
         canvas : QgsMapCanvas, optional
             the map canvas the tool will work on, defaults to the map canvas of

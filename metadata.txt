@@ -2,9 +2,9 @@
 name=BKG Geocoder
 qgisMinimumVersion=3.0
 description=Geokodierung mit dem BKG Geokodierungsdienst
-version=1.0
+version=1.0.9
 author=Bundesamt für Kartographie und Geodäsie
-email=franke@ggr-planung.de
+email=gis@ggr-planung.de
 
 about=Plugin für die Geokodierung von Adressen mit Hilfe des Geokodierungsdienstes des Bundesamtes für Kartographie und Geodäsie (BKG). Zur Nutzung des Geokodierungsdienstes ist ein Schlüssel notwendig, der vom BKG bezogen werden kann (www.bkg.bund.de).
 

@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: elpaso/qgis-testing-environment:latest
 
-    working_directory: /tests_directory/bkg-geocoder
+    working_directory: /tests_directory/bkggeocoder
 
     steps:
 
@@ -24,7 +24,7 @@ jobs:
       - run:
           name: "Setup QGIS Testing Environment"
           command: |
-            qgis_setup.sh bkg-geocoder
+            qgis_setup.sh bkggeocoder
 
       - run:
           name: "Run Unittests"

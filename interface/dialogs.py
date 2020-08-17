@@ -38,8 +38,8 @@ from qgis.gui import QgsMapCanvas
 import os
 
 from typing import List
-from interface.utils import clear_layout
-from config import UI_PATH, Config, ICON_PATH
+from bkggeocoder.interface.utils import clear_layout
+from bkggeocoder.config import UI_PATH, Config, ICON_PATH
 
 config = Config()
 
@@ -66,14 +66,14 @@ class Dialog(QDialog):
         '''
 
         super().__init__(parent=parent)
-        if title:
-            self.setWindowTitle(title)
-
         if ui_file:
             # look for file ui folder if not found
             ui_file = ui_file if os.path.exists(ui_file) \
                 else os.path.join(UI_PATH, ui_file)
             uic.loadUi(ui_file, self)
+        if title:
+            self.setWindowTitle(title)
+
         self.setModal(modal)
         self.setupUi()
 
@@ -108,7 +108,7 @@ class InspectResultsDialog(Dialog):
 
     def __init__(self, feature: QgsFeature, results: List[dict],
                  canvas: QgsMapCanvas, review_fields: List[str] = [],
-                 preselect: int = -1, crs: str = 'EPSG:4326',
+                 preselect: int = -1, crs: str = 'EPSG:4326', label: str = '',
                  parent: QWidget = None, show_score: bool = True):
         '''
         Parameters
@@ -131,6 +131,9 @@ class InspectResultsDialog(Dialog):
         crs : str, optional
             code of projection of the geometries of the given features (feature
             and results), defaults to epsg 4326
+        label : str, optional
+            title shown at the top of the dialog as a label,
+            defaults to no title
         parent : QWidget, optional
             parent widget, defaults to None
         show_score : bool, optional
@@ -144,8 +147,10 @@ class InspectResultsDialog(Dialog):
         self.geom_only_button.setVisible(False)
         self.result = None
         self.i = -1
-        self.show_score = True
+        self.show_score = show_score
         self.crs = crs
+
+        self.title_label.setText(str(label))
 
         self._populate_review(review_fields)
         self._setup_preview_layer()
@@ -315,7 +320,6 @@ class InspectResultsDialog(Dialog):
 
 
 class ReverseResultsDialog(InspectResultsDialog):
-    show_score = False
     '''
     dialog showing a feature with its attributes used for geocoding  and
     a list of pickable results of geocoding this feature
@@ -331,7 +335,8 @@ class ReverseResultsDialog(InspectResultsDialog):
 
     def __init__(self, feature: QgsFeature, results: List[dict],
                  canvas: QgsMapCanvas, review_fields: List[str] = [],
-                 crs: str = 'EPSG:4326', parent: QWidget = None):
+                 crs: str = 'EPSG:4326', label: str = '',
+                 parent: QWidget = None, show_score: bool = False):
         '''
         Parameters
         ----------
@@ -349,11 +354,18 @@ class ReverseResultsDialog(InspectResultsDialog):
         crs : str, optional
             code of projection of the geometries of the given features (feature
             and results), defaults to epsg 4326
+        label : str, optional
+            title shown at the top of the dialog as a label,
+            defaults to no title
         parent : QWidget, optional
             parent widget, defaults to None
+        show_score : bool, optional
+            show the score of the results in the ui, defaults to not showing the
+            scores
         '''
-        super().__init__(feature, results, canvas, crs=crs,
-                         review_fields=review_fields, parent=parent)
+        super().__init__(feature, results, canvas, crs=crs, label=label,
+                         review_fields=review_fields, parent=parent,
+                         show_score=show_score)
         # ui file was designed for the inspection of geocoding results,
         # replace labels to match reverse geocoding
         self.results_label.setText('Nächstgelegene Adressen')

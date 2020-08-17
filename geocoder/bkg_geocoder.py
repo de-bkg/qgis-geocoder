@@ -24,13 +24,64 @@ __author__ = 'Christoph Franke'
 __date__ = '16/03/2020'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
-import requests
+from typing import List, Tuple
 import re
+from html.parser import HTMLParser
+from json.decoder import JSONDecodeError
 
-from geocoder.geocoder import Geocoder
+from .geocoder import Geocoder
+from bkggeocoder.interface.utils import Request, Reply
+
+requests = Request()
 
 # default url to the BKG geocoding service, key has to be replaced
-URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}/geosearch'
+URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
+
+
+class ErrorCodeParser(HTMLParser):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.error = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'serviceexception':
+            attrs = dict(attrs)
+            self.error = attrs.get('code')
+            return
+
+
+class CRSParser(HTMLParser):
+    '''
+    parse OpenSearch description of BKG geocoding api to find supported
+    coordinate reference systems
+
+    HTMLParser is used for compatibility reasons to 3.4 (no lxml included)
+
+    Attributes
+    ----------
+    codes : list
+        list of available crs as tuples (code, pretty name), filled while
+        feeding the desctiption xml to this parser
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.codes = []
+
+    def handle_starttag(self, tag, attrs):
+        '''
+        override, append tags describing a supported crs to the codes list
+        '''
+        if tag.startswith('query'):
+            attrs = dict(attrs)
+            if 'bkg:srsname' in attrs:
+                self.codes.append((attrs['bkg:srsname'], attrs['title']))
+
+    def clean(self):
+        '''
+        reset the parser
+        '''
+        self.codes = []
 
 
 class BKGGeocoder(Geocoder):
@@ -48,6 +99,9 @@ class BKGGeocoder(Geocoder):
         can be used by splitting the input into seperate supported keywords
     special_characters : list
         control characters that should be escaped if not used as such
+    exception_codes : dict
+        possible error codes returned by the API on error and the translated
+        messages
     '''
 
     keywords = {
@@ -64,6 +118,15 @@ class BKGGeocoder(Geocoder):
         'bundesland': 'Bundesland',
         'ortsteil': 'Ortsteil'
     }
+
+    exception_codes = {
+        'ERROR_UNKNOWN_IDENT': 'Falsche UUID',
+        'ERROR_UNKNOWN_SERVICE': 'Unbekannter Service',
+        'NOACCESS_SERVICE': 'Kein Zugriff',
+        'MissingParameterValue': 'Fehlende Parameter',
+        'InvalidParameterValue': 'Ungültiger Parameterwert'
+    }
+
     special_characters = ['+', '&&', '||', '!', '(', ')', '{', '}',
                           '[', ']', '^', '"', '~', '*', '?', ':']
 
@@ -95,7 +158,8 @@ class BKGGeocoder(Geocoder):
         key : str, optional
             key provided by BKG (no url needed, url will be built with that)
         url : str, optional
-            complete service-url provided by BKG (no seperate key needed)
+            complete service-url provided by BKG (no seperate key needed),
+            higher priority than the key if both are given
         crs : str, optional
             code of projection the returned geometries will be in,
             defaults to epsg 4326
@@ -117,6 +181,9 @@ class BKGGeocoder(Geocoder):
             raise ValueError('at least one keyword out of "key" and "url" has '
                              'to be passed')
         url = url or self.get_url(key)
+        # users already might typed in url with 'geosearch' term in it
+        if 'geosearch' not in url:
+            url += '/geosearch'
         self.logic_link = logic_link
         self.fuzzy = fuzzy
         self.rs = rs
@@ -138,7 +205,39 @@ class BKGGeocoder(Geocoder):
         str
             service url corresponding to given key
         '''
-        return URL.format(key=key)
+        url = URL.format(key=key)
+        return url
+
+    @staticmethod
+    def get_crs(url: str = '', key: str = '') -> Tuple[bool, List[tuple]]:
+        '''
+        request the supported coordinate reference sytems
+
+        Parameters
+        ----------
+        key : str, optional
+            key provided by BKG (no url needed, url will be built with that)
+        url : str, optional
+            complete service-url provided by BKG (no seperate key needed),
+            higher priority than the key if both are given
+
+        Returns
+        ----------
+        tuple
+            tuple of success and list of available crs as tuples (code,
+            pretty name)
+        '''
+        url = url or URL.format(key=key)
+        # in case users typed in url with the 'geosearch' term in it
+        url = url.replace('geosearch', '')
+        url += '/index.xml'
+        try:
+            res = requests.get(url)
+            parser = CRSParser()
+            parser.feed(res.content.decode("utf-8"))
+        except ConnectionError:
+            return False, [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
+        return True, parser.codes
 
     def _escape_special_chars(self, text) -> str:
         '''
@@ -179,7 +278,7 @@ class BKGGeocoder(Geocoder):
 
     def query(self, *args: object, **kwargs: object) -> dict:
         '''
-        query
+        query the service
 
         Parameters
         ----------
@@ -198,9 +297,12 @@ class BKGGeocoder(Geocoder):
 
         Raises
         ----------
-        Exception
-            API responds with a status code different from 200 (OK) or no
-            search terms are given
+        RuntimeError
+            critical error (no parameters, no access to service/url),
+            it is recommended to abort geocoding
+        ValueError
+            request got through but parameters were malformed,
+            may still work for different features
         '''
         self.params = {}
         if self.area_wkt:
@@ -208,13 +310,49 @@ class BKGGeocoder(Geocoder):
         self.params['srsname'] = self.crs
         query = self._build_params(*args, **kwargs)
         if not query:
-            raise Exception('keine Suchparameter gefunden')
+            raise RuntimeError('keine Suchparameter gefunden')
         self.params['query'] = query
         self.r = requests.get(self.url, params=self.params)
-        # ToDo raise specific errors
-        if self.r.status_code != 200:
-            raise Exception(self.r.text)
+        self.raise_on_error(self.r)
         return self.r.json()['features']
+
+    def raise_on_error(self, reply: Reply):
+        '''
+        raise errors if reply is not valid
+        (valid only with HTML status code 200)
+
+        Parameters
+        ----------
+        reply : Reply
+            BKG service reply
+
+        Raises
+        ----------
+        RuntimeError
+            no access to service/url
+        ValueError
+            malformed request parameters
+        '''
+        # depending on error json or xml is returned from API
+        if reply.status_code == 400:
+            # json response if parameters were malformed
+            try:
+                res_json = reply.json()
+                code = res_json.get('exceptionCode')
+                message = self.exception_codes.get(code)
+                raise ValueError(message)
+            # xml response if service could not be accessed
+            except JSONDecodeError:
+                parser = ErrorCodeParser()
+                parser.feed(reply.content.decode('utf-8'))
+                message = self.exception_codes.get(parser.error)
+                raise RuntimeError(message)
+        if reply.status_code == 500:
+            raise ValueError('interner Serverfehler')
+        if reply.status_code == None:
+            raise RuntimeError('Service nicht erreichbar')
+        if reply.status_code != 200:
+            raise ValueError('unbekannter Fehler')
 
     def reverse(self, x: float, y: float) -> list:
         '''
@@ -236,8 +374,10 @@ class BKGGeocoder(Geocoder):
 
         Raises
         ----------
-        Exception
-            API responds with a status code different from 200 (OK)
+        RuntimeError
+            no access to service/url
+        ValueError
+            malformed request parameters
         '''
         params = {
             'lat': y,
@@ -245,8 +385,7 @@ class BKGGeocoder(Geocoder):
             'srsname': self.crs
         }
         self.r = requests.get(self.url, params=params)
-        if self.r.status_code != 200:
-            raise Exception(self.r.text)
+        self.raise_on_error(self.r)
         return self.r.json()['features']
 
 
