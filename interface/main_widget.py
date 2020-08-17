@@ -82,6 +82,18 @@ RS_PRESETS = [
     ('Freistaat Thüringen', '16*')
 ]
 
+def check(layer):
+    '''
+    check if wrapped layer still excists
+    '''
+    try:
+        if layer is not None:
+            # call function on layer to check if it still exists
+            layer.id()
+    except RuntimeError:
+        return None
+    return layer
+
 
 class MainWidget(QDockWidget):
     '''
@@ -668,7 +680,7 @@ class MainWidget(QDockWidget):
 
         # try to set prev. selected field
         label_field = self.label_cache.get(layer.id())
-        if label_field is None and self.output_layer:
+        if label_field is None and check(self.output_layer):
             label_field = self.label_cache.get(self.output_layer.id())
         idx = self.label_field_combo.findData(label_field)
         self.label_field_combo.setCurrentIndex(max(idx, 0))
