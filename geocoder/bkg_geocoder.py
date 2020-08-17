@@ -132,7 +132,7 @@ class BKGGeocoder(Geocoder):
                           '[', ']', '^', '"', '~', '*', '?', ':']
 
     @staticmethod
-    def split_code_city(value: str) -> dict:
+    def split_code_city(value: str, kwargs: dict) -> dict:
         '''extract zip-code and city from a string'''
         res = {}
         # all letters and '-', rejoin them with spaces
@@ -146,8 +146,18 @@ class BKGGeocoder(Geocoder):
             res['plz'] = f[0]
         return res
 
+    @staticmethod
+    def join_number(value: str, kwargs: dict) -> dict:
+        '''
+        join house number and addition
+        warning: changes kwargs in place
+        '''
+        nr = kwargs.pop('haus', '')
+        return {'haus': f'{nr}{value}'}
+
     special_keywords = {
-        'plz_ort': split_code_city
+        'plz_ort': split_code_city,
+        'zusatz': join_number
     }
 
     def __init__(self, key: str = '', url: str = '', crs: str = 'EPSG:4326',
@@ -266,10 +276,6 @@ class BKGGeocoder(Geocoder):
                             for a in args if a]) or ''
         if args and kwargs:
             query += logic
-        # special case: column 'zusatz' has to be joined to house
-        if 'zusatz' in kwargs:
-            value = kwargs.pop('zusatz')
-            kwargs['haus'] = f'{kwargs.get("haus", "")}{value}'
         # pop and process the special keywords
         special = [k for k in kwargs.keys() if k in self.special_keywords]
         for k in special:
