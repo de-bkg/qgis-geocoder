@@ -21,6 +21,7 @@ repository=https://github.com/ChrFr/qgis-geocoder
       - Unterstützung von Proxies
       - dynamische Liste der verfügbaren Koordinatenbezugssysteme
       - optionaler Debug-Logger
+      - zusätzliches Feld "Zusatz" als Parameter verfügbar
 
       Bugfixes
       - Fehler bei Zuweisung der Adressfelder behoben

@@ -116,7 +116,8 @@ class BKGGeocoder(Geocoder):
         'kreis': 'Kreis',
         'verwgem': 'Verwaltungsgemeinde',
         'bundesland': 'Bundesland',
-        'ortsteil': 'Ortsteil'
+        'ortsteil': 'Ortsteil',
+        'zusatz': 'Zusatz (zu Hausnummer)'
     }
 
     exception_codes = {
@@ -146,7 +147,7 @@ class BKGGeocoder(Geocoder):
         return res
 
     special_keywords = {
-        'plz_ort': split_code_city,
+        'plz_ort': split_code_city
     }
 
     def __init__(self, key: str = '', url: str = '', crs: str = 'EPSG:4326',
@@ -265,11 +266,15 @@ class BKGGeocoder(Geocoder):
                             for a in args if a]) or ''
         if args and kwargs:
             query += logic
+        # special case: column 'zusatz' has to be joined to house
+        if 'zusatz' in kwargs:
+            value = kwargs.pop('zusatz')
+            kwargs['haus'] = f'{kwargs.get("haus", "")}{value}'
         # pop and process the special keywords
         special = [k for k in kwargs.keys() if k in self.special_keywords]
         for k in special:
             value = kwargs.pop(k)
-            kwargs.update(self.special_keywords[k].__func__(value))
+            kwargs.update(self.special_keywords[k].__func__(value, kwargs))
         query += logic.join((f'{k}:({self._escape_special_chars(v)}){suffix}'
                              for k, v in kwargs.items() if v))
         if self.rs:
