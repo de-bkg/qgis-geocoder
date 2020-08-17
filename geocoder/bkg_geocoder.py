@@ -116,11 +116,13 @@ class BKGGeocoder(Geocoder):
         'kreis': 'Kreis',
         'verwgem': 'Verwaltungsgemeinde',
         'bundesland': 'Bundesland',
-        'ortsteil': 'Ortsteil'
+        'ortsteil': 'Ortsteil',
+        'zusatz': 'Zusatz (zu Hausnummer)'
     }
 
     exception_codes = {
-        'ERROR_UNKNOWN_IDENT': 'Falsche UUID',
+        'ERROR_UNKNOWN_IDENT': ('Falsche UUID oder fehlende Zugriffsrechte auf '
+                                'den Geokodierungsdienst'),
         'ERROR_UNKNOWN_SERVICE': 'Unbekannter Service',
         'NOACCESS_SERVICE': 'Kein Zugriff',
         'MissingParameterValue': 'Fehlende Parameter',
@@ -131,7 +133,7 @@ class BKGGeocoder(Geocoder):
                           '[', ']', '^', '"', '~', '*', '?', ':']
 
     @staticmethod
-    def split_code_city(value: str) -> dict:
+    def split_code_city(value: str, kwargs: dict) -> dict:
         '''extract zip-code and city from a string'''
         res = {}
         # all letters and '-', rejoin them with spaces
@@ -145,8 +147,18 @@ class BKGGeocoder(Geocoder):
             res['plz'] = f[0]
         return res
 
+    @staticmethod
+    def join_number(value: str, kwargs: dict) -> dict:
+        '''
+        join house number and addition
+        warning: changes kwargs in place
+        '''
+        nr = kwargs.pop('haus', '')
+        return {'haus': f'{nr}{value}'}
+
     special_keywords = {
         'plz_ort': split_code_city,
+        'zusatz': join_number
     }
 
     def __init__(self, key: str = '', url: str = '', crs: str = 'EPSG:4326',
@@ -269,7 +281,7 @@ class BKGGeocoder(Geocoder):
         special = [k for k in kwargs.keys() if k in self.special_keywords]
         for k in special:
             value = kwargs.pop(k)
-            kwargs.update(self.special_keywords[k].__func__(value))
+            kwargs.update(self.special_keywords[k].__func__(value, kwargs))
         query += logic.join((f'{k}:({self._escape_special_chars(v)}){suffix}'
                              for k, v in kwargs.items() if v))
         if self.rs:
