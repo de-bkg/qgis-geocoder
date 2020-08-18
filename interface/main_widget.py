@@ -446,13 +446,17 @@ class MainWidget(QDockWidget):
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [dragged_feature],
                                          parent=self)
-        rev_geocoding.error.connect(
-            lambda msg: QMessageBox.information(self, 'Fehler', msg))
+        def error(msg, level):
+            self.log(msg, debug_only=True, level=level)
+            QMessageBox.information(self, 'Fehler', msg)
+        rev_geocoding.error.connect(lambda msg: error(msg, Qgis.Critical))
+        rev_geocoding.warning.connect(lambda msg: error(msg, Qgis.Warning))
         rev_geocoding.message.connect(
             lambda msg: self.log(msg, debug_only=True))
 
-        def done(feature, results):
+        def done(feature, r):
             '''open dialog / set results when reverse geocoding is done'''
+            results = r.json()['features']
             # only one opened dialog at a time
             if not self.reverse_dialog:
                 review_fields = [f for f in self.field_map.fields()
@@ -502,7 +506,7 @@ class MainWidget(QDockWidget):
 
         # do the actual reverse geocoding
         rev_geocoding.feature_done.connect(done)
-        rev_geocoding.start()
+        rev_geocoding.work()
 
     def show_attribute_table(self):
         '''
@@ -813,6 +817,8 @@ class MainWidget(QDockWidget):
         self.geocoding.feature_done.connect(feature_done)
         self.geocoding.error.connect(
             lambda msg: self.log(msg, level=Qgis.Critical))
+        self.geocoding.warning.connect(
+            lambda msg: self.log(msg, level=Qgis.Warning))
         self.geocoding.finished.connect(self.geocoding_done)
 
         self.inspect_picker.set_layer(self.output_layer)

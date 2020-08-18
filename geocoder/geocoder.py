@@ -336,8 +336,10 @@ class Worker(QThread):
     ----------
     finished : pyqtSignal
         emitted when all tasks are finished, success True/False
+    warning : pyqtSignal
+        emitted on error while working, error message
     error : pyqtSignal
-        emitted on error while working, error messafe
+        emitted on critical error while working, error message
     message : pyqtSignal
         emitted when a message is send, message
     progress : pyqtSignal
@@ -346,6 +348,7 @@ class Worker(QThread):
 
     # available signals to be used in the concrete worker
     finished = pyqtSignal(bool)
+    warning = pyqtSignal(str)
     error = pyqtSignal(str)
     message = pyqtSignal(str)
     progress = pyqtSignal(int)
@@ -394,8 +397,10 @@ class Geocoding(Worker):
     ----------
     finished : pyqtSignal
         emitted when all features are geocoded, success True/False
+    warning : pyqtSignal
+        emitted on error while working, error message
     error : pyqtSignal
-        emitted on error while working, error messafe
+        emitted on error while working, error message
     message : pyqtSignal
         emitted when a message is send, message
     progress : pyqtSignal
@@ -442,12 +447,12 @@ class Geocoding(Worker):
             self.geocoder.reply = None
             if self.is_killed:
                 success = False
-                self.error.emit('Anfrage abgebrochen')
+                self.warning.emit('Anfrage abgebrochen')
                 break
             try:
                 self.process(feature)
             except ValueError as e:
-                self.error.emit(f'Feature {feature.id()} -> {e}')
+                self.warning.emit(f'Feature {feature.id()} -> {e}')
             except RuntimeError as e:
                 raise e
             finally:
