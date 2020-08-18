@@ -83,17 +83,41 @@ RS_PRESETS = [
     ('Freistaat Thüringen', '16*')
 ]
 
-def check(layer):
+
+class LayerWrapper():
     '''
-    check if wrapped layer still excists
+    wrapper for vector layers to prevent errors when wrapped c++ layer is
+    accessed after removal from the QGIS registry and to keep track of the id
+    even after removal
+
+    Attributes
+    ----------
+    id : int
+        the id of the wrapped layer
+    layer : QgsVectorLayer
+        the wrapped vector layer, None if it was already removed from the
+        registry
     '''
-    try:
-        if layer is not None:
-            # call function on layer to check if it still exists
-            layer.id()
-    except RuntimeError:
-        return None
-    return layer
+    def __init__(self, layer: QgsVectorLayer):
+        '''
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            the vector layer to wrap
+        '''
+        self._layer = layer
+        self.id = layer.id()
+
+    @property
+    def layer(self) -> QgsVectorLayer:
+        # check if wrapped layer still excists
+        try:
+            if self._layer is not None:
+                # have to call any function on layer to ensure
+                self._layer.id()
+        except RuntimeError:
+            return None
+        return self._layer
 
 
 class MainWidget(QDockWidget):
@@ -111,14 +135,14 @@ class MainWidget(QDockWidget):
     def __init__(self, parent: QWidget = None):
         super(MainWidget, self).__init__(parent)
         # currently selected output layer
-        self.output_layer = None
+        self.output = None
         # stores which layers are marked as output layers
         self.output_layer_ids = []
 
-        self.input_layer = None
+        self.input = None
         self.label_field_name = None
-        # cache all results for a layer, feature-ids as keys, geojson features
-        # as values
+        # cache all results for a layer, (layer-id, feature-id) as keys,
+        # geojson features as values
         self.result_cache = {}
         # cache field-map settings for layers, layer-ids as keys,
         # FieldMaps as values
@@ -134,9 +158,7 @@ class MainWidget(QDockWidget):
         ui_file = self.ui_file if os.path.exists(self.ui_file) \
             else os.path.join(UI_PATH, self.ui_file)
         uic.loadUi(ui_file, self)
-        self.setAllowedAreas(
-            Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea
-        )
+        self.setAllowedAreas(Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea)
         self.setupUi()
         self.setup_config()
 
@@ -213,6 +235,8 @@ class MainWidget(QDockWidget):
         self._dragged_feature = None
 
         self.setup_crs()
+
+        QgsProject.instance().layersRemoved.connect(self.unregister_layers)
 
     def setup_config(self):
         '''
@@ -293,10 +317,11 @@ class MainWidget(QDockWidget):
         '''
         apply currently set style file to current output layer
         '''
-        if not self.output_layer:
+        layer = self.output.layer if self.output else None
+        if not layer:
             return
         self.canvas.refresh()
-        self.output_layer.loadNamedStyle(config.output_style)
+        layer.loadNamedStyle(config.output_style)
         if self.label_field_name:
             self.apply_label()
 
@@ -305,17 +330,22 @@ class MainWidget(QDockWidget):
         apply the label of the currently selected label field to the output
         layer
         '''
+        layer = self.input.layer if self.input else None
+        if not layer:
+            return
         self.label_field_name = self.label_field_combo.currentData()
-        self.label_cache[self.input_layer.id()] = self.label_field_name
-        if not self.output_layer:
+        self.label_cache[layer.id] = self.label_field_name
+
+        layer = self.output.layer if self.output else None
+        if not layer:
             return
         if not self.label_field_name:
-            self.output_layer.setLabelsEnabled(False)
-            self.output_layer.reload()
+            layer.setLabelsEnabled(False)
+            layer.reload()
             return
 
-        self.output_layer.setLabelsEnabled(True)
-        labeling = self.output_layer.labeling()
+        layer.setLabelsEnabled(True)
+        labeling = layer.labeling()
         if not labeling:
             settings = QgsPalLayerSettings()
             settings.enabled = True
@@ -330,8 +360,8 @@ class MainWidget(QDockWidget):
         settings = labeling.settings()
         settings.fieldName = self.label_field_name
         labeling.setSettings(settings)
-        self.output_layer.setLabeling(labeling)
-        self.output_layer.reload()
+        layer.setLabeling(labeling)
+        layer.reload()
 
     def setup_crs(self):
         '''
@@ -364,18 +394,18 @@ class MainWidget(QDockWidget):
         feature_id : int
             id of the feature to inspect the results of
         '''
-        if not self.output_layer:
+        layer = self.output.layer if self.output else None
+        if not layer:
             return
         # get the results for given feature id from the cache
-        results = self.result_cache.get((self.output_layer.id(), feature_id),
-                                        None)
+        results = self.result_cache.get((layer.id(), feature_id), None)
         # ToDo: warning dialog or pass it to results diag and show warning there
-        if not results or not self.output_layer:
+        if not results:
             return
         # close dialog if there is already one opened
         if self.inspect_dialog:
             self.inspect_dialog.close()
-        feature = self.output_layer.getFeature(feature_id)
+        feature = layer.getFeature(feature_id)
         # fields and their values that were active during search are shown
         # in dialog
         review_fields = [f for f in self.field_map.fields()
@@ -384,7 +414,7 @@ class MainWidget(QDockWidget):
                  if self.label_field_name else '')
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
-            parent=self, crs=self.output_layer.crs().authid(),
+            parent=self, crs=layer.crs().authid(),
             review_fields=review_fields, label=label)
         accepted = self.inspect_dialog.show()
         # set picked result when user accepted
@@ -407,10 +437,12 @@ class MainWidget(QDockWidget):
         point : QgsPointXY
             the position the feature was dragged to
         '''
-        if not self.output_layer:
+
+        layer = self.output.layer if self.output else None
+        if not layer:
             return
 
-        dragged_feature = self.output_layer.getFeature(feature_id)
+        dragged_feature = layer.getFeature(feature_id)
         prev_dragged_id = (self._dragged_feature.id()
                            if self._dragged_feature else None)
         if feature_id != prev_dragged_id:
@@ -418,17 +450,17 @@ class MainWidget(QDockWidget):
                 self.reverse_dialog.close()
             # reset geometry of previously dragged feature
             if prev_dragged_id is not None:
-                self.output_layer.changeGeometry(
+                layer.changeGeometry(
                     prev_dragged_id, self._init_drag_geom)
             # remember initial geometry because geometry of dragged feature
             # will be changed in place
             self._init_drag_geom = dragged_feature.geometry()
             self._dragged_feature = dragged_feature
 
-        crs = self.output_layer.crs().authid()
+        crs = layer.crs().authid()
         url = config.api_url if config.use_api_url else None
 
-        output_crs = self.output_layer.crs()
+        output_crs = layer.crs()
         # point geometry originates from clicking on canvas ->
         # transform into crs of feature
         transform = QgsCoordinateTransform(
@@ -439,10 +471,10 @@ class MainWidget(QDockWidget):
         current_geom = QgsGeometry.fromPointXY(transform.transform(point))
 
         # apply the geometry to the feature
-        self.output_layer.changeGeometry(feature_id, current_geom)
+        layer.changeGeometry(feature_id, current_geom)
 
         # request feature again, otherwise geometry remains be unchanged
-        dragged_feature = self.output_layer.getFeature(feature_id)
+        dragged_feature = layer.getFeature(feature_id)
         bkg_geocoder = BKGGeocoder(key=config.api_key, crs=crs, url=url,
                                    logic_link=config.logic_link)
         rev_geocoding = ReverseGeocoding(bkg_geocoder, [dragged_feature],
@@ -482,13 +514,13 @@ class MainWidget(QDockWidget):
                             geom_only=self.reverse_dialog.geom_only
                             #,apply_adress=not self.reverse_dialog.geom_only
                         )
-                    self.output_layer.changeAttributeValue(
-                        feature_id, self.output_layer.fields().indexFromName(
+                    layer.changeAttributeValue(
+                        feature_id, layer.fields().indexFromName(
                             'manuell_bearbeitet'), True)
                 else:
                     # reset the geometry if rejected
                     try:
-                        self.output_layer.changeGeometry(
+                        layer.changeGeometry(
                             self._dragged_feature.id(), self._init_drag_geom)
                     # catch error when quitting QGIS with dialog opened
                     # (layer is already deleted at this point)
@@ -507,23 +539,70 @@ class MainWidget(QDockWidget):
 
         # do the actual reverse geocoding
         rev_geocoding.feature_done.connect(done)
-        rev_geocoding.work()
+        rev_geocoding.start()
 
     def show_attribute_table(self):
         '''
         open the QGIS attribute table for current output layer
         '''
-        if not self.output_layer:
+        layer = self.output.layer
+        if not self.output.layer:
             return
-        self.iface.showAttributeTable(self.output_layer)
+        self.iface.showAttributeTable(layer)
+
+    def unregister_layers(self, layer_ids: List[str]):
+        '''
+        removes all cached relations to given layers and resets output or
+        input if they are part of the given layer list
+
+        Parameters
+        ----------
+        layer_ids : list
+             list of ids of layers to unregister
+        '''
+        for layer_id in layer_ids:
+            self.field_map_cache.pop(layer_id, None)
+            self.label_cache.pop(layer_id, None)
+            # remove results if layer was output layer
+            if layer_id in self.output_layer_ids:
+                self.output_layer_ids.remove(layer_id)
+                remove_keys = [k for k in self.result_cache.keys()
+                               if k[0] == layer_id]
+                for k in remove_keys:
+                    self.result_cache.pop(k)
+            # current output layer removed -> reset ui
+            if self.output and layer_id == self.output.id:
+                self.reset_output()
+                self.log('Ergebnisse wurden zurückgesetzt, da der '
+                         'Ergebnislayer entfernt wurde.', level=Qgis.Warning)
+            if self.input and layer_id == self.input.id:
+                self.input = None
+
+    def reset_output(self):
+        '''
+        resets the current output to none and disables UI elements connected
+        to the results
+        '''
+        self.output = None
+        self.reverse_picker_button.setEnabled(False)
+        self.inspect_picker_button.setEnabled(False)
+        self.export_csv_button.setEnabled(False)
+        self.attribute_table_button.setEnabled(False)
+        self.reverse_picker.set_active(False)
+        self.inspect_picker.set_active(False)
+        if self.inspect_dialog:
+            self.inspect_dialog.close()
+        if self.reverse_dialog:
+            self.reverse_dialog.close()
 
     def export_csv(self):
         '''
         open the QGIS export dialog
         '''
-        if not self.output_layer:
+        layer = self.output.layer if self.output else None
+        if not layer:
             return
-        self.iface.setActiveLayer(self.output_layer)
+        self.iface.setActiveLayer(layer)
         actions = self.iface.layerMenu().actions()
         for action in actions:
             if action.objectName() == 'mActionLayerSaveAs':
@@ -547,8 +626,8 @@ class MainWidget(QDockWidget):
         '''
         override, emit closing signal
         '''
-        self.reverse_picker.disconnect()
-        self.inspect_picker.disconnect()
+        self.reverse_picker.set_active(False)
+        self.inspect_picker.set_active(False)
         self.closingWidget.emit()
         event.accept()
 
@@ -610,7 +689,7 @@ class MainWidget(QDockWidget):
                     break
             self.layer_combo.setCurrentIndex(idx)
 
-        self.input_layer = layer
+        self.input = LayerWrapper(layer)
 
         # layer can only be updated in place if it has a point geometry
         if layer.wkbType() != QgsWkbTypes.Point:
@@ -699,8 +778,8 @@ class MainWidget(QDockWidget):
 
         # try to set prev. selected field
         label_field = self.label_cache.get(layer.id())
-        if label_field is None and check(self.output_layer):
-            label_field = self.label_cache.get(self.output_layer.id())
+        if label_field is None and self.output and self.output.layer:
+            label_field = self.label_cache.get(self.output.id)
         idx = self.label_field_combo.findData(label_field)
         self.label_field_combo.setCurrentIndex(max(idx, 0))
 
@@ -713,18 +792,19 @@ class MainWidget(QDockWidget):
         encoding : str
             the name of the encoding e.g. 'utf-8'
         '''
-        if not self.input_layer:
+        layer = self.input.layer if self.input else None
+        if not layer:
             return
-        self.input_layer.dataProvider().setEncoding(encoding)
-        self.input_layer.updateFields()
+        layer.dataProvider().setEncoding(encoding)
+        layer.updateFields()
         # repopulate fields
-        self.change_layer(self.input_layer)
+        self.change_layer(layer)
 
     def bkg_geocode(self):
         '''
         start geocoding of input layer with current settings
         '''
-        layer = self.input_layer
+        layer = self.input.layer if self.input else None
         if not layer:
             return
 
@@ -759,28 +839,28 @@ class MainWidget(QDockWidget):
                      u'"Ausgangslayer aktualisieren".\n\n'
                      u'Start abgebrochen...'))
                 return
-            self.output_layer = layer
-            self.output_layer.setCrs(
+            self.output = LayerWrapper(layer)
+            self.output.layer.setCrs(
                 QgsCoordinateReferenceSystem(config.projection))
         # create output layer as a clone of input layer
         else:
-            self.output_layer = clone_layer(
+            self.output = LayerWrapper(clone_layer(
                 layer, name=f'{layer.name()}_ergebnisse',
-                crs=config.projection, features=features)
-            QgsProject.instance().addMapLayer(self.output_layer, False)
+                crs=config.projection, features=features))
+            QgsProject.instance().addMapLayer(self.output.layer, False)
             # add output to same group as input layer
             tree_layer = QgsProject.instance().layerTreeRoot().findLayer(layer)
             group = tree_layer.parent()
-            group.insertLayer(0, self.output_layer)
-            self.output_layer_ids.append(self.output_layer.id())
+            group.insertLayer(0, self.output.layer)
+            self.output_layer_ids.append(self.output.id)
             # cloned layer gets same mapping, it has the same fields
-            cloned_field_map = self.field_map.copy(layer=self.output_layer)
-            self.field_map_cache[self.output_layer.id()] = cloned_field_map
-            self.label_cache[self.output_layer.id()] =\
-                self.label_cache.get(self.input_layer.id())
+            cloned_field_map = self.field_map.copy(layer=self.output.layer)
+            self.field_map_cache[self.output.id] = cloned_field_map
+            self.label_cache[self.output.id] =\
+                self.label_cache.get(layer.id())
             # take features of output layer as input to match the ids of the
             # geocoding
-            features = [f for f in self.output_layer.getFeatures()]
+            features = [f for f in self.output.layer.getFeatures()]
 
         self.apply_label()
 
@@ -826,16 +906,16 @@ class MainWidget(QDockWidget):
             lambda msg: self.log(msg, level=Qgis.Warning))
         self.geocoding.finished.connect(self.geocoding_done)
 
-        self.inspect_picker.set_layer(self.output_layer)
-        self.reverse_picker.set_layer(self.output_layer)
+        self.inspect_picker.set_layer(self.output.layer)
+        self.reverse_picker.set_layer(self.output.layer)
 
         self.tab_widget.setCurrentIndex(2)
 
-        field_names = self.output_layer.fields().names()
+        field_names = self.output.layer.fields().names()
         add_fields = [QgsField(n, q, d) for n, a, q, d in BKG_FIELDS
                       if n not in field_names]
-        self.output_layer.dataProvider().addAttributes(add_fields)
-        self.output_layer.updateFields()
+        self.output.layer.dataProvider().addAttributes(add_fields)
+        self.output.layer.updateFields()
 
         self.request_start_button.setVisible(False)
         self.request_stop_button.setVisible(True)
@@ -866,18 +946,18 @@ class MainWidget(QDockWidget):
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
             # select output layer as current layer
-            self.layer_combo.setLayer(self.output_layer)
+            self.layer_combo.setLayer(self.output.layer)
             # zoom to extent of results
-        extent = self.output_layer.extent()
+        extent = self.output.layer.extent()
         if not extent.isEmpty():
             transform = QgsCoordinateTransform(
-                self.output_layer.crs(),
+                self.output.layer.crs(),
                 self.canvas.mapSettings().destinationCrs(),
                 QgsProject.instance()
             )
             self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
-        self.output_layer.reload()
+        self.output.layer.reload()
         #else:
             #self.progress_bar.setValue(0)
             #QgsProject.instance().removeMapLayer(self.output_layer.id())
@@ -908,7 +988,7 @@ class MainWidget(QDockWidget):
             best = results[0]
         else:
             best = None
-        self.result_cache[self.output_layer.id(), feature.id()] = results
+        self.result_cache[self.output.id, feature.id()] = results
         self.set_bkg_result(feature, best, i=0, n_results=len(results))
 
     def set_bkg_result(self, feature: QgsFeature, result: dict, i: int = -1,
@@ -937,7 +1017,9 @@ class MainWidget(QDockWidget):
         set_edited : bool, optional
             mark feature as manually edited, defaults to mark as not edited
         '''
-        layer = self.output_layer
+        layer = self.output.layer if self.output else None
+        if not layer:
+            return
         if not layer.isEditable():
             layer.startEditing()
         fidx = layer.fields().indexFromName
