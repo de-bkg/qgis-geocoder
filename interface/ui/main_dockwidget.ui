@@ -652,7 +652,7 @@ padding: 2px;
            <item row="1" column="0">
             <widget class="QRadioButton" name="api_key_check">
              <property name="toolTip">
-              <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;</string>
+              <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
              </property>
              <property name="text">
               <string>BKG UUID</string>
