@@ -36,7 +36,8 @@ from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
                        QgsCoordinateTransform, QgsProject, QgsFeature, Qgis,
                        QgsPalLayerSettings, QgsTextFormat, QgsMessageLog,
-                       QgsTextBufferSettings, QgsVectorLayerSimpleLabeling)
+                       QgsTextBufferSettings, QgsVectorLayerSimpleLabeling,
+                       QgsCoordinateReferenceSystem)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget, QWidget, QFileDialog)
 
@@ -757,6 +758,8 @@ class MainWidget(QDockWidget):
                      u'Start abgebrochen...'))
                 return
             self.output_layer = layer
+            self.output_layer.setCrs(
+                QgsCoordinateReferenceSystem(config.projection))
         # create output layer as a clone of input layer
         else:
             self.output_layer = clone_layer(
