@@ -378,6 +378,7 @@ class MainWidget(QDockWidget):
                                   'nicht gültig')
         self.key_error_label.setText(msg)
         self.key_error_label.setVisible(not success)
+        self.request_start_button.setEnabled(success)
         for code, name in available_crs:
             self.output_projection_combo.addItem(f'{name} ({code})', code)
         if current_crs:
