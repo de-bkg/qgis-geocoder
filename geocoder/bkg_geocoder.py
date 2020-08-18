@@ -287,8 +287,6 @@ class BKGGeocoder(Geocoder):
             kwargs.update(self.special_keywords[k].__func__(value, kwargs))
         query += logic.join((f'{k}:({self._escape_special_chars(v)}){suffix}'
                              for k, v in kwargs.items() if v))
-        if self.rs:
-            query = f'({query}) AND rs:{self.rs}'
         return query
 
     def query(self, *args: object, **kwargs: object) -> Reply:
@@ -322,6 +320,8 @@ class BKGGeocoder(Geocoder):
         self.params = {}
         if self.area_wkt:
             self.params['geometry'] = self.area_wkt
+        if self.rs:
+            self.params['filter'] = f'rs:{self.rs}'
         self.params['srsname'] = self.crs
         query = self._build_params(*args, **kwargs)
         if not query:
