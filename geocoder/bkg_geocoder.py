@@ -363,8 +363,11 @@ class BKGGeocoder(Geocoder):
             raise ValueError('interner Serverfehler')
         if reply.status_code == None:
             raise RuntimeError('Service nicht erreichbar')
+        if reply.status_code == 404:
+            raise ValueError(f'Die Seite {reply.url[:30] + "..."} '
+                             'ist nicht erreichbar.')
         if reply.status_code != 200:
-            raise ValueError('unbekannter Fehler')
+            raise ValueError(f'{reply.status_code} unbekannter Fehler')
 
     def reverse(self, x: float, y: float) -> Reply:
         '''
