@@ -243,12 +243,15 @@ class BKGGeocoder(Geocoder):
         # in case users typed in url with the 'geosearch' term in it
         url = url.replace('geosearch', '')
         url += '/index.xml'
+        default = [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
         try:
             res = requests.get(url)
-            parser = CRSParser()
-            parser.feed(res.content.decode("utf-8"))
         except ConnectionError:
-            return False, [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
+            return False, default
+        if res.status_code != 200:
+            return False, default
+        parser = CRSParser()
+        parser.feed(res.content.decode("utf-8"))
         return True, parser.codes
 
     def _escape_special_chars(self, text) -> str:
@@ -284,8 +287,6 @@ class BKGGeocoder(Geocoder):
             kwargs.update(self.special_keywords[k].__func__(value, kwargs))
         query += logic.join((f'{k}:({self._escape_special_chars(v)}){suffix}'
                              for k, v in kwargs.items() if v))
-        if self.rs:
-            query = f'({query}) AND rs:{self.rs}'
         return query
 
     def query(self, *args: object, **kwargs: object) -> Reply:
@@ -319,6 +320,8 @@ class BKGGeocoder(Geocoder):
         self.params = {}
         if self.area_wkt:
             self.params['geometry'] = self.area_wkt
+        if self.rs:
+            self.params['filter'] = f'rs:{self.rs}'
         self.params['srsname'] = self.crs
         query = self._build_params(*args, **kwargs)
         if not query:
@@ -360,11 +363,16 @@ class BKGGeocoder(Geocoder):
                 message = self.exception_codes.get(parser.error)
                 raise RuntimeError(message)
         if reply.status_code == 500:
-            raise ValueError('interner Serverfehler')
+            raise ValueError('500 - interner Serverfehler')
         if reply.status_code == None:
-            raise RuntimeError('Service nicht erreichbar')
+            raise RuntimeError(f'Service "{reply.url[:30] + "..."}" nicht '
+                               'erreichbar. Bitte überprüfen Sie die '
+                               'eingegebene Dienst-URL.')
+        if reply.status_code == 404:
+            raise ValueError(
+                f'404 - "{reply.url[:30] + "..."}" nicht gefunden.')
         if reply.status_code != 200:
-            raise ValueError('unbekannter Fehler')
+            raise ValueError(f'{reply.status_code} - unbekannter Fehler')
 
     def reverse(self, x: float, y: float) -> Reply:
         '''

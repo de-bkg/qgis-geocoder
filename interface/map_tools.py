@@ -82,7 +82,11 @@ class MapTool:
         '''
         disconnect the tool from the map canvas
         '''
-        self.canvas.mapToolSet.disconnect(self.disconnect)
+        try:
+            self.canvas.mapToolSet.disconnect(self.disconnect)
+        # raised when not connected
+        except TypeError:
+            pass
         self.set_active(False)
 
 

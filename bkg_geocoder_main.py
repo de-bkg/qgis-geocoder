@@ -102,8 +102,8 @@ class BKGGeocoderPlugin:
             del self.toolbar
         # remove widget
         if self.mainwidget:
-            self.mainwidget.close()
             self.iface.removeDockWidget(self.mainwidget)
+            self.mainwidget.close()
             self.mainwidget.deleteLater()
             self.mainwidget = None
         self.pluginIsActive = False
