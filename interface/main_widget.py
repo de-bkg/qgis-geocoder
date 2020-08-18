@@ -547,6 +547,8 @@ class MainWidget(QDockWidget):
         '''
         override, emit closing signal
         '''
+        self.reverse_picker.disconnect()
+        self.inspect_picker.disconnect()
         self.closingWidget.emit()
         event.accept()
 
