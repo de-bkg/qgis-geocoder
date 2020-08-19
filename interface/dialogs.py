@@ -268,6 +268,7 @@ class InspectResultsDialog(Dialog):
                 QgsProject.instance()
             )
             self.canvas.setExtent(transform.transform(extent))
+            self.canvas.zoomByFactor(1.5)
         self.canvas.refresh()
 
     def _toggle_result(self, n, feature: QgsFeature):
