@@ -27,6 +27,7 @@ __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 import os
 import webbrowser
+import re
 
 from typing import List
 from qgis.PyQt import uic
@@ -213,8 +214,18 @@ class MainWidget(QDockWidget):
             self.rs_combo.addItem(name, rs)
         self.rs_combo.currentIndexChanged.connect(
             lambda: self.rs_edit.setText(self.rs_combo.currentData()))
-        self.rs_edit.editingFinished.connect(
-            lambda: self.rs_combo.setCurrentIndex(0))
+        def rs_finished():
+            self.rs_combo.blockSignals(True)
+            self.rs_combo.setCurrentIndex(0)
+            self.rs_combo.blockSignals(False)
+        self.rs_edit.editingFinished.connect(rs_finished)
+        def set_rs(rs):
+            valid = self.check_rs(rs)
+            self.rs_error_label.setVisible(
+                not valid and self.use_rs_check.isChecked())
+        self.rs_edit.textChanged.connect(set_rs)
+        self.use_rs_check.toggled.connect(
+            lambda: set_rs(self.rs_edit.text()))
 
         # connect map tools
         self.inspect_picker = FeaturePicker(
@@ -362,6 +373,25 @@ class MainWidget(QDockWidget):
         labeling.setSettings(settings)
         layer.setLabeling(labeling)
         layer.reload()
+
+    def check_rs(self, rs: str) -> bool:
+        '''
+        validate the given "Regionalschlüssel"
+
+        Parameters
+        ----------
+        rs: str
+            "Regionalschlüssel" to validate
+
+        Returns
+        -------
+        bool
+            True if valid, False if not valid
+        '''
+        if not text:
+            return False
+        regex = '^[01]\d{0,11}\*?$'
+        return re.match(regex, text) is not None
 
     def setup_crs(self):
         '''
@@ -822,7 +852,14 @@ class MainWidget(QDockWidget):
                  u'Start abgebrochen...'))
             return
 
-        rs = config.rs if self.use_rs_check.isChecked() else None
+        rs = None
+        if self.use_rs_check.isChecked():
+            valid = self.check_rs(config.rs)
+            if not valid:
+                self.log('Der Regionalschlüssel ist ungültig und wird '
+                         'ignoriert.', level=Qgis.Warning)
+            else:
+                rs = config.rs
 
         features = layer.selectedFeatures() \
             if config.selected_features_only else layer.getFeatures()
@@ -959,10 +996,6 @@ class MainWidget(QDockWidget):
             self.canvas.setExtent(transform.transform(extent))
         self.canvas.refresh()
         self.output.layer.reload()
-        #else:
-            #self.progress_bar.setValue(0)
-            #QgsProject.instance().removeMapLayer(self.output_layer.id())
-            #self.output_layer = None
         self.timer.stop()
 
         # update the states of the buttons
