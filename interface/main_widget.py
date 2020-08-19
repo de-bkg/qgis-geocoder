@@ -118,6 +118,8 @@ class MainWidget(QDockWidget):
         self.inspect_dialog = None
         self.reverse_dialog = None
 
+        self.geocoding = None
+
         self.iface = utils.iface
         self.canvas = self.iface.mapCanvas()
         ui_file = self.ui_file if os.path.exists(self.ui_file) \
@@ -556,6 +558,7 @@ class MainWidget(QDockWidget):
         layer_ids : list
              list of ids of layers to unregister
         '''
+        io_removed = False
         for layer_id in layer_ids:
             self.field_map_cache.pop(layer_id, None)
             self.label_cache.pop(layer_id, None)
@@ -569,10 +572,16 @@ class MainWidget(QDockWidget):
             # current output layer removed -> reset ui
             if self.output and layer_id == self.output.id:
                 self.reset_output()
+                io_removed = True
                 self.log('Ergebnisse wurden zurückgesetzt, da der '
                          'Ergebnislayer entfernt wurde.', level=Qgis.Warning)
             if self.input and layer_id == self.input.id:
                 self.input = None
+                io_removed = True
+        if io_removed and self.geocoding:
+            self.geocoding.kill()
+            self.log('Eingabe-/Ausgabelayer wurden während des '
+                     'Geocodings gelöscht. Breche ab...', level=Qgis.Critical)
 
     def reset_output(self):
         '''
@@ -867,8 +876,8 @@ class MainWidget(QDockWidget):
 
         self.apply_label()
 
-        #layer.
-        #self.output.layer.
+        layer.setReadOnly(True)
+        self.output.layer.setReadOnly(True)
 
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():
@@ -902,7 +911,9 @@ class MainWidget(QDockWidget):
             results = r.json()['features']
             message = (f'{label} -> <b>{len(results)} </b> Ergebnis(se)')
             self.log(message, level=Qgis.Info)
+            self.output.layer.setReadOnly(False)
             self.store_bkg_results(f, results)
+            self.output.layer.setReadOnly(True)
 
         self.geocoding.progress.connect(self.progress_bar.setValue)
         self.geocoding.feature_done.connect(feature_done)
@@ -949,6 +960,11 @@ class MainWidget(QDockWidget):
         success : bool
             whether the geocoding was run successfully without errors or not
         '''
+        self.geocoding = None
+        if not self.input or not self.output:
+            return
+        self.input.layer.setReadOnly(False)
+        self.output.layer.setReadOnly(False)
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
             # select output layer as current layer
@@ -986,6 +1002,8 @@ class MainWidget(QDockWidget):
         results : list
             the geojson feature list of all matches returned by the BKG geocoder
         '''
+        if not self.output:
+            return
         if results:
             results.sort(key=lambda x: x['properties']['score'], reverse=True)
             best = results[0]

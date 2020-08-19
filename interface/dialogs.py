@@ -220,7 +220,9 @@ class InspectResultsDialog(Dialog):
         ])
         project = QgsProject.instance()
         project.addMapLayer(self.preview_layer.layer, False)
-        project.layerTreeRoot().insertLayer(0, self.preview_layer.layer)
+        root = project.layerTreeRoot()
+        tree_layer = root.insertLayer(0, self.preview_layer.layer)
+        tree_layer.setExpanded(False)
 
     def _add_results(self, preselect: int = -1, row_number: int = 0):
         '''
