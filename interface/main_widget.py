@@ -44,7 +44,7 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 
 from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
-from .utils import (clone_layer, TopPlusOpen, get_geometries,
+from .utils import (clone_layer, TopPlusOpen, get_geometries, LayerWrapper,
                     clear_layout)
 from bkggeocoder.geocoder.bkg_geocoder import BKGGeocoder
 from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
@@ -83,42 +83,6 @@ RS_PRESETS = [
     ('Sachsen-Anhalt', '15*'),
     ('Freistaat Thüringen', '16*')
 ]
-
-
-class LayerWrapper():
-    '''
-    wrapper for vector layers to prevent errors when wrapped c++ layer is
-    accessed after removal from the QGIS registry and to keep track of the id
-    even after removal
-
-    Attributes
-    ----------
-    id : int
-        the id of the wrapped layer
-    layer : QgsVectorLayer
-        the wrapped vector layer, None if it was already removed from the
-        registry
-    '''
-    def __init__(self, layer: QgsVectorLayer):
-        '''
-        Parameters
-        ----------
-        layer : QgsVectorLayer
-            the vector layer to wrap
-        '''
-        self._layer = layer
-        self.id = layer.id()
-
-    @property
-    def layer(self) -> QgsVectorLayer:
-        # check if wrapped layer still excists
-        try:
-            if self._layer is not None:
-                # have to call any function on layer to ensure
-                self._layer.id()
-        except RuntimeError:
-            return None
-        return self._layer
 
 
 class MainWidget(QDockWidget):
@@ -388,10 +352,10 @@ class MainWidget(QDockWidget):
         bool
             True if valid, False if not valid
         '''
-        if not text:
+        if not rs:
             return False
         regex = '^[01]\d{0,11}\*?$'
-        return re.match(regex, text) is not None
+        return re.match(regex, rs) is not None
 
     def setup_crs(self):
         '''
@@ -444,7 +408,8 @@ class MainWidget(QDockWidget):
         label = (feature.attribute(self.label_field_name)
                  if self.label_field_name else '')
         self.inspect_dialog = InspectResultsDialog(
-            feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
+            feature, results, self.canvas,
+            preselect=feature.attribute('bkg_i'),
             parent=self, crs=layer.crs().authid(),
             review_fields=review_fields, label=label)
         accepted = self.inspect_dialog.show()
@@ -902,6 +867,9 @@ class MainWidget(QDockWidget):
 
         self.apply_label()
 
+        #layer.
+        #self.output.layer.
+
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():
             spatial_layer = self.spatial_filter_combo.currentLayer()
@@ -985,7 +953,7 @@ class MainWidget(QDockWidget):
             self.log('Geokodierung erfolgreich abgeschlossen')
             # select output layer as current layer
             self.layer_combo.setLayer(self.output.layer)
-            # zoom to extent of results
+        # zoom to extent of results
         extent = self.output.layer.extent()
         if not extent.isEmpty():
             transform = QgsCoordinateTransform(
@@ -994,6 +962,7 @@ class MainWidget(QDockWidget):
                 QgsProject.instance()
             )
             self.canvas.setExtent(transform.transform(extent))
+            self.canvas.zoomByFactor(1.2)
         self.canvas.refresh()
         self.output.layer.reload()
         self.timer.stop()
