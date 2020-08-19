@@ -633,6 +633,7 @@ class MainWidget(QDockWidget):
         '''
         self.reverse_picker.set_active(False)
         self.inspect_picker.set_active(False)
+        self.iface.removeDockWidget(self)
         self.closingWidget.emit()
         event.accept()
 
