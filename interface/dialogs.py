@@ -30,15 +30,15 @@ from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
-                       QgsField, QgsProject,
-                       QgsCategorizedSymbolRenderer, QgsRendererCategory,
+                       QgsField, QgsProject, QgsCategorizedSymbolRenderer,
                        QgsMarkerSymbol, QgsRasterMarkerSymbolLayer,
-                       QgsRectangle, QgsCoordinateTransform)
+                       QgsRectangle, QgsCoordinateTransform,
+                       QgsRendererCategory)
 from qgis.gui import QgsMapCanvas
 import os
 
 from typing import List
-from bkggeocoder.interface.utils import clear_layout
+from bkggeocoder.interface.utils import clear_layout, LayerWrapper
 from bkggeocoder.config import UI_PATH, Config, ICON_PATH
 
 config = Config()
@@ -194,8 +194,8 @@ class InspectResultsDialog(Dialog):
         '''
         set up the layer to show the results on
         '''
-        self.preview_layer = QgsVectorLayer(
-            f'Point?crs={self.crs}', 'results_tmp', 'memory')
+        self.preview_layer = LayerWrapper(QgsVectorLayer(
+            f'Point?crs={self.crs}', 'results_tmp', 'memory'))
 
         renderer = QgsCategorizedSymbolRenderer('i')
         for i in range(1, len(self.results) + 1):
@@ -210,21 +210,25 @@ class InspectResultsDialog(Dialog):
                 symbol.appendSymbolLayer(symbol_layer)
             category.setSymbol(symbol)
             renderer.addCategory(category)
-        self.preview_layer.setRenderer(renderer)
+        self.preview_layer.layer.setRenderer(renderer)
 
-        self.preview_layer.startEditing()
-        provider = self.preview_layer.dataProvider()
+        self.preview_layer.layer.startEditing()
+        provider = self.preview_layer.layer.dataProvider()
         provider.addAttributes([
             QgsField('i',  QVariant.Int),
             QgsField('text', QVariant.String)
         ])
-        QgsProject.instance().addMapLayer(self.preview_layer)
+        project = QgsProject.instance()
+        project.addMapLayer(self.preview_layer.layer, False)
+        root = project.layerTreeRoot()
+        tree_layer = root.insertLayer(0, self.preview_layer.layer)
+        tree_layer.setExpanded(False)
 
     def _add_results(self, preselect: int = -1, row_number: int = 0):
         '''
         adds results to the map canvas and to the result list of the dialog
         '''
-        provider = self.preview_layer.dataProvider()
+        provider = self.preview_layer.layer.dataProvider()
 
         for i, result in enumerate(self.results):
             feature = QgsFeature()
@@ -259,15 +263,16 @@ class InspectResultsDialog(Dialog):
             if i == preselect:
                 radio.setChecked(True)
 
-        self.preview_layer.commitChanges()
-        extent = self.preview_layer.extent()
+        self.preview_layer.layer.commitChanges()
+        extent = self.preview_layer.layer.extent()
         if not extent.isEmpty():
             transform = QgsCoordinateTransform(
-                self.preview_layer.crs(),
+                self.preview_layer.layer.crs(),
                 self.canvas.mapSettings().destinationCrs(),
                 QgsProject.instance()
             )
             self.canvas.setExtent(transform.transform(extent))
+            self.canvas.zoomByFactor(1.5)
         self.canvas.refresh()
 
     def _toggle_result(self, n, feature: QgsFeature):
@@ -277,9 +282,10 @@ class InspectResultsDialog(Dialog):
         '''
         self.result = self.results[n]
         self.i = n
-        self.preview_layer.removeSelection()
-        self.preview_layer.select(feature.id())
-        self._zoom_to(feature)
+        if self.preview_layer.layer:
+            self.preview_layer.layer.removeSelection()
+            self.preview_layer.layer.select(feature.id())
+            self._zoom_to(feature)
 
     def _zoom_to(self, feature):
         '''
@@ -289,7 +295,7 @@ class InspectResultsDialog(Dialog):
         point = feature.geometry().asPoint()
         rect = QgsRectangle(point, point)
         transform = QgsCoordinateTransform(
-            self.preview_layer.crs(),
+            self.preview_layer.layer.crs(),
             self.canvas.mapSettings().destinationCrs(),
             QgsProject.instance()
         )
@@ -300,14 +306,16 @@ class InspectResultsDialog(Dialog):
         '''
         override clicking ok button
         '''
-        QgsProject.instance().removeMapLayer(self.preview_layer.id())
+        if self.preview_layer.layer:
+            QgsProject.instance().removeMapLayer(self.preview_layer.id())
         super().accept()
 
     def reject(self):
         '''
         override clicking cancel button
         '''
-        QgsProject.instance().removeMapLayer(self.preview_layer.id())
+        if self.preview_layer.layer:
+            QgsProject.instance().removeMapLayer(self.preview_layer.id())
         super().reject()
 
     def showEvent(self, e):

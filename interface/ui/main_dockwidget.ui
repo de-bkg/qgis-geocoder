@@ -431,7 +431,7 @@ padding: 2px;
               <string notr="true">color: red;</string>
              </property>
              <property name="text">
-              <string>Der eingegebene Regionalschlüssel ist nicht gültig'</string>
+              <string>Der eingegebene Regionalschlüssel ist nicht gültig</string>
              </property>
             </widget>
            </item>
@@ -734,7 +734,7 @@ padding: 2px;
               </spacer>
              </item>
              <item>
-              <widget class="QCheckBox" name="fuzzysearch_checkbox">
+              <widget class="QCheckBox" name="fuzzy_check">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>

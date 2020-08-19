@@ -86,8 +86,6 @@ class BKGGeocoderPlugin:
         '''
         # disconnects
         self.mainwidget.closingWidget.disconnect(self.onClosePlugin)
-        self.mainwidget.close()
-
         self.pluginIsActive = False
 
     def unload(self):
@@ -102,7 +100,6 @@ class BKGGeocoderPlugin:
             del self.toolbar
         # remove widget
         if self.mainwidget:
-            self.iface.removeDockWidget(self.mainwidget)
             self.mainwidget.close()
             self.mainwidget.deleteLater()
             self.mainwidget = None

@@ -33,6 +33,43 @@ from qgis.PyQt.QtCore import (QUrl, QEventLoop, QTimer, QUrlQuery,
                               QObject, pyqtSignal)
 import json
 
+
+class LayerWrapper():
+    '''
+    wrapper for vector layers to prevent errors when wrapped c++ layer is
+    accessed after removal from the QGIS registry and to keep track of the id
+    even after removal
+
+    Attributes
+    ----------
+    id : int
+        the id of the wrapped layer
+    layer : QgsVectorLayer
+        the wrapped vector layer, None if it was already removed from the
+        registry
+    '''
+    def __init__(self, layer: QgsVectorLayer):
+        '''
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            the vector layer to wrap
+        '''
+        self._layer = layer
+        self.id = layer.id()
+
+    @property
+    def layer(self) -> QgsVectorLayer:
+        # check if wrapped layer still excists
+        try:
+            if self._layer is not None:
+                # have to call any function on layer to ensure
+                self._layer.id()
+        except RuntimeError:
+            return None
+        return self._layer
+
+
 def clear_layout(layout: QLayout):
     '''
     empties layout by removing children and grand-children (complete hierarchy)

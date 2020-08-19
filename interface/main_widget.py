@@ -44,7 +44,7 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 
 from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
-from .utils import (clone_layer, TopPlusOpen, get_geometries,
+from .utils import (clone_layer, TopPlusOpen, get_geometries, LayerWrapper,
                     clear_layout)
 from bkggeocoder.geocoder.bkg_geocoder import BKGGeocoder
 from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
@@ -85,42 +85,6 @@ RS_PRESETS = [
 ]
 
 
-class LayerWrapper():
-    '''
-    wrapper for vector layers to prevent errors when wrapped c++ layer is
-    accessed after removal from the QGIS registry and to keep track of the id
-    even after removal
-
-    Attributes
-    ----------
-    id : int
-        the id of the wrapped layer
-    layer : QgsVectorLayer
-        the wrapped vector layer, None if it was already removed from the
-        registry
-    '''
-    def __init__(self, layer: QgsVectorLayer):
-        '''
-        Parameters
-        ----------
-        layer : QgsVectorLayer
-            the vector layer to wrap
-        '''
-        self._layer = layer
-        self.id = layer.id()
-
-    @property
-    def layer(self) -> QgsVectorLayer:
-        # check if wrapped layer still excists
-        try:
-            if self._layer is not None:
-                # have to call any function on layer to ensure
-                self._layer.id()
-        except RuntimeError:
-            return None
-        return self._layer
-
-
 class MainWidget(QDockWidget):
     '''
     the dockable main widget
@@ -153,6 +117,8 @@ class MainWidget(QDockWidget):
 
         self.inspect_dialog = None
         self.reverse_dialog = None
+
+        self.geocoding = None
 
         self.iface = utils.iface
         self.canvas = self.iface.mapCanvas()
@@ -260,6 +226,9 @@ class MainWidget(QDockWidget):
             lambda: setattr(config, 'logic_link', 'AND'))
         self.search_or_check.toggled.connect(
             lambda: setattr(config, 'logic_link', 'OR'))
+        self.fuzzy_check.setChecked(config.fuzzy)
+        self.fuzzy_check.toggled.connect(
+            lambda checked: setattr(config, 'fuzzy', checked))
 
         # API key and url
         self.api_key_edit.setText(config.api_key)
@@ -388,10 +357,10 @@ class MainWidget(QDockWidget):
         bool
             True if valid, False if not valid
         '''
-        if not text:
+        if not rs:
             return False
         regex = '^[01]\d{0,11}\*?$'
-        return re.match(regex, text) is not None
+        return re.match(regex, rs) is not None
 
     def setup_crs(self):
         '''
@@ -444,7 +413,8 @@ class MainWidget(QDockWidget):
         label = (feature.attribute(self.label_field_name)
                  if self.label_field_name else '')
         self.inspect_dialog = InspectResultsDialog(
-            feature, results, self.canvas, preselect=feature.attribute('bkg_i'),
+            feature, results, self.canvas,
+            preselect=feature.attribute('bkg_i'),
             parent=self, crs=layer.crs().authid(),
             review_fields=review_fields, label=label)
         accepted = self.inspect_dialog.show()
@@ -591,6 +561,7 @@ class MainWidget(QDockWidget):
         layer_ids : list
              list of ids of layers to unregister
         '''
+        io_removed = False
         for layer_id in layer_ids:
             self.field_map_cache.pop(layer_id, None)
             self.label_cache.pop(layer_id, None)
@@ -604,10 +575,16 @@ class MainWidget(QDockWidget):
             # current output layer removed -> reset ui
             if self.output and layer_id == self.output.id:
                 self.reset_output()
+                io_removed = True
                 self.log('Ergebnisse wurden zurückgesetzt, da der '
                          'Ergebnislayer entfernt wurde.', level=Qgis.Warning)
             if self.input and layer_id == self.input.id:
                 self.input = None
+                io_removed = True
+        if io_removed and self.geocoding:
+            self.geocoding.kill()
+            self.log('Eingabe-/Ausgabelayer wurden während des '
+                     'Geocodings gelöscht. Breche ab...', level=Qgis.Critical)
 
     def reset_output(self):
         '''
@@ -659,6 +636,7 @@ class MainWidget(QDockWidget):
         '''
         self.reverse_picker.set_active(False)
         self.inspect_picker.set_active(False)
+        self.iface.removeDockWidget(self)
         self.closingWidget.emit()
         event.accept()
 
@@ -902,6 +880,9 @@ class MainWidget(QDockWidget):
 
         self.apply_label()
 
+        layer.setReadOnly(True)
+        self.output.layer.setReadOnly(True)
+
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():
             spatial_layer = self.spatial_filter_combo.currentLayer()
@@ -919,7 +900,7 @@ class MainWidget(QDockWidget):
 
         bkg_geocoder = BKGGeocoder(key=config.api_key, crs=config.projection,
                                    url=url, logic_link=config.logic_link, rs=rs,
-                                   area_wkt=area_wkt)
+                                   area_wkt=area_wkt, fuzzy=config.fuzzy)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
@@ -934,7 +915,9 @@ class MainWidget(QDockWidget):
             results = r.json()['features']
             message = (f'{label} -> <b>{len(results)} </b> Ergebnis(se)')
             self.log(message, level=Qgis.Info)
+            self.output.layer.setReadOnly(False)
             self.store_bkg_results(f, results)
+            self.output.layer.setReadOnly(True)
 
         self.geocoding.progress.connect(self.progress_bar.setValue)
         self.geocoding.feature_done.connect(feature_done)
@@ -981,11 +964,16 @@ class MainWidget(QDockWidget):
         success : bool
             whether the geocoding was run successfully without errors or not
         '''
+        self.geocoding = None
+        if not self.input or not self.output:
+            return
+        self.input.layer.setReadOnly(False)
+        self.output.layer.setReadOnly(False)
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
             # select output layer as current layer
             self.layer_combo.setLayer(self.output.layer)
-            # zoom to extent of results
+        # zoom to extent of results
         extent = self.output.layer.extent()
         if not extent.isEmpty():
             transform = QgsCoordinateTransform(
@@ -994,6 +982,7 @@ class MainWidget(QDockWidget):
                 QgsProject.instance()
             )
             self.canvas.setExtent(transform.transform(extent))
+            self.canvas.zoomByFactor(1.2)
         self.canvas.refresh()
         self.output.layer.reload()
         self.timer.stop()
@@ -1017,6 +1006,8 @@ class MainWidget(QDockWidget):
         results : list
             the geojson feature list of all matches returned by the BKG geocoder
         '''
+        if not self.output:
+            return
         if results:
             results.sort(key=lambda x: x['properties']['score'], reverse=True)
             best = results[0]
