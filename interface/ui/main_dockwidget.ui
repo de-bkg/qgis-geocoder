@@ -426,6 +426,16 @@ padding: 2px;
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="rs_error_label">
+             <property name="styleSheet">
+              <string notr="true">color: red;</string>
+             </property>
+             <property name="text">
+              <string>Der eingegebene Regionalschlüssel ist nicht gültig'</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <property name="spacing">
               <number>6</number>
