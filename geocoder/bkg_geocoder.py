@@ -131,6 +131,7 @@ class BKGGeocoder(Geocoder):
 
     special_characters = ['+', '&&', '||', '!', '(', ')', '{', '}',
                           '[', ']', '^', '"', '~', '*', '?', ':']
+    fuzzy_distance = 0.5
 
     @staticmethod
     def split_code_city(value: str, kwargs: dict) -> dict:
@@ -186,7 +187,7 @@ class BKGGeocoder(Geocoder):
             wkt text describing a (multi-)polygon, restrict results to be in
             this area, defaults to no restriction
         fuzzy : bool, optional
-            fuzzy search, the terms don't have to match exactly if set True,
+            fuzzy search, the terms don't have to match exactly if set to True,
             defaults to not using fuzzy search
         '''
         if not key and not url:
@@ -270,14 +271,23 @@ class BKGGeocoder(Geocoder):
         '''
         for char in self.special_characters:
             text = text.replace(char, r'\{}'.format(char))
-        return text
+        return text.rstrip().lstrip()
+
+    def _add_fuzzy(self, text: str) -> str:
+        '''decorate text with fuzzy operators'''
+        if not self.fuzzy or not text:
+            return text
+        terms = text.rstrip().lstrip().split(' ')
+        operator = f'~{self.fuzzy_distance} '
+        fuzzy = operator.join(terms) + operator
+        return fuzzy.rstrip()
 
     def _build_params(self, *args: object, **kwargs: object) -> str:
         '''builds a query string from given parameters'''
-        suffix = '~' if self.fuzzy else ''
         logic = f' {self.logic_link} '
-        query = logic.join([f'"{self._escape_special_chars(a)}"{suffix}'
-                            for a in args if a]) or ''
+        query = logic.join(
+            [f'"{self._add_fuzzy(self._escape_special_chars(a))}"'
+             for a in args if a]) or ''
         if args and kwargs:
             query += logic
         # pop and process the special keywords
@@ -285,8 +295,9 @@ class BKGGeocoder(Geocoder):
         for k in special:
             value = kwargs.pop(k)
             kwargs.update(self.special_keywords[k].__func__(value, kwargs))
-        query += logic.join((f'{k}:({self._escape_special_chars(v)}){suffix}'
-                             for k, v in kwargs.items() if v))
+        query += logic.join(
+            (f'{k}:({self._add_fuzzy(self._escape_special_chars(v))})'
+             for k, v in kwargs.items() if v))
         return query
 
     def query(self, *args: object, **kwargs: object) -> Reply:

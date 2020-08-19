@@ -226,6 +226,9 @@ class MainWidget(QDockWidget):
             lambda: setattr(config, 'logic_link', 'AND'))
         self.search_or_check.toggled.connect(
             lambda: setattr(config, 'logic_link', 'OR'))
+        self.fuzzy_check.setChecked(config.fuzzy)
+        self.fuzzy_check.toggled.connect(
+            lambda checked: setattr(config, 'fuzzy', checked))
 
         # API key and url
         self.api_key_edit.setText(config.api_key)
@@ -897,7 +900,7 @@ class MainWidget(QDockWidget):
 
         bkg_geocoder = BKGGeocoder(key=config.api_key, crs=config.projection,
                                    url=url, logic_link=config.logic_link, rs=rs,
-                                   area_wkt=area_wkt)
+                                   area_wkt=area_wkt, fuzzy=config.fuzzy)
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
