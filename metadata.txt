@@ -29,6 +29,7 @@ repository=https://github.com/ChrFr/qgis-geocoder
       - Überprüfung des Schlüssels nach Eingabe
       - optionaler Debug-Logger
       - überarbeiteter Regionalschlüsselfilter
+      - wiederholte Verbindungsversuche und Abbruch bei Verbindungsproblemen mit dem Dienst
 
       Bugfixes
       - Fehler bei Zuweisung der Adressfelder behoben
