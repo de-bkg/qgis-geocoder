@@ -971,8 +971,8 @@ class MainWidget(QDockWidget):
         self.output.layer.setReadOnly(False)
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
-            # select output layer as current layer
-            self.layer_combo.setLayer(self.output.layer)
+        # select output layer as current layer
+        self.layer_combo.setLayer(self.output.layer)
         # zoom to extent of results
         extent = self.output.layer.extent()
         if not extent.isEmpty():
