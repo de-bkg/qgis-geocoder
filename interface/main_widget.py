@@ -86,6 +86,14 @@ RS_PRESETS = [
     ('Freistaat Thüringen', '16*')
 ]
 
+def field_comp(layer: QgsVectorLayer, field_name: str) -> str:
+    '''return compatible field name depending on data provider (looking at
+    you ESRI)'''
+    provider_type = layer.dataProvider().storageType()
+    if provider_type == 'ESRI Shapefile':
+        field_name = field_name[:10]
+    return field_name
+
 
 class MainWidget(QDockWidget):
     '''
@@ -528,7 +536,7 @@ class MainWidget(QDockWidget):
                         )
                     layer.changeAttributeValue(
                         feature_id, layer.fields().indexFromName(
-                            'manuell_bearbeitet'), True)
+                            field_comp(layer, 'manuell_bearbeitet')), True)
                 else:
                     # reset the geometry if rejected
                     try:
@@ -731,7 +739,7 @@ class MainWidget(QDockWidget):
 
         # get field map with previous settings if layer was already used as
         # input before
-        bkg_f = [f[0] for f in BKG_FIELDS]
+        bkg_f = [field_comp(layer, f[0]) for f in BKG_FIELDS]
         self.field_map = self.field_map_cache.get(layer.id(), None)
         if not self.field_map or not self.field_map.valid(layer):
             # if no field map was set yet, create it with the known BKG
@@ -789,7 +797,7 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(True)
         self.label_field_combo.clear()
         self.label_field_combo.addItem('kein Label')
-        aliases = {n: a for n, a, q, d in BKG_FIELDS}
+        aliases = {field_comp(layer, n): a for n, a, q, d in BKG_FIELDS}
         for field in layer.fields():
             field_name = field.name()
             alias = aliases.get(field_name)
@@ -971,7 +979,7 @@ class MainWidget(QDockWidget):
 
         field_names = self.output.layer.fields().names()
         add_fields = [QgsField(n, q, d) for n, a, q, d in BKG_FIELDS
-                      if n not in field_names]
+                      if field_comp(self.output.layer, n) not in field_names]
         self.output.layer.dataProvider().addAttributes(add_fields)
         self.output.layer.updateFields()
 
@@ -1084,7 +1092,11 @@ class MainWidget(QDockWidget):
             return
         if not layer.isEditable():
             layer.startEditing()
-        fidx = layer.fields().indexFromName
+
+        fields = layer.fields()
+        def get_field_idx(field_name):
+            return fields.indexFromName(field_comp(layer, field_name))
+
         feat_id = feature.id()
         if result:
             coords = result['geometry']['coordinates']
@@ -1097,18 +1109,19 @@ class MainWidget(QDockWidget):
                     if value is not None:
                         # property gets prefix bkg_ in layer
                         layer.changeAttributeValue(
-                            feat_id, fidx(f'bkg_{prop}'), value)
+                            feat_id, get_field_idx(f'bkg_{prop}'), value)
                 if n_results:
                     layer.changeAttributeValue(
-                        feat_id, fidx('bkg_n_results'), n_results)
-            layer.changeAttributeValue(feat_id, fidx('bkg_i'), i)
+                        feat_id, get_field_idx('bkg_n_results'), n_results)
+            layer.changeAttributeValue(feat_id, get_field_idx('bkg_i'), i)
         else:
             layer.changeAttributeValue(
-                feat_id, fidx('bkg_typ'), '')
+                feat_id, get_field_idx('bkg_typ'), '')
             layer.changeAttributeValue(
-                feat_id, fidx('bkg_score'), 0)
+                feat_id, get_field_idx('bkg_score'), 0)
         layer.changeAttributeValue(
-            feat_id, fidx('manuell_bearbeitet'), set_edited)
+            feat_id, get_field_idx('manuell_bearbeitet'), set_edited)
+        layer.commitChanges()
 
     def show_help(self, tag: str = ''):
         '''
