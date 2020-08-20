@@ -551,6 +551,19 @@ padding: 2px;
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="spatial_error_label">
+             <property name="styleSheet">
+              <string notr="true">color: red;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <property name="topMargin">
               <number>0</number>
@@ -598,7 +611,29 @@ padding: 2px;
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beschränken Sie die Suche weiter auf lediglich die selektierten Objekte des gewählten Layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>nur selektierte Objekte nutzen</string>
+                <string>nur selektierte 
+Objekte nutzen</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="n_spatial_seclected_label">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="reload_spatial_button">
+               <property name="toolTip">
+                <string>&lt;p&gt;Überprüfung des räumlichen Filters.&lt;/p&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</iconset>
                </property>
               </widget>
              </item>
@@ -621,25 +656,8 @@ padding: 2px;
           <property name="saveCollapsedState">
            <bool>false</bool>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="api_key_edit">
-             <property name="toolTip">
-              <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QRadioButton" name="api_url_check">
-             <property name="toolTip">
-              <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;</string>
-             </property>
-             <property name="text">
-              <string>BKG Dienst-URL inkl. UUID</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0" colspan="2">
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <item>
             <widget class="QLabel" name="key_error_label">
              <property name="styleSheet">
               <string notr="true">color: red;</string>
@@ -649,42 +667,67 @@ padding: 2px;
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="api_url_edit">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="toolTip">
-              <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QRadioButton" name="api_key_check">
-             <property name="toolTip">
-              <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
-             </property>
-             <property name="text">
-              <string>BKG UUID</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QPushButton" name="reload_UUID_button">
-             <property name="toolTip">
-              <string>&lt;p&gt;Überprüfung der aktuell eingestellten UUID/Dienst-URL.&lt;/p&gt;</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</iconset>
-             </property>
-            </widget>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <layout class="QGridLayout" name="gridLayout_2">
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="api_key_edit">
+                 <property name="toolTip">
+                  <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QRadioButton" name="api_key_check">
+                 <property name="toolTip">
+                  <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>BKG UUID</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QRadioButton" name="api_url_check">
+                 <property name="toolTip">
+                  <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>BKG Dienst-URL inkl. UUID</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="api_url_edit">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die Dienst-URL inclusive der UUID an.&lt;/p&gt;</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QPushButton" name="reload_UUID_button">
+               <property name="toolTip">
+                <string>&lt;p&gt;Überprüfung der aktuell eingestellten UUID/Dienst-URL.&lt;/p&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
