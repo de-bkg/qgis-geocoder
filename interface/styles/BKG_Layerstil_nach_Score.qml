@@ -25,7 +25,7 @@
           <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
           <prop v="MM" k="outline_width_unit"/>
           <prop v="diameter" k="scale_method"/>
-          <prop v="2.4" k="size"/>
+          <prop v="3.5" k="size"/>
           <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
           <prop v="MM" k="size_unit"/>
           <prop v="1" k="vertical_anchor_point"/>
@@ -54,7 +54,7 @@
           <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
           <prop v="MM" k="outline_width_unit"/>
           <prop v="diameter" k="scale_method"/>
-          <prop v="2.4" k="size"/>
+          <prop v="3.5" k="size"/>
           <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
           <prop v="MM" k="size_unit"/>
           <prop v="1" k="vertical_anchor_point"/>
@@ -83,7 +83,7 @@
           <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
           <prop v="MM" k="outline_width_unit"/>
           <prop v="diameter" k="scale_method"/>
-          <prop v="2.4" k="size"/>
+          <prop v="3.5" k="size"/>
           <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
           <prop v="MM" k="size_unit"/>
           <prop v="1" k="vertical_anchor_point"/>
@@ -112,7 +112,7 @@
           <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
           <prop v="MM" k="outline_width_unit"/>
           <prop v="diameter" k="scale_method"/>
-          <prop v="2.4" k="size"/>
+          <prop v="3.5" k="size"/>
           <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
           <prop v="MM" k="size_unit"/>
           <prop v="1" k="vertical_anchor_point"/>
@@ -141,7 +141,7 @@
           <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
           <prop v="MM" k="outline_width_unit"/>
           <prop v="diameter" k="scale_method"/>
-          <prop v="2.4" k="size"/>
+          <prop v="3.5" k="size"/>
           <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
           <prop v="MM" k="size_unit"/>
           <prop v="1" k="vertical_anchor_point"/>
@@ -172,7 +172,7 @@
           <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
           <prop v="MM" k="outline_width_unit"/>
           <prop v="diameter" k="scale_method"/>
-          <prop v="2.4" k="size"/>
+          <prop v="3.5" k="size"/>
           <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
           <prop v="MM" k="size_unit"/>
           <prop v="1" k="vertical_anchor_point"/>
