@@ -222,7 +222,7 @@ class BKGGeocoder(Geocoder):
         return url
 
     @staticmethod
-    def get_crs(url: str = '', key: str = '') -> Tuple[bool, List[tuple]]:
+    def get_crs(url: str = '', key: str = '') -> Tuple[bool, str, List[tuple]]:
         '''
         request the supported coordinate reference sytems
 
@@ -237,23 +237,27 @@ class BKGGeocoder(Geocoder):
         Returns
         ----------
         tuple
-            tuple of success and list of available crs as tuples (code,
-            pretty name)
+            tuple of success, error message and list of available crs as tuples
+            (code, pretty name)
         '''
         url = url or URL.format(key=key)
         # in case users typed in url with the 'geosearch' term in it
         url = url.replace('geosearch', '')
         url += '/index.xml'
         default = [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
+        con_msg = 'Der Dienst ist zur Zeit nicht erreichbar.'
         try:
             res = requests.get(url)
         except ConnectionError:
-            return False, default
+            return False, con_msg, default
+        if res.status_code == None:
+            return False, con_msg, default
         if res.status_code != 200:
-            return False, default
+            msg = 'Der eingegebene Schlüssel bzw. die URL ist nicht gültig'
+            return False, msg, default
         parser = CRSParser()
         parser.feed(res.content.decode("utf-8"))
-        return True, parser.codes
+        return True, '', parser.codes
 
     def _escape_special_chars(self, text) -> str:
         '''
@@ -300,7 +304,8 @@ class BKGGeocoder(Geocoder):
              for k, v in kwargs.items() if v))
         return query
 
-    def query(self, *args: object, **kwargs: object) -> Reply:
+    def query(self, *args: object, max_retries: int = 2, **kwargs: object
+              ) -> Reply:
         '''
         query the service
 
@@ -310,6 +315,9 @@ class BKGGeocoder(Geocoder):
             query parameters without keyword
         **kwargs
             query parameters with keyword and value
+        max_retries: int, optional
+            maximum number of retries after connection error, defaults to 2
+            retries
 
         Returns
         ----------
@@ -329,6 +337,7 @@ class BKGGeocoder(Geocoder):
             may still work for different features
         '''
         self.params = {}
+        retries = 0
         if self.area_wkt:
             self.params['geometry'] = self.area_wkt
         if self.rs:
@@ -338,7 +347,17 @@ class BKGGeocoder(Geocoder):
         if not query:
             raise RuntimeError('keine Suchparameter gefunden')
         self.params['query'] = query
-        self.reply = requests.get(self.url, params=self.params)
+        while True:
+            try:
+                self.reply = requests.get(self.url, params=self.params)
+            except ConnectionError:
+                if retries >= max_retries:
+                    raise RuntimeError(
+                        f'Anfrage nach {retries + 1} gescheiterten '
+                        'Verbindungsversuchen abgebrochen.')
+                retries += 1
+                continue
+            break
         self.raise_on_error(self.reply)
         return self.reply
 
@@ -378,7 +397,8 @@ class BKGGeocoder(Geocoder):
         if reply.status_code == None:
             raise RuntimeError(f'Service "{reply.url[:30] + "..."}" nicht '
                                'erreichbar. Bitte überprüfen Sie die '
-                               'eingegebene Dienst-URL.')
+                               'eingegebene Dienst-URL und ihre '
+                               'Internetverbindung.')
         if reply.status_code == 404:
             raise ValueError(
                 f'404 - "{reply.url[:30] + "..."}" nicht gefunden.')

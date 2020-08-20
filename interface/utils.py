@@ -711,7 +711,7 @@ class Request(QObject):
         loop.deleteLater()
         if not timer.isActive():
             reply.deleteLater()
-            raise ConnectionError('Timeout ')
+            raise ConnectionError('Timeout')
 
         timer.stop()
         #if reply.error():
@@ -765,7 +765,7 @@ class Request(QObject):
             loop.deleteLater()
             if not timer.isActive():
                 reply.deleteLater()
-                raise ConnectionError('Timeout ')
+                raise ConnectionError('Timeout')
 
             timer.stop()
         if reply.error():

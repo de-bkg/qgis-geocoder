@@ -244,6 +244,7 @@ class MainWidget(QDockWidget):
         self.api_url_edit.editingFinished.connect(
             lambda: setattr(config, 'api_url', self.api_url_edit.text()))
         self.api_url_edit.editingFinished.connect(self.setup_crs)
+        self.reload_UUID_button.clicked.connect(self.setup_crs)
 
         if config.use_api_url:
             self.api_url_check.setChecked(True)
@@ -367,14 +368,14 @@ class MainWidget(QDockWidget):
         request service-url for available crs and populate crs-combobox with
         retrieved values
         '''
+        self.uuid_group.setEnabled(False)
+        self.request_start_button.setEnabled(False)
         current_crs = self.output_projection_combo.currentData()
         self.output_projection_combo.clear()
         # fill crs combo
         url = config.api_url if config.use_api_url else None
-        success, available_crs = BKGGeocoder.get_crs(key=config.api_key,
-                                                     url=url)
-        msg = '' if success else ('Der eingegebene Schlüssel bzw. die URL ist '
-                                  'nicht gültig')
+        success, msg, available_crs = BKGGeocoder.get_crs(key=config.api_key,
+                                                          url=url)
         self.key_error_label.setText(msg)
         self.key_error_label.setVisible(not success)
         self.request_start_button.setEnabled(success)
@@ -383,6 +384,7 @@ class MainWidget(QDockWidget):
         if current_crs:
             idx = self.output_projection_combo.findData(current_crs)
             self.output_projection_combo.setCurrentIndex(idx)
+        self.uuid_group.setEnabled(True)
 
     def inspect_results(self, feature_id: int):
         '''
