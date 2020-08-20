@@ -53,6 +53,8 @@ import datetime
 
 config = Config()
 
+BKG_MAX_WKT_LENGTH = 1500
+
 # fields added to the input layer containing the properties of the results
 BKG_FIELDS = [
     ('bkg_n_results', 'Anzahl der Ergebnisse', QVariant.Int, 'int2'),
@@ -117,8 +119,8 @@ class MainWidget(QDockWidget):
 
         self.inspect_dialog = None
         self.reverse_dialog = None
-
         self.geocoding = None
+        self.area_wkt = None
 
         self.iface = utils.iface
         self.canvas = self.iface.mapCanvas()
@@ -162,8 +164,6 @@ class MainWidget(QDockWidget):
         # only vector layers as input
         self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         self.layer_combo.layerChanged.connect(self.change_layer)
-        # only polygons can be used as a spatial filter
-        self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
         # input layer encodings
         for encoding in QgsVectorDataProvider.availableEncodings():
@@ -192,6 +192,15 @@ class MainWidget(QDockWidget):
         self.rs_edit.textChanged.connect(set_rs)
         self.use_rs_check.toggled.connect(
             lambda: set_rs(self.rs_edit.text()))
+
+        # spatial filter
+        self.spatial_error_label.setVisible(False)
+        # only polygons can be used as a spatial filter
+        self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+        self.spatial_filter_combo.layerChanged.connect(self.set_area_filter)
+        self.spatial_selected_only_check.toggled.connect(self.set_area_filter)
+        self.use_spatial_filter_check.toggled.connect(self.set_area_filter)
+        self.reload_spatial_button.clicked.connect(self.set_area_filter)
 
         # connect map tools
         self.inspect_picker = FeaturePicker(
@@ -811,6 +820,35 @@ class MainWidget(QDockWidget):
         # repopulate fields
         self.change_layer(layer)
 
+    def set_area_filter(self):
+        '''
+        sets area filter according to current settings as well known text.
+        applies warning message to UI if wkt is too long to pass to the UI
+        '''
+        spatial_layer = self.spatial_filter_combo.currentLayer()
+        if not self.use_spatial_filter_check.isChecked() or not spatial_layer:
+            self.area_wkt = None
+            return
+        selected_only = self.spatial_selected_only_check.isChecked()
+        geometries = get_geometries(spatial_layer, selected=selected_only,
+                                    crs=config.projection)
+        count_msg = (f'{spatial_layer.selectedFeatureCount()}/'
+                     f'{spatial_layer.featureCount()}') \
+            if selected_only else ''
+        self.n_spatial_seclected_label.setText(count_msg)
+        union = None
+        for geom in geometries:
+            union = geom if not union else union.combine(geom)
+        self.area_wkt = union.asWkt() if union else None
+        if self.area_wkt and len(self.area_wkt) > BKG_MAX_WKT_LENGTH:
+            msg = ('Die Geometrie ist zu komplex (um den Faktor '
+                   f'{round(len(self.area_wkt)/BKG_MAX_WKT_LENGTH, 2)}). Bitte '
+                   'vereinfachen Sie die ausgewählten Geometrien.')
+            self.spatial_error_label.setText(msg)
+            self.spatial_error_label.setVisible(True)
+        else:
+            self.spatial_error_label.setVisible(False)
+
     def bkg_geocode(self):
         '''
         start geocoding of input layer with current settings
@@ -887,16 +925,13 @@ class MainWidget(QDockWidget):
 
         area_wkt = None
         if self.use_spatial_filter_check.isChecked():
-            spatial_layer = self.spatial_filter_combo.currentLayer()
-            if spatial_layer:
-                selected_only = self.spatial_selected_only_check.isChecked()
-                geometries = get_geometries(
-                    spatial_layer, selected=selected_only,
-                    crs=config.projection)
-                union = None
-                for geom in geometries:
-                    union = geom if not union else union.combine(geom)
-                area_wkt = union.asWkt()
+            #
+            self.set_area_filter()
+            if self.area_wkt and len(self.area_wkt) > BKG_MAX_WKT_LENGTH:
+                self.log('Die Filtergeometrie ist zu komplex und wird '
+                         'ignoriert.', level=Qgis.Warning)
+            else:
+                area_wkt = self.area_wkt
 
         url = config.api_url if config.use_api_url else None
 
