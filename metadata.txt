@@ -19,8 +19,8 @@ repository=https://github.com/ChrFr/qgis-geocoder
       - alternative Stile für Ergebnislayer wählbar
       - integrierte Hilfeseite
       - Unterstützung von Proxies
-      - dynamische Liste der verfügbaren Koordinatenbezugssysteme
-      - zusätzliches Feld "Zusatz" als Parameter verfügbar
+      - dynamisch abgerufene Liste der verfügbaren Koordinatenbezugssysteme
+      - zusätzliches Feld "Zusatz" (Zusatz zur Hausnummer) als Parameter verfügbar
       - Implementierung der unscharfen Suche
 
       Sonstiges
@@ -31,11 +31,13 @@ repository=https://github.com/ChrFr/qgis-geocoder
       - optionaler Debug-Logger
       - überarbeiteter Regionalschlüsselfilter
       - wiederholte Verbindungsversuche und Abbruch bei Verbindungsproblemen mit dem Dienst
+      - Limitierung der Länge der Filtergeometrien
 
       Bugfixes
       - Fehler bei Zuweisung der Adressfelder behoben
       - Reload nach Update des Plugins
       - Projektion der Hintergrundlayer
+      - Aktualisierung der Felder von Shapefiles
 
       1.0
       ---------
