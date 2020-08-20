@@ -222,7 +222,7 @@ class BKGGeocoder(Geocoder):
         return url
 
     @staticmethod
-    def get_crs(url: str = '', key: str = '') -> Tuple[bool, List[tuple]]:
+    def get_crs(url: str = '', key: str = '') -> Tuple[bool, str, List[tuple]]:
         '''
         request the supported coordinate reference sytems
 
@@ -237,23 +237,27 @@ class BKGGeocoder(Geocoder):
         Returns
         ----------
         tuple
-            tuple of success and list of available crs as tuples (code,
-            pretty name)
+            tuple of success, error message and list of available crs as tuples
+            (code, pretty name)
         '''
         url = url or URL.format(key=key)
         # in case users typed in url with the 'geosearch' term in it
         url = url.replace('geosearch', '')
         url += '/index.xml'
         default = [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
+        con_msg = 'Der Dienst ist zur Zeit nicht erreichbar.'
         try:
             res = requests.get(url)
         except ConnectionError:
-            return False, default
+            return False, con_msg, default
+        if res.status_code == None:
+            return False, con_msg, default
         if res.status_code != 200:
-            return False, default
+            msg = 'Der eingegebene Schlüssel bzw. die URL ist nicht gültig'
+            return False, msg, default
         parser = CRSParser()
         parser.feed(res.content.decode("utf-8"))
-        return True, parser.codes
+        return True, '', parser.codes
 
     def _escape_special_chars(self, text) -> str:
         '''
