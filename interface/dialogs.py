@@ -307,7 +307,7 @@ class InspectResultsDialog(Dialog):
         override clicking ok button
         '''
         if self.preview_layer.layer:
-            QgsProject.instance().removeMapLayer(self.preview_layer.id())
+            QgsProject.instance().removeMapLayer(self.preview_layer.id)
         super().accept()
 
     def reject(self):
@@ -315,7 +315,7 @@ class InspectResultsDialog(Dialog):
         override clicking cancel button
         '''
         if self.preview_layer.layer:
-            QgsProject.instance().removeMapLayer(self.preview_layer.id())
+            QgsProject.instance().removeMapLayer(self.preview_layer.id)
         super().reject()
 
     def showEvent(self, e):
@@ -400,7 +400,7 @@ class ReverseResultsDialog(InspectResultsDialog):
             if checked:
                 self.result = None
                 self.i = -1
-                self.preview_layer.removeSelection()
+                self.preview_layer.layer.removeSelection()
                 self._zoom_to(self.feature)
             self.accept_button.setDisabled(checked)
         radio.toggled.connect(toggled)
@@ -423,7 +423,8 @@ class ReverseResultsDialog(InspectResultsDialog):
         '''
         self.results = results
         # lazy way to reset preview
-        QgsProject.instance().removeMapLayer(self.preview_layer.id())
+        if self.preview_layer.layer:
+            QgsProject.instance().removeMapLayer(self.preview_layer.id)
         clear_layout(self.results_contents)
         self._setup_preview_layer()
         self._add_results()
