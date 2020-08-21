@@ -836,14 +836,18 @@ class MainWidget(QDockWidget):
         spatial_layer = self.spatial_filter_combo.currentLayer()
         if not self.use_spatial_filter_check.isChecked() or not spatial_layer:
             self.area_wkt = None
+            self.n_spatial_selected_label.setText('')
+            self.spatial_error_label.setVisible(False)
+            self.reload_spatial_button.setEnabled(False)
             return
+        self.reload_spatial_button.setEnabled(True)
         selected_only = self.spatial_selected_only_check.isChecked()
         geometries = get_geometries(spatial_layer, selected=selected_only,
                                     crs=config.projection)
         count_msg = (f'{spatial_layer.selectedFeatureCount()}/'
                      f'{spatial_layer.featureCount()}') \
             if selected_only else ''
-        self.n_spatial_seclected_label.setText(count_msg)
+        self.n_spatial_selected_label.setText(count_msg)
         union = None
         for geom in geometries:
             union = geom if not union else union.combine(geom)
