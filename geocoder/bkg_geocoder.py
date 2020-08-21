@@ -24,7 +24,7 @@ __author__ = 'Christoph Franke'
 __date__ = '16/03/2020'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import re
 from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
@@ -160,6 +160,19 @@ class BKGGeocoder(Geocoder):
     special_keywords = {
         'plz_ort': split_code_city,
         'zusatz': join_number
+    }
+
+    @staticmethod
+    def fill_post_code(value: Union[str, int], kwargs: dict) -> dict:
+        '''
+        fill up post codes shorter than 5 characters with leading zeros
+        '''
+        return {'plz': str(value).zfill(5)}
+
+    special_keywords = {
+        'plz_ort': split_code_city,
+        'zusatz': join_number,
+        'plz': fill_post_code
     }
 
     def __init__(self, key: str = '', url: str = '', crs: str = 'EPSG:4326',
