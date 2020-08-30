@@ -657,7 +657,7 @@ Objekte nutzen</string>
            <bool>false</bool>
           </property>
           <property name="saveCollapsedState">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <item>
@@ -733,6 +733,23 @@ Objekte nutzen</string>
             </layout>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="output_fields_group">
+          <property name="toolTip">
+           <string/>
+          </property>
+          <property name="title">
+           <string>Zusätzliche Ergebnisfelder</string>
+          </property>
+          <property name="collapsed">
+           <bool>true</bool>
+          </property>
+          <property name="saveCollapsedState">
+           <bool>true</bool>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3"/>
          </widget>
         </item>
         <item>

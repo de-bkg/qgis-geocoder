@@ -28,6 +28,8 @@ from typing import List, Tuple, Union
 import re
 from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsField
 
 from .geocoder import Geocoder
 from bkggeocoder.interface.utils import Request, Reply
@@ -37,6 +39,70 @@ requests = Request()
 # default url to the BKG geocoding service, key has to be replaced
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
 
+BKG_MAX_WKT_LENGTH = 1500
+
+
+class BkgField:
+    PREFIX = 'bkg'
+    def __init__(self, name: str, field_type: str,
+                 field_variant: QVariant = None,
+                 add_prefix: bool = True, alias: str = None):
+        self._name = name
+        self.add_prefix = add_prefix
+        self.alias = alias or self.name
+        self.field_variant = field_variant or self._get_variant(field_type)
+        self.field_type = field_type
+
+    @property
+    def name(self):
+        return self._name if not self.add_prefix \
+            else f'{self.PREFIX}_{self._name}'
+
+    def to_qgs_field(self):
+        return QgsField(self.name, self.field_variant, typeName=self.field_type)
+
+    @staticmethod
+    def _get_variant(field_type):
+        if field_type == 'bool':
+            return QVariant.Bool
+        if 'int' in field_type:
+            return QVariant.Int
+        if 'float' in field_type:
+            return QVariant.Double
+        return QVariant.String
+
+
+# fields added to the input layer containing the properties of the results
+BKG_FIELDS = [
+    BkgField('n_results', 'int2', alias='Anzahl der Ergebnisse'),
+    BkgField('i', 'int2', alias='Ergebnisindex'),
+    BkgField('typ', 'text', alias='Klassifizierung'),
+    BkgField('text', 'text',  alias='Anschrift laut Dienst'),
+    BkgField('score', 'float8', alias='Score'),
+    BkgField('treffer', 'text', alias='Trefferbewertung'),
+    BkgField('manuell_bearbeitet', 'bool', alias='Manuell bearbeitet',
+             add_prefix=False)
+]
+
+# "Regionalschlüssel" to filter "Bundesländer"
+RS_PRESETS = [
+    ('Schleswig-Holstein', '01*'),
+    ('Freie und Hansestadt Hamburg', '02*'),
+    ('Niedersachsen', '03*'),
+    ('Freie Hansestadt Bremen', '04*'),
+    ('Nordrhein-Westfalen', '05*'),
+    ('Hessen', '06*'),
+    ('Rheinland-Pfalz', '07*'),
+    ('Baden-Württemberg', '08*'),
+    ('Freistaat Bayern', '09*'),
+    ('Saarland', '10*'),
+    ('Berlin', '11*'),
+    ('Brandenburg', '12*'),
+    ('Mecklenburg-Vorpommern', '13*'),
+    ('Freistaat Sachsen', '14*'),
+    ('Sachsen-Anhalt', '15*'),
+    ('Freistaat Thüringen', '16*')
+]
 
 class ErrorCodeParser(HTMLParser):
 

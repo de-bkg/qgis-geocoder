@@ -31,7 +31,7 @@ import re
 
 from typing import List
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QTimer
 from qgis import utils
 from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
@@ -46,45 +46,14 @@ from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
 from .utils import (clone_layer, TopPlusOpen, get_geometries, LayerWrapper,
                     clear_layout)
-from bkggeocoder.geocoder.bkg_geocoder import BKGGeocoder
+from bkggeocoder.geocoder.bkg_geocoder import (BKGGeocoder, RS_PRESETS,
+                                               BKG_MAX_WKT_LENGTH, BKG_FIELDS)
 from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from bkggeocoder.config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
 import datetime
 
 config = Config()
 
-BKG_MAX_WKT_LENGTH = 1500
-
-# fields added to the input layer containing the properties of the results
-BKG_FIELDS = [
-    ('bkg_n_results', 'Anzahl der Ergebnisse', QVariant.Int, 'int2'),
-    ('bkg_i', 'Ergebnisindex', QVariant.Double, 'int2'),
-    ('bkg_typ', 'Klassifizierung', QVariant.String, 'text'),
-    ('bkg_text', 'Anschrift laut Dienst', QVariant.String, 'text'),
-    ('bkg_score', 'Score', QVariant.Double, 'float8'),
-    ('bkg_treffer', 'Trefferbewertung', QVariant.String, 'text'),
-    ('manuell_bearbeitet', 'Manuell bearbeitet', QVariant.Bool, 'bool')
-]
-
-# "Regionalschlüssel" to filter "Bundesländer"
-RS_PRESETS = [
-    ('Schleswig-Holstein', '01*'),
-    ('Freie und Hansestadt Hamburg', '02*'),
-    ('Niedersachsen', '03*'),
-    ('Freie Hansestadt Bremen', '04*'),
-    ('Nordrhein-Westfalen', '05*'),
-    ('Hessen', '06*'),
-    ('Rheinland-Pfalz', '07*'),
-    ('Baden-Württemberg', '08*'),
-    ('Freistaat Bayern', '09*'),
-    ('Saarland', '10*'),
-    ('Berlin', '11*'),
-    ('Brandenburg', '12*'),
-    ('Mecklenburg-Vorpommern', '13*'),
-    ('Freistaat Sachsen', '14*'),
-    ('Sachsen-Anhalt', '15*'),
-    ('Freistaat Thüringen', '16*')
-]
 
 def field_comp(layer: QgsVectorLayer, field_name: str) -> str:
     '''return compatible field name depending on data provider (looking at
@@ -739,7 +708,7 @@ class MainWidget(QDockWidget):
 
         # get field map with previous settings if layer was already used as
         # input before
-        bkg_f = [field_comp(layer, f[0]) for f in BKG_FIELDS]
+        bkg_f = [field_comp(layer, f.name) for f in BKG_FIELDS]
         self.field_map = self.field_map_cache.get(layer.id(), None)
         if not self.field_map or not self.field_map.valid(layer):
             # if no field map was set yet, create it with the known BKG
@@ -797,7 +766,7 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(True)
         self.label_field_combo.clear()
         self.label_field_combo.addItem('kein Label')
-        aliases = {field_comp(layer, n): a for n, a, q, d in BKG_FIELDS}
+        aliases = {field_comp(layer, f.name): f.alias for f in BKG_FIELDS}
         for field in layer.fields():
             field_name = field.name()
             alias = aliases.get(field_name)
@@ -982,8 +951,9 @@ class MainWidget(QDockWidget):
         self.tab_widget.setCurrentIndex(2)
 
         field_names = self.output.layer.fields().names()
-        add_fields = [QgsField(n, q, d) for n, a, q, d in BKG_FIELDS
-                      if field_comp(self.output.layer, n) not in field_names]
+        add_fields = [f.to_qgs_field() for f in BKG_FIELDS
+                      if field_comp(self.output.layer, f.name)
+                      not in field_names]
         self.output.layer.dataProvider().addAttributes(add_fields)
         self.output.layer.updateFields()
 
