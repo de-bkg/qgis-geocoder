@@ -94,6 +94,7 @@ class MainWidget(QDockWidget):
         self.field_map_cache = {}
         # cache label fields, layer-ids as keys, field name as values
         self.label_cache = {}
+        self.field_map = None
 
         add_fields = [
             AddField('n_results', 'int2', alias='Anzahl der Ergebnisse',
@@ -214,6 +215,22 @@ class MainWidget(QDockWidget):
 
         self.setup_crs()
 
+        grid = self.output_fields_group.layout()
+        i = 0
+        def toggle_result_field(field, state):
+            self.result_fields[field.name] = field, state
+        # selectable optional result fields
+        for field, active in self.result_fields.values():
+            if field.optional:
+                label = field.alias.replace(' laut Dienst', '')
+                check = QCheckBox(label)
+                check.toggled.connect(
+                    lambda state, f=field: toggle_result_field(f, state))
+                grid.addWidget(check, i // 2, i % 2)
+                i += 1
+
+        # unregister layers from plugin when they are removed from QGIS
+        # avoids errors when user is messing around in the QGIS UI
         QgsProject.instance().layersRemoved.connect(self.unregister_layers)
 
     def setup_config(self):
@@ -728,7 +745,7 @@ class MainWidget(QDockWidget):
             # if no field map was set yet, create it with the known BKG
             # keywords
             # ignore result fields (can't be mapped)
-            bkg_f = [field_comp(layer, f.field_name)
+            bkg_f = [field_comp(layer, f[0].field_name)
                      for f in self.result_fields.values()]
             self.field_map = FieldMap(layer, ignore=bkg_f,
                                       keywords=BKGGeocoder.keywords)
