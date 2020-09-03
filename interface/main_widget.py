@@ -45,9 +45,10 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
 from .utils import (clone_layer, TopPlusOpen, get_geometries, LayerWrapper,
-                    clear_layout)
+                    clear_layout, AddField)
 from bkggeocoder.geocoder.bkg_geocoder import (BKGGeocoder, RS_PRESETS,
-                                               BKG_MAX_WKT_LENGTH, BKG_FIELDS)
+                                               BKG_MAX_WKT_LENGTH,
+                                               BKG_RESULT_FIELDS)
 from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
 from bkggeocoder.config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
 import datetime
@@ -93,6 +94,20 @@ class MainWidget(QDockWidget):
         self.field_map_cache = {}
         # cache label fields, layer-ids as keys, field name as values
         self.label_cache = {}
+
+        add_fields = [
+            AddField('n_results', 'int2', alias='Anzahl der Ergebnisse',
+                     prefix='gc'),
+            AddField('i', 'int2', alias='Ergebnisindex', prefix='gc'),
+            AddField('manuell_bearbeitet', 'bool', alias='Manuell bearbeitet')
+        ]
+        add_fields += BKG_RESULT_FIELDS
+
+        # additional fields for storing results,
+        # non-optional fields are active by default, others will be set by
+        # user input
+        self.result_fields = {f.name: (f, True if not f.optional else False)
+                              for f in add_fields}
 
         self.inspect_dialog = None
         self.reverse_dialog = None
@@ -708,11 +723,13 @@ class MainWidget(QDockWidget):
 
         # get field map with previous settings if layer was already used as
         # input before
-        bkg_f = [field_comp(layer, f.name) for f in BKG_FIELDS]
         self.field_map = self.field_map_cache.get(layer.id(), None)
         if not self.field_map or not self.field_map.valid(layer):
             # if no field map was set yet, create it with the known BKG
             # keywords
+            # ignore result fields (can't be mapped)
+            bkg_f = [field_comp(layer, f.field_name)
+                     for f in self.result_fields.values()]
             self.field_map = FieldMap(layer, ignore=bkg_f,
                                       keywords=BKGGeocoder.keywords)
             self.field_map_cache[layer.id()] = self.field_map
@@ -766,7 +783,8 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(True)
         self.label_field_combo.clear()
         self.label_field_combo.addItem('kein Label')
-        aliases = {field_comp(layer, f.name): f.alias for f in BKG_FIELDS}
+        aliases = {field_comp(layer, f[0].field_name): f[0].alias
+                   for f in self.result_fields.values()}
         for field in layer.fields():
             field_name = field.name()
             alias = aliases.get(field_name)
@@ -950,9 +968,10 @@ class MainWidget(QDockWidget):
 
         self.tab_widget.setCurrentIndex(2)
 
+        # add active result fields if they are not already part of the layer
         field_names = self.output.layer.fields().names()
-        add_fields = [f.to_qgs_field() for f in BKG_FIELDS
-                      if field_comp(self.output.layer, f.name)
+        add_fields = [f[0].to_qgs_field() for f in self.result_fields.values()
+                      if f[1] and field_comp(self.output.layer, f[0].field_name)
                       not in field_names]
         self.output.layer.dataProvider().addAttributes(add_fields)
         self.output.layer.updateFields()

@@ -25,13 +25,55 @@ from typing import List
 from qgis.core import (QgsVectorLayer, QgsProject, QgsCoordinateTransform,
                        QgsRasterLayer, QgsCoordinateReferenceSystem, QgsFeature,
                        QgsNetworkAccessManager, QgsLayerTreeGroup, QgsGeometry,
-                       QgsLayerTreeLayer)
+                       QgsLayerTreeLayer, QgsField)
 from qgis.utils import iface
 from qgis.PyQt.QtWidgets import QLayout
 from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.PyQt.QtCore import (QUrl, QEventLoop, QTimer, QUrlQuery,
-                              QObject, pyqtSignal)
+                              QObject, pyqtSignal, QVariant)
 import json
+
+
+class AddField:
+    '''
+    extra field to add to a layer
+    '''
+    def __init__(self, name: str, field_type: str,
+                 field_variant: QVariant = None,
+                 prefix: str = '', alias: str = None,  optional: bool = False):
+        '''
+        Parameters
+        ----------
+        key : str, optional
+            key provided by BKG (no url needed, url will be built with that)
+        optional : bool, optional
+            marks field as optional or required
+        '''
+        self.name = name
+        self.prefix = prefix
+        self.alias = alias or self.name
+        self.field_variant = field_variant or self._get_variant(field_type)
+        self.field_type = field_type
+        self.optional = optional
+
+    @property
+    def field_name(self):
+        return self.name if not self.prefix \
+            else f'{self.prefix}_{self.name}'
+
+    def to_qgs_field(self):
+        return QgsField(self.field_name, self.field_variant,
+                        typeName=self.field_type)
+
+    @staticmethod
+    def _get_variant(field_type):
+        if field_type == 'bool':
+            return QVariant.Bool
+        if 'int' in field_type:
+            return QVariant.Int
+        if 'float' in field_type:
+            return QVariant.Double
+        return QVariant.String
 
 
 class LayerWrapper():

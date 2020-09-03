@@ -28,11 +28,9 @@ from typing import List, Tuple, Union
 import re
 from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsField
 
 from .geocoder import Geocoder
-from bkggeocoder.interface.utils import Request, Reply
+from bkggeocoder.interface.utils import Request, Reply, AddField
 
 requests = Request()
 
@@ -41,47 +39,45 @@ URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
 
 BKG_MAX_WKT_LENGTH = 1500
 
-
-class BkgField:
-    PREFIX = 'bkg'
-    def __init__(self, name: str, field_type: str,
-                 field_variant: QVariant = None,
-                 add_prefix: bool = True, alias: str = None):
-        self._name = name
-        self.add_prefix = add_prefix
-        self.alias = alias or self.name
-        self.field_variant = field_variant or self._get_variant(field_type)
-        self.field_type = field_type
-
-    @property
-    def name(self):
-        return self._name if not self.add_prefix \
-            else f'{self.PREFIX}_{self._name}'
-
-    def to_qgs_field(self):
-        return QgsField(self.name, self.field_variant, typeName=self.field_type)
-
-    @staticmethod
-    def _get_variant(field_type):
-        if field_type == 'bool':
-            return QVariant.Bool
-        if 'int' in field_type:
-            return QVariant.Int
-        if 'float' in field_type:
-            return QVariant.Double
-        return QVariant.String
-
-
 # fields added to the input layer containing the properties of the results
-BKG_FIELDS = [
-    BkgField('n_results', 'int2', alias='Anzahl der Ergebnisse'),
-    BkgField('i', 'int2', alias='Ergebnisindex'),
-    BkgField('typ', 'text', alias='Klassifizierung'),
-    BkgField('text', 'text',  alias='Anschrift laut Dienst'),
-    BkgField('score', 'float8', alias='Score'),
-    BkgField('treffer', 'text', alias='Trefferbewertung'),
-    BkgField('manuell_bearbeitet', 'bool', alias='Manuell bearbeitet',
-             add_prefix=False)
+prefix = 'bkg'
+
+# ['text', 'typ', 'score', 'bbox', 'ags', 'rs', 'schluessel', 'bundesland', 'regbezirk', 'kreis', 'verwgem', 'gemeinde', 'plz', 'ort', 'ortsteil', 'strasse', 'haus', 'qualitaet', 'treffer']
+BKG_RESULT_FIELDS = [
+    # required by UI
+    AddField('typ', 'text', alias='Klassifizierung', prefix=prefix),
+    AddField('text', 'text',  alias='Anschrift laut Dienst', prefix=prefix),
+    AddField('score', 'float8', alias='Score', prefix=prefix),
+    AddField('treffer', 'text', alias='Trefferbewertung', prefix=prefix),
+    # optional fields
+    AddField('qualitaet', 'text', alias='Qualität', prefix=prefix,
+             optional=True),
+    AddField('ags', 'text', alias='AGS laut Dienst', prefix=prefix,
+             optional=True),
+    AddField('rs', 'text', alias='RS laut Dienst', prefix=prefix,
+             optional=True),
+    AddField('schluessel', 'text', alias='Schlüssel laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('bundesland', 'text', alias='Bundesland laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('regbezirk', 'text', alias='Regierungsbezirk laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('kreis', 'text', alias='Kreis laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('verwgem', 'text', alias='Verwaltungsgemeinde laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('gemeinde', 'text', alias='Gemeinde laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('plz', 'text', alias='Posleitzahl laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('ort', 'text', alias='Ort laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('ortsteil', 'text', alias='Ortsteil laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('strasse', 'text', alias='Strasse laut Dienst',
+             prefix=prefix, optional=True),
+    AddField('haus', 'text', alias='Hausnummer laut Dienst',
+             prefix=prefix, optional=True)
 ]
 
 # "Regionalschlüssel" to filter "Bundesländer"
