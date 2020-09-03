@@ -33,7 +33,7 @@ from typing import List
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QTimer
 from qgis import utils
-from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
+from qgis.core import (QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
                        QgsCoordinateTransform, QgsProject, QgsFeature, Qgis,
                        QgsPalLayerSettings, QgsTextFormat, QgsMessageLog,
@@ -668,11 +668,19 @@ class MainWidget(QDockWidget):
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
 
         # undock it immediately and resize to content
-        self.setFloating(True);
-        self.resize(self.sizeHint().width(), self.sizeHint().height())
+        self.setFloating(True)
+        # switch to config tab to update min size of dock widget
+        # otherwise widget tends to be have a very high height (as if all
+        # config groups are expanded)
+        self.tab_widget.setCurrentIndex(1)
+        height = self.config_request_output_tab.layout().minimumSize().height()
         # set a fixed position, otherwise it is floating in a weird position
-        geometry = self.geometry()
-        self.setGeometry(500, 500, geometry.width(), geometry.height())
+        self.setGeometry(500, 500, self.sizeHint().width(), height + 100)
+        # switch back to input tab
+        self.tab_widget.setCurrentIndex(0)
+        # for some reason the height is ignored when setting geometry when
+        # calling show() the first time
+        self.resize(self.sizeHint().width(), height + 100)
 
     def log(self, text: str, level: int = Qgis.Info, debug_only=False):
         '''
