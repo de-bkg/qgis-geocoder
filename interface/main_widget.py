@@ -1122,23 +1122,38 @@ class MainWidget(QDockWidget):
             properties = result['properties']
             layer.changeGeometry(feat_id, geom)
             if not geom_only:
-                for prop in ['typ', 'text', 'score', 'treffer']:
-                    value = properties.get(prop, None)
+                # apply all result properties if corresponding field is
+                # available and active
+                for rf, active in self.result_fields.values():
+                    if not active:
+                        continue
+                    fidx = get_field_idx(rf.field_name)
+                    if fidx < 0:
+                        continue
+                    value = properties.get(rf.name, None)
                     if value is not None:
-                        # property gets prefix bkg_ in layer
-                        layer.changeAttributeValue(
-                            feat_id, get_field_idx(f'bkg_{prop}'), value)
+                        layer.changeAttributeValue(feat_id, fidx, value)
                 if n_results:
-                    layer.changeAttributeValue(
-                        feat_id, get_field_idx('bkg_n_results'), n_results)
-            layer.changeAttributeValue(feat_id, get_field_idx('bkg_i'), i)
+                    fidx = get_field_idx(
+                        self.result_fields['n_results'][0].field_name)
+                    if fidx >= 0:
+                        layer.changeAttributeValue(feat_id, fidx, n_results)
+
+            fidx = get_field_idx(self.result_fields['i'][0].field_name)
+            if fidx >= 0:
+                layer.changeAttributeValue(feat_id, fidx, i)
         else:
-            layer.changeAttributeValue(
-                feat_id, get_field_idx('bkg_typ'), '')
-            layer.changeAttributeValue(
-                feat_id, get_field_idx('bkg_score'), 0)
-        layer.changeAttributeValue(
-            feat_id, get_field_idx('manuell_bearbeitet'), set_edited)
+            fidx = get_field_idx(self.result_fields['typ'][0].field_name)
+            if fidx >= 0:
+                layer.changeAttributeValue(feat_id, fidx, '')
+            fidx = get_field_idx(self.result_fields['score'][0].field_name)
+            if fidx >= 0:
+                layer.changeAttributeValue(feat_id, fidx, 0)
+
+        fidx = get_field_idx(
+            self.result_fields['manuell_bearbeitet'][0].field_name)
+        if fidx >= 0:
+            layer.changeAttributeValue(feat_id, fidx, set_edited)
         layer.commitChanges()
 
     def show_help(self, tag: str = ''):
