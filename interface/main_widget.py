@@ -452,11 +452,14 @@ class MainWidget(QDockWidget):
                          if self.field_map.active(f)]
         label = (feature.attribute(self.label_field_name)
                  if self.label_field_name else '')
+
         self.inspect_dialog = InspectResultsDialog(
             feature, results, self.canvas,
-            preselect=feature.attribute('bkg_i'),
+            preselect=feature.attribute(self.result_fields['i'][0].field_name),
             parent=self, crs=layer.crs().authid(),
-            review_fields=review_fields, label=label)
+            review_fields=review_fields, label=label,
+            text_field=self.result_fields['text'][0].field_name
+        )
         accepted = self.inspect_dialog.show()
         # set picked result when user accepted
         if accepted:
@@ -541,7 +544,9 @@ class MainWidget(QDockWidget):
                          if self.label_field_name else '')
                 self.reverse_dialog = ReverseResultsDialog(
                     feature, results, self.canvas, review_fields=review_fields,
-                    parent=self, crs=output_crs.authid(), label=label)
+                    parent=self, crs=output_crs.authid(), label=label,
+                    text_field=self.result_fields['text'][0].field_name
+                )
                 accepted = self.reverse_dialog.show()
                 if accepted:
                     result = self.reverse_dialog.result
