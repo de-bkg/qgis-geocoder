@@ -535,9 +535,8 @@ class MainWidget(QDockWidget):
                             geom_only=self.reverse_dialog.geom_only
                             #,apply_adress=not self.reverse_dialog.geom_only
                         )
-                    layer.changeAttributeValue(
-                        feature_id, layer.fields().indexFromName(
-                            field_comp(layer, 'manuell_bearbeitet')), True)
+                    self.result_fields['manuell_bearbeitet'][0].set_value(
+                        layer, feature_id, True)
                 else:
                     # reset the geometry if rejected
                     try:
@@ -753,7 +752,7 @@ class MainWidget(QDockWidget):
             # if no field map was set yet, create it with the known BKG
             # keywords
             # ignore result fields (can't be mapped)
-            bkg_f = [field_comp(layer, f[0].field_name)
+            bkg_f = [f[0].field_name_comp(layer)
                      for f in self.result_fields.values()]
             self.field_map = FieldMap(layer, ignore=bkg_f,
                                       keywords=BKGGeocoder.keywords)
@@ -808,7 +807,7 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(True)
         self.label_field_combo.clear()
         self.label_field_combo.addItem('kein Label')
-        aliases = {field_comp(layer, f[0].field_name): f[0].alias
+        aliases = {f[0].field_name_comp(layer): f[0].alias
                    for f in self.result_fields.values()}
         for field in layer.fields():
             field_name = field.name()
@@ -994,10 +993,8 @@ class MainWidget(QDockWidget):
         self.tab_widget.setCurrentIndex(2)
 
         # add active result fields if they are not already part of the layer
-        field_names = self.output.layer.fields().names()
         add_fields = [f[0].to_qgs_field() for f in self.result_fields.values()
-                      if f[1] and field_comp(self.output.layer, f[0].field_name)
-                      not in field_names]
+                      if f[1] and f[0].idx(layer) < 0]
         self.output.layer.dataProvider().addAttributes(add_fields)
         self.output.layer.updateFields()
 
@@ -1127,33 +1124,18 @@ class MainWidget(QDockWidget):
                 for rf, active in self.result_fields.values():
                     if not active:
                         continue
-                    fidx = get_field_idx(rf.field_name)
-                    if fidx < 0:
-                        continue
                     value = properties.get(rf.name, None)
                     if value is not None:
-                        layer.changeAttributeValue(feat_id, fidx, value)
+                        rf.set_value(layer, feat_id, value)
                 if n_results:
-                    fidx = get_field_idx(
-                        self.result_fields['n_results'][0].field_name)
-                    if fidx >= 0:
-                        layer.changeAttributeValue(feat_id, fidx, n_results)
-
-            fidx = get_field_idx(self.result_fields['i'][0].field_name)
-            if fidx >= 0:
-                layer.changeAttributeValue(feat_id, fidx, i)
+                    self.result_fields['n_results'][0].set_value(
+                        layer, feat_id, value)
+            self.result_fields['i'][0].set_value(layer, feat_id, i)
         else:
-            fidx = get_field_idx(self.result_fields['typ'][0].field_name)
-            if fidx >= 0:
-                layer.changeAttributeValue(feat_id, fidx, '')
-            fidx = get_field_idx(self.result_fields['score'][0].field_name)
-            if fidx >= 0:
-                layer.changeAttributeValue(feat_id, fidx, 0)
-
-        fidx = get_field_idx(
-            self.result_fields['manuell_bearbeitet'][0].field_name)
-        if fidx >= 0:
-            layer.changeAttributeValue(feat_id, fidx, set_edited)
+            self.result_fields['typ'][0].set_value(layer, feat_id, '')
+            self.result_fields['score'][0].set_value(layer, feat_id, 0)
+        self.result_fields['manuell_bearbeitet'][0].set_value(
+            layer, feat_id, set_edited)
         layer.commitChanges()
 
     def show_help(self, tag: str = ''):

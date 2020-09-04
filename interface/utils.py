@@ -65,6 +65,27 @@ class AddField:
         return QgsField(self.field_name, self.field_variant,
                         typeName=self.field_type)
 
+    def set_value(self, layer, feature_id, value, auto_add=True):
+        fidx = self.idx(layer)
+        if fidx < 0:
+            if auto_add:
+                layer.dataProvider().addAttribute(self.to_qgs_field())
+                layer.updateFields()
+            else:
+                return
+        layer.changeAttributeValue(feature_id, fidx, value)
+
+    def idx(self, layer: QgsVectorLayer):
+        field_name = self.field_name_comp(layer)
+        return layer.fields().indexFromName(field_name)
+
+    def field_name_comp(self, layer: QgsVectorLayer) -> str:
+        '''return compatible field name depending on data provider '''
+        provider_type = layer.dataProvider().storageType()
+        if provider_type == 'ESRI Shapefile':
+            self.field_name[:10]
+        return self.field_name
+
     @staticmethod
     def _get_variant(field_type):
         if field_type == 'bool':
