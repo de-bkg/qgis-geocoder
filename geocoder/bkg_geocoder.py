@@ -24,19 +24,81 @@ __author__ = 'Christoph Franke'
 __date__ = '16/03/2020'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import re
 from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
 
 from .geocoder import Geocoder
-from bkggeocoder.interface.utils import Request, Reply
+from bkggeocoder.interface.utils import Request, Reply, ResField
 
 requests = Request()
 
 # default url to the BKG geocoding service, key has to be replaced
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
 
+BKG_MAX_WKT_LENGTH = 1500
+
+# fields added to the input layer containing the properties of the results
+prefix = 'bkg'
+
+# ['text', 'typ', 'score', 'bbox', 'ags', 'rs', 'schluessel', 'bundesland', 'regbezirk', 'kreis', 'verwgem', 'gemeinde', 'plz', 'ort', 'ortsteil', 'strasse', 'haus', 'qualitaet', 'treffer']
+BKG_RESULT_FIELDS = [
+    # required by UI
+    ResField('typ', 'text', alias='Klassifizierung', prefix=prefix),
+    ResField('text', 'text',  alias='Anschrift laut Dienst', prefix=prefix),
+    ResField('score', 'float8', alias='Score', prefix=prefix),
+    ResField('treffer', 'text', alias='Trefferbewertung', prefix=prefix),
+    # optional fields
+    ResField('qualitaet', 'text', alias='Qualität', prefix=prefix,
+             optional=True),
+    ResField('ags', 'text', alias='AGS laut Dienst', prefix=prefix,
+             optional=True),
+    ResField('rs', 'text', alias='RS laut Dienst', prefix=prefix,
+             optional=True),
+    ResField('schluessel', 'text', alias='Schlüssel laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('bundesland', 'text', alias='Bundesland laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('regbezirk', 'text', alias='Regierungsbezirk laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('kreis', 'text', alias='Kreis laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('verwgem', 'text', alias='Verwaltungsgemeinde laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('gemeinde', 'text', alias='Gemeinde laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('plz', 'text', alias='Posleitzahl laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('ort', 'text', alias='Ort laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('ortsteil', 'text', alias='Ortsteil laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('strasse', 'text', alias='Strasse laut Dienst',
+             prefix=prefix, optional=True),
+    ResField('haus', 'text', alias='Hausnummer laut Dienst',
+             prefix=prefix, optional=True)
+]
+
+# "Regionalschlüssel" to filter "Bundesländer"
+RS_PRESETS = [
+    ('Schleswig-Holstein', '01*'),
+    ('Freie und Hansestadt Hamburg', '02*'),
+    ('Niedersachsen', '03*'),
+    ('Freie Hansestadt Bremen', '04*'),
+    ('Nordrhein-Westfalen', '05*'),
+    ('Hessen', '06*'),
+    ('Rheinland-Pfalz', '07*'),
+    ('Baden-Württemberg', '08*'),
+    ('Freistaat Bayern', '09*'),
+    ('Saarland', '10*'),
+    ('Berlin', '11*'),
+    ('Brandenburg', '12*'),
+    ('Mecklenburg-Vorpommern', '13*'),
+    ('Freistaat Sachsen', '14*'),
+    ('Sachsen-Anhalt', '15*'),
+    ('Freistaat Thüringen', '16*')
+]
 
 class ErrorCodeParser(HTMLParser):
 
@@ -160,6 +222,19 @@ class BKGGeocoder(Geocoder):
     special_keywords = {
         'plz_ort': split_code_city,
         'zusatz': join_number
+    }
+
+    @staticmethod
+    def fill_post_code(value: Union[str, int], kwargs: dict) -> dict:
+        '''
+        fill up post codes shorter than 5 characters with leading zeros
+        '''
+        return {'plz': str(value).zfill(5)}
+
+    special_keywords = {
+        'plz_ort': split_code_city,
+        'zusatz': join_number,
+        'plz': fill_post_code
     }
 
     def __init__(self, key: str = '', url: str = '', crs: str = 'EPSG:4326',

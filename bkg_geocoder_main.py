@@ -84,8 +84,6 @@ class BKGGeocoderPlugin:
         '''
         override, close UI on closing plugin
         '''
-        # disconnects
-        self.mainwidget.closingWidget.disconnect(self.onClosePlugin)
         self.pluginIsActive = False
 
     def unload(self):
@@ -115,18 +113,14 @@ class BKGGeocoderPlugin:
             change the input layer of the plugin to given layer, defaults to not
             changing the selected layer
         '''
-        if self.pluginIsActive:
-            return
-
         # initialize and show main widget
         if not self.mainwidget:
             # Create the dockwidget (after translation) and keep reference
             self.mainwidget = MainWidget()
-
-        self.pluginIsActive = True
-        # connect to provide cleanup on closing of dockwidget
-        self.mainwidget.closingWidget.connect(self.onClosePlugin)
+            self.mainwidget.closingWidget.connect(self.onClosePlugin)
         if layer:
             self.mainwidget.change_layer(layer)
-        self.mainwidget.show()
+        if not self.pluginIsActive:
+            self.mainwidget.show()
+        self.pluginIsActive = True
 

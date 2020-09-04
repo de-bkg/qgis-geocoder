@@ -43,6 +43,8 @@ HELP_URL = f'{path}/help/Benutzerhandbuch.html'
 
 # path to config file location
 DEFAULT_FILE = os.path.join(expanduser("~"), "bkg_geocoder.cfg")
+DEFAULT_STYLE = os.path.join(
+    STYLE_PATH, 'BKG_Layerstil_nach_Trefferbewertung.qml')
 
 
 class Singleton(type):
@@ -82,8 +84,8 @@ class Config(object):
         'debug': False,
         'fuzzy': False,
         'rs': '',
-        'output_style': os.path.join(
-            STYLE_PATH, 'BKG_Layerstil_nach_Trefferbewertung.qml'),
+        'output_style': DEFAULT_STYLE,
+        'result_fields': []
     }
 
     _config = {}

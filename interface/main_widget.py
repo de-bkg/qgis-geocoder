@@ -31,9 +31,9 @@ import re
 
 from typing import List
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QVariant, QTimer
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QTimer
 from qgis import utils
-from qgis.core import (QgsField, QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
+from qgis.core import (QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsVectorDataProvider, QgsWkbTypes, QgsVectorLayer,
                        QgsCoordinateTransform, QgsProject, QgsFeature, Qgis,
                        QgsPalLayerSettings, QgsTextFormat, QgsMessageLog,
@@ -45,46 +45,17 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
 from .utils import (clone_layer, TopPlusOpen, get_geometries, LayerWrapper,
-                    clear_layout)
-from bkggeocoder.geocoder.bkg_geocoder import BKGGeocoder
+                    clear_layout, ResField)
+from bkggeocoder.geocoder.bkg_geocoder import (BKGGeocoder, RS_PRESETS,
+                                               BKG_MAX_WKT_LENGTH,
+                                               BKG_RESULT_FIELDS)
 from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from bkggeocoder.config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
+from bkggeocoder.config import (Config, STYLE_PATH, UI_PATH, HELP_URL,
+                                VERSION, DEFAULT_STYLE)
 import datetime
 
 config = Config()
 
-BKG_MAX_WKT_LENGTH = 1500
-
-# fields added to the input layer containing the properties of the results
-BKG_FIELDS = [
-    ('bkg_n_results', 'Anzahl der Ergebnisse', QVariant.Int, 'int2'),
-    ('bkg_i', 'Ergebnisindex', QVariant.Double, 'int2'),
-    ('bkg_typ', 'Klassifizierung', QVariant.String, 'text'),
-    ('bkg_text', 'Anschrift laut Dienst', QVariant.String, 'text'),
-    ('bkg_score', 'Score', QVariant.Double, 'float8'),
-    ('bkg_treffer', 'Trefferbewertung', QVariant.String, 'text'),
-    ('manuell_bearbeitet', 'Manuell bearbeitet', QVariant.Bool, 'bool')
-]
-
-# "Regionalschlüssel" to filter "Bundesländer"
-RS_PRESETS = [
-    ('Schleswig-Holstein', '01*'),
-    ('Freie und Hansestadt Hamburg', '02*'),
-    ('Niedersachsen', '03*'),
-    ('Freie Hansestadt Bremen', '04*'),
-    ('Nordrhein-Westfalen', '05*'),
-    ('Hessen', '06*'),
-    ('Rheinland-Pfalz', '07*'),
-    ('Baden-Württemberg', '08*'),
-    ('Freistaat Bayern', '09*'),
-    ('Saarland', '10*'),
-    ('Berlin', '11*'),
-    ('Brandenburg', '12*'),
-    ('Mecklenburg-Vorpommern', '13*'),
-    ('Freistaat Sachsen', '14*'),
-    ('Sachsen-Anhalt', '15*'),
-    ('Freistaat Thüringen', '16*')
-]
 
 def field_comp(layer: QgsVectorLayer, field_name: str) -> str:
     '''return compatible field name depending on data provider (looking at
@@ -124,6 +95,21 @@ class MainWidget(QDockWidget):
         self.field_map_cache = {}
         # cache label fields, layer-ids as keys, field name as values
         self.label_cache = {}
+        self.field_map = None
+
+        add_fields = [
+            ResField('n_results', 'int2', alias='Anzahl der Ergebnisse',
+                     prefix='gc'),
+            ResField('i', 'int2', alias='Ergebnisindex', prefix='gc'),
+            ResField('manuell_bearbeitet', 'bool', alias='Manuell bearbeitet')
+        ]
+        add_fields += BKG_RESULT_FIELDS
+
+        # additional fields for storing results,
+        # non-optional fields are active by default, others will be set by
+        # user input
+        self.result_fields = {f.name: (f, True if not f.optional else False)
+                              for f in add_fields}
 
         self.inspect_dialog = None
         self.reverse_dialog = None
@@ -230,6 +216,8 @@ class MainWidget(QDockWidget):
 
         self.setup_crs()
 
+        # unregister layers from plugin when they are removed from QGIS
+        # avoids errors when user is messing around in the QGIS UI
         QgsProject.instance().layersRemoved.connect(self.unregister_layers)
 
     def setup_config(self):
@@ -293,6 +281,9 @@ class MainWidget(QDockWidget):
             lambda checked: setattr(config, 'debug', checked))
 
         # output layer style
+        # workaround: version change included name changes of predefined styles
+        if not os.path.exists(config.output_style):
+            config.output_style = DEFAULT_STYLE
         self.layer_style_edit.setText(config.output_style)
         self.layer_style_edit.editingFinished.connect(
             lambda path: setattr(config, 'output_style', path))
@@ -311,6 +302,33 @@ class MainWidget(QDockWidget):
         # label field
         self.label_field_combo.currentIndexChanged.connect(self.apply_label)
 
+        # additional result fields
+        grid = self.output_fields_group.layout()
+        i = 0
+        def toggle_result_field(field, checked):
+            self.result_fields[field.name] = field, checked
+            result_fields = config.result_fields
+            if checked:
+                if field.name not in config.result_fields:
+                    result_fields.append(field.name)
+            elif field.name in config.result_fields:
+                result_fields.remove(field.name)
+            # set to trigger auto-write
+            config.result_fields = result_fields
+
+        # selectable optional result fields
+        for field, active in self.result_fields.values():
+            if field.optional:
+                label = field.alias.replace(' laut Dienst', '')
+                check = QCheckBox(label)
+                checked = field.name in config.result_fields
+                check.setChecked(checked)
+                self.result_fields[field.name] = field, checked
+                check.toggled.connect(
+                    lambda state, f=field: toggle_result_field(f, state))
+                grid.addWidget(check, i // 2, i % 2)
+                i += 1
+
     def apply_output_style(self):
         '''
         apply currently set style file to current output layer
@@ -320,6 +338,9 @@ class MainWidget(QDockWidget):
             return
         self.canvas.refresh()
         layer.loadNamedStyle(config.output_style)
+        for field, active in self.result_fields.values():
+            idx = field.idx(layer)
+            layer.setFieldAlias(idx, field.alias)
         if self.label_field_name:
             self.apply_label()
 
@@ -534,9 +555,8 @@ class MainWidget(QDockWidget):
                             geom_only=self.reverse_dialog.geom_only
                             #,apply_adress=not self.reverse_dialog.geom_only
                         )
-                    layer.changeAttributeValue(
-                        feature_id, layer.fields().indexFromName(
-                            field_comp(layer, 'manuell_bearbeitet')), True)
+                    self.result_fields['manuell_bearbeitet'][0].set_value(
+                        layer, feature_id, True)
                 else:
                     # reset the geometry if rejected
                     try:
@@ -667,11 +687,19 @@ class MainWidget(QDockWidget):
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
 
         # undock it immediately and resize to content
-        self.setFloating(True);
-        self.resize(self.sizeHint().width(), self.sizeHint().height())
+        self.setFloating(True)
+        # switch to config tab to update min size of dock widget
+        # otherwise widget tends to be have a very high height (as if all
+        # config groups are expanded)
+        self.tab_widget.setCurrentIndex(1)
+        height = self.config_request_output_tab.layout().minimumSize().height()
         # set a fixed position, otherwise it is floating in a weird position
-        geometry = self.geometry()
-        self.setGeometry(500, 500, geometry.width(), geometry.height())
+        self.setGeometry(500, 500, self.sizeHint().width(), height + 100)
+        # switch back to input tab
+        self.tab_widget.setCurrentIndex(0)
+        # for some reason the height is ignored when setting geometry when
+        # calling show() the first time
+        self.resize(self.sizeHint().width(), height + 100)
 
     def log(self, text: str, level: int = Qgis.Info, debug_only=False):
         '''
@@ -739,11 +767,13 @@ class MainWidget(QDockWidget):
 
         # get field map with previous settings if layer was already used as
         # input before
-        bkg_f = [field_comp(layer, f[0]) for f in BKG_FIELDS]
         self.field_map = self.field_map_cache.get(layer.id(), None)
         if not self.field_map or not self.field_map.valid(layer):
             # if no field map was set yet, create it with the known BKG
             # keywords
+            # ignore result fields (can't be mapped)
+            bkg_f = [f[0].field_name_comp(layer)
+                     for f in self.result_fields.values()]
             self.field_map = FieldMap(layer, ignore=bkg_f,
                                       keywords=BKGGeocoder.keywords)
             self.field_map_cache[layer.id()] = self.field_map
@@ -797,7 +827,8 @@ class MainWidget(QDockWidget):
         self.label_field_combo.blockSignals(True)
         self.label_field_combo.clear()
         self.label_field_combo.addItem('kein Label')
-        aliases = {field_comp(layer, n): a for n, a, q, d in BKG_FIELDS}
+        aliases = {f[0].field_name_comp(layer): f[0].alias
+                   for f in self.result_fields.values()}
         for field in layer.fields():
             field_name = field.name()
             alias = aliases.get(field_name)
@@ -953,8 +984,6 @@ class MainWidget(QDockWidget):
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
-        self.apply_output_style()
-
         self.geocoding.message.connect(
             lambda msg: self.log(msg, debug_only=True))
 
@@ -981,11 +1010,12 @@ class MainWidget(QDockWidget):
 
         self.tab_widget.setCurrentIndex(2)
 
-        field_names = self.output.layer.fields().names()
-        add_fields = [QgsField(n, q, d) for n, a, q, d in BKG_FIELDS
-                      if field_comp(self.output.layer, n) not in field_names]
+        # add active result fields if they are not already part of the layer
+        add_fields = [f[0].to_qgs_field() for f in self.result_fields.values()
+                      if f[1] and f[0].idx(layer) < 0]
         self.output.layer.dataProvider().addAttributes(add_fields)
         self.output.layer.updateFields()
+        self.apply_output_style()
 
         self.request_start_button.setVisible(False)
         self.request_stop_button.setVisible(True)
@@ -1097,10 +1127,6 @@ class MainWidget(QDockWidget):
         if not layer.isEditable():
             layer.startEditing()
 
-        fields = layer.fields()
-        def get_field_idx(field_name):
-            return fields.indexFromName(field_comp(layer, field_name))
-
         feat_id = feature.id()
         if result:
             coords = result['geometry']['coordinates']
@@ -1108,23 +1134,23 @@ class MainWidget(QDockWidget):
             properties = result['properties']
             layer.changeGeometry(feat_id, geom)
             if not geom_only:
-                for prop in ['typ', 'text', 'score', 'treffer']:
-                    value = properties.get(prop, None)
+                # apply all result properties if corresponding field is
+                # available and active
+                for rf, active in self.result_fields.values():
+                    if not active:
+                        continue
+                    value = properties.get(rf.name, None)
                     if value is not None:
-                        # property gets prefix bkg_ in layer
-                        layer.changeAttributeValue(
-                            feat_id, get_field_idx(f'bkg_{prop}'), value)
+                        rf.set_value(layer, feat_id, value)
                 if n_results:
-                    layer.changeAttributeValue(
-                        feat_id, get_field_idx('bkg_n_results'), n_results)
-            layer.changeAttributeValue(feat_id, get_field_idx('bkg_i'), i)
+                    self.result_fields['n_results'][0].set_value(
+                        layer, feat_id, value)
+            self.result_fields['i'][0].set_value(layer, feat_id, i)
         else:
-            layer.changeAttributeValue(
-                feat_id, get_field_idx('bkg_typ'), '')
-            layer.changeAttributeValue(
-                feat_id, get_field_idx('bkg_score'), 0)
-        layer.changeAttributeValue(
-            feat_id, get_field_idx('manuell_bearbeitet'), set_edited)
+            self.result_fields['typ'][0].set_value(layer, feat_id, '')
+            self.result_fields['score'][0].set_value(layer, feat_id, 0)
+        self.result_fields['manuell_bearbeitet'][0].set_value(
+            layer, feat_id, set_edited)
         layer.commitChanges()
 
     def show_help(self, tag: str = ''):
