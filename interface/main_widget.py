@@ -50,7 +50,8 @@ from bkggeocoder.geocoder.bkg_geocoder import (BKGGeocoder, RS_PRESETS,
                                                BKG_MAX_WKT_LENGTH,
                                                BKG_RESULT_FIELDS)
 from bkggeocoder.geocoder.geocoder import Geocoding, FieldMap, ReverseGeocoding
-from bkggeocoder.config import Config, STYLE_PATH, UI_PATH, HELP_URL, VERSION
+from bkggeocoder.config import (Config, STYLE_PATH, UI_PATH, HELP_URL,
+                                VERSION, DEFAULT_STYLE)
 import datetime
 
 config = Config()
@@ -280,6 +281,9 @@ class MainWidget(QDockWidget):
             lambda checked: setattr(config, 'debug', checked))
 
         # output layer style
+        # workaround: version change included name changes of predefined styles
+        if not os.path.exists(config.output_style):
+            config.output_style = DEFAULT_STYLE
         self.layer_style_edit.setText(config.output_style)
         self.layer_style_edit.editingFinished.connect(
             lambda path: setattr(config, 'output_style', path))
@@ -317,7 +321,9 @@ class MainWidget(QDockWidget):
             if field.optional:
                 label = field.alias.replace(' laut Dienst', '')
                 check = QCheckBox(label)
-                check.setChecked(field.name in config.result_fields)
+                checked = field.name in config.result_fields
+                check.setChecked(checked)
+                self.result_fields[field.name] = field, checked
                 check.toggled.connect(
                     lambda state, f=field: toggle_result_field(f, state))
                 grid.addWidget(check, i // 2, i % 2)
@@ -332,6 +338,9 @@ class MainWidget(QDockWidget):
             return
         self.canvas.refresh()
         layer.loadNamedStyle(config.output_style)
+        for field, active in self.result_fields.values():
+            idx = field.idx(layer)
+            layer.setFieldAlias(idx, field.alias)
         if self.label_field_name:
             self.apply_label()
 
@@ -975,8 +984,6 @@ class MainWidget(QDockWidget):
         self.geocoding = Geocoding(bkg_geocoder, self.field_map,
                                    features=features, parent=self)
 
-        self.apply_output_style()
-
         self.geocoding.message.connect(
             lambda msg: self.log(msg, debug_only=True))
 
@@ -1008,6 +1015,7 @@ class MainWidget(QDockWidget):
                       if f[1] and f[0].idx(layer) < 0]
         self.output.layer.dataProvider().addAttributes(add_fields)
         self.output.layer.updateFields()
+        self.apply_output_style()
 
         self.request_start_button.setVisible(False)
         self.request_stop_button.setVisible(True)

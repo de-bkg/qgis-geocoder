@@ -276,7 +276,7 @@
     </settings>
   </labeling>
   <blendMode>0</blendMode>
-  <featureBlendMode>0</featureBlendMode>  
+  <featureBlendMode>0</featureBlendMode>
   <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="&quot;bkg_treffer&quot;">
     <columns>
       <column type="field" hidden="0" name="fid" width="-1"/>
@@ -289,7 +289,7 @@
       <column type="field" hidden="0" name="manuell_bearbeitet" width="200"/>
       <column type="actions" hidden="1" width="-1"/>
     </columns>
-  </attributetableconfig>  
+  </attributetableconfig>
   <editable>
     <field editable="0" name="bkg_i"/>
     <field editable="0" name="bkg_n_results"/>
@@ -299,15 +299,6 @@
     <field editable="1" name="bkg_typ"/>
     <field editable="1" name="manuell_bearbeitet"/>
   </editable>
-  <aliases>
-    <alias field="bkg_text" index="1" name="Anschrift laut Dienst"/>
-    <alias field="bkg_typ" index="2" name="Klassifizierung"/>
-    <alias field="bkg_score" index="3" name="Score"/>
-    <alias field="bkg_treffer" index="4" name="Trefferbewertung"/>
-    <alias field="bkg_n_results" index="5" name="Anzahl der Ergebnisse"/>
-    <alias field="bkg_i" index="6" name="Ergebnisindex"/>
-    <alias field="manuell_bearbeitet" index="7" name="Manuell bearbeitet"/>
-  </aliases>
   <fieldConfiguration>
     <field name="bkg_treffer">
       <editWidget type="ValueMap">

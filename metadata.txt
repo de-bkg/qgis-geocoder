@@ -17,6 +17,7 @@ repository=https://github.com/ChrFr/qgis-geocoder
       Neue Features
       - Anzeige eines auswählbaren Labels für Features in Karte und Dialogen
       - alternative Stile für Ergebnislayer wählbar
+      - zusätzliche Ergebnisfelder wählbar
       - integrierte Hilfeseite
       - Unterstützung von Proxies
       - dynamisch abgerufene Liste der verfügbaren Koordinatenbezugssysteme
@@ -38,6 +39,7 @@ repository=https://github.com/ChrFr/qgis-geocoder
       - Reload nach Update des Plugins
       - Projektion der Hintergrundlayer
       - Aktualisierung der Felder von Shapefiles
+      - Auswahl des Eingangslayers über Kontextmenü in der Legende bei geöffnetem Plugin
 
       1.0
       ---------
