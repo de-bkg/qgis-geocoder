@@ -45,7 +45,7 @@ from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
 from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
 from .utils import (clone_layer, TopPlusOpen, get_geometries, LayerWrapper,
-                    clear_layout, AddField)
+                    clear_layout, ResField)
 from bkggeocoder.geocoder.bkg_geocoder import (BKGGeocoder, RS_PRESETS,
                                                BKG_MAX_WKT_LENGTH,
                                                BKG_RESULT_FIELDS)
@@ -97,10 +97,10 @@ class MainWidget(QDockWidget):
         self.field_map = None
 
         add_fields = [
-            AddField('n_results', 'int2', alias='Anzahl der Ergebnisse',
+            ResField('n_results', 'int2', alias='Anzahl der Ergebnisse',
                      prefix='gc'),
-            AddField('i', 'int2', alias='Ergebnisindex', prefix='gc'),
-            AddField('manuell_bearbeitet', 'bool', alias='Manuell bearbeitet')
+            ResField('i', 'int2', alias='Ergebnisindex', prefix='gc'),
+            ResField('manuell_bearbeitet', 'bool', alias='Manuell bearbeitet')
         ]
         add_fields += BKG_RESULT_FIELDS
 
@@ -215,20 +215,6 @@ class MainWidget(QDockWidget):
 
         self.setup_crs()
 
-        grid = self.output_fields_group.layout()
-        i = 0
-        def toggle_result_field(field, state):
-            self.result_fields[field.name] = field, state
-        # selectable optional result fields
-        for field, active in self.result_fields.values():
-            if field.optional:
-                label = field.alias.replace(' laut Dienst', '')
-                check = QCheckBox(label)
-                check.toggled.connect(
-                    lambda state, f=field: toggle_result_field(f, state))
-                grid.addWidget(check, i // 2, i % 2)
-                i += 1
-
         # unregister layers from plugin when they are removed from QGIS
         # avoids errors when user is messing around in the QGIS UI
         QgsProject.instance().layersRemoved.connect(self.unregister_layers)
@@ -311,6 +297,31 @@ class MainWidget(QDockWidget):
 
         # label field
         self.label_field_combo.currentIndexChanged.connect(self.apply_label)
+
+        # additional result fields
+        grid = self.output_fields_group.layout()
+        i = 0
+        def toggle_result_field(field, checked):
+            self.result_fields[field.name] = field, checked
+            result_fields = config.result_fields
+            if checked:
+                if field.name not in config.result_fields:
+                    result_fields.append(field.name)
+            elif field.name in config.result_fields:
+                result_fields.remove(field.name)
+            # set to trigger auto-write
+            config.result_fields = result_fields
+
+        # selectable optional result fields
+        for field, active in self.result_fields.values():
+            if field.optional:
+                label = field.alias.replace(' laut Dienst', '')
+                check = QCheckBox(label)
+                check.setChecked(field.name in config.result_fields)
+                check.toggled.connect(
+                    lambda state, f=field: toggle_result_field(f, state))
+                grid.addWidget(check, i // 2, i % 2)
+                i += 1
 
     def apply_output_style(self):
         '''
@@ -1107,10 +1118,6 @@ class MainWidget(QDockWidget):
             return
         if not layer.isEditable():
             layer.startEditing()
-
-        fields = layer.fields()
-        def get_field_idx(field_name):
-            return fields.indexFromName(field_comp(layer, field_name))
 
         feat_id = feature.id()
         if result:

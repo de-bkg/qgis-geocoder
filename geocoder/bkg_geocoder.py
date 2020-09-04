@@ -30,7 +30,7 @@ from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
 
 from .geocoder import Geocoder
-from bkggeocoder.interface.utils import Request, Reply, AddField
+from bkggeocoder.interface.utils import Request, Reply, ResField
 
 requests = Request()
 
@@ -45,38 +45,38 @@ prefix = 'bkg'
 # ['text', 'typ', 'score', 'bbox', 'ags', 'rs', 'schluessel', 'bundesland', 'regbezirk', 'kreis', 'verwgem', 'gemeinde', 'plz', 'ort', 'ortsteil', 'strasse', 'haus', 'qualitaet', 'treffer']
 BKG_RESULT_FIELDS = [
     # required by UI
-    AddField('typ', 'text', alias='Klassifizierung', prefix=prefix),
-    AddField('text', 'text',  alias='Anschrift laut Dienst', prefix=prefix),
-    AddField('score', 'float8', alias='Score', prefix=prefix),
-    AddField('treffer', 'text', alias='Trefferbewertung', prefix=prefix),
+    ResField('typ', 'text', alias='Klassifizierung', prefix=prefix),
+    ResField('text', 'text',  alias='Anschrift laut Dienst', prefix=prefix),
+    ResField('score', 'float8', alias='Score', prefix=prefix),
+    ResField('treffer', 'text', alias='Trefferbewertung', prefix=prefix),
     # optional fields
-    AddField('qualitaet', 'text', alias='Qualität', prefix=prefix,
+    ResField('qualitaet', 'text', alias='Qualität', prefix=prefix,
              optional=True),
-    AddField('ags', 'text', alias='AGS laut Dienst', prefix=prefix,
+    ResField('ags', 'text', alias='AGS laut Dienst', prefix=prefix,
              optional=True),
-    AddField('rs', 'text', alias='RS laut Dienst', prefix=prefix,
+    ResField('rs', 'text', alias='RS laut Dienst', prefix=prefix,
              optional=True),
-    AddField('schluessel', 'text', alias='Schlüssel laut Dienst',
+    ResField('schluessel', 'text', alias='Schlüssel laut Dienst',
              prefix=prefix, optional=True),
-    AddField('bundesland', 'text', alias='Bundesland laut Dienst',
+    ResField('bundesland', 'text', alias='Bundesland laut Dienst',
              prefix=prefix, optional=True),
-    AddField('regbezirk', 'text', alias='Regierungsbezirk laut Dienst',
+    ResField('regbezirk', 'text', alias='Regierungsbezirk laut Dienst',
              prefix=prefix, optional=True),
-    AddField('kreis', 'text', alias='Kreis laut Dienst',
+    ResField('kreis', 'text', alias='Kreis laut Dienst',
              prefix=prefix, optional=True),
-    AddField('verwgem', 'text', alias='Verwaltungsgemeinde laut Dienst',
+    ResField('verwgem', 'text', alias='Verwaltungsgemeinde laut Dienst',
              prefix=prefix, optional=True),
-    AddField('gemeinde', 'text', alias='Gemeinde laut Dienst',
+    ResField('gemeinde', 'text', alias='Gemeinde laut Dienst',
              prefix=prefix, optional=True),
-    AddField('plz', 'text', alias='Posleitzahl laut Dienst',
+    ResField('plz', 'text', alias='Posleitzahl laut Dienst',
              prefix=prefix, optional=True),
-    AddField('ort', 'text', alias='Ort laut Dienst',
+    ResField('ort', 'text', alias='Ort laut Dienst',
              prefix=prefix, optional=True),
-    AddField('ortsteil', 'text', alias='Ortsteil laut Dienst',
+    ResField('ortsteil', 'text', alias='Ortsteil laut Dienst',
              prefix=prefix, optional=True),
-    AddField('strasse', 'text', alias='Strasse laut Dienst',
+    ResField('strasse', 'text', alias='Strasse laut Dienst',
              prefix=prefix, optional=True),
-    AddField('haus', 'text', alias='Hausnummer laut Dienst',
+    ResField('haus', 'text', alias='Hausnummer laut Dienst',
              prefix=prefix, optional=True)
 ]
 

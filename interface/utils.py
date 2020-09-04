@@ -34,9 +34,10 @@ from qgis.PyQt.QtCore import (QUrl, QEventLoop, QTimer, QUrlQuery,
 import json
 
 
-class AddField:
+class ResField:
     '''
-    extra field to add to a layer
+    represents an extra field to add to a layer to store results in (or
+    anything else)
     '''
     def __init__(self, name: str, field_type: str,
                  field_variant: QVariant = None,
@@ -44,10 +45,18 @@ class AddField:
         '''
         Parameters
         ----------
-        key : str, optional
-            key provided by BKG (no url needed, url will be built with that)
+        name : str
+            name of the field
+        field_type : str
+            field type (e.g. char, varchar, text, int, serial, double)
+        field_variant : QVariant, optional
+            variant type, is derived from field_type if not given
+        prefix : str, optional
+            prefix added to the field name, defaults to no prefix
+        alias : str, optional
+            pretty name of the field, defaults to given name
         optional : bool, optional
-            marks field as optional or required
+            marks field as optional or required, defaults to required
         '''
         self.name = name
         self.prefix = prefix
@@ -61,11 +70,33 @@ class AddField:
         return self.name if not self.prefix \
             else f'{self.prefix}_{self.name}'
 
-    def to_qgs_field(self):
+    def to_qgs_field(self) -> QgsField:
+        '''
+        representation of field as a QgsField, addable to a vector layer
+
+        Returns
+        -------
+        QgsField
+        '''
         return QgsField(self.field_name, self.field_variant,
                         typeName=self.field_type)
 
-    def set_value(self, layer, feature_id, value, auto_add=True):
+    def set_value(self, layer: QgsVectorLayer, feature_id: int, value: object,
+                  auto_add: bool = True):
+        '''
+        set a value to the represented field of the feature with given id
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            the layer the feature is in
+        feature_id : int
+            id of the feature
+        value : object
+            the value to set
+        auto_add : bool, optional
+            add the field to the layer if it doesn't exist yet, defaults to True
+        '''
         fidx = self.idx(layer)
         if fidx < 0:
             if auto_add:
@@ -75,7 +106,20 @@ class AddField:
                 return
         layer.changeAttributeValue(feature_id, fidx, value)
 
-    def idx(self, layer: QgsVectorLayer):
+    def idx(self, layer: QgsVectorLayer) -> int:
+        '''
+        index of the field in given layer
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+             the layer to look in
+
+        Returns
+        -------
+        int
+            index of the field, -1 if not found
+        '''
         field_name = self.field_name_comp(layer)
         return layer.fields().indexFromName(field_name)
 

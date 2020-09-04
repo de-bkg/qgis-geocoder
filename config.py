@@ -84,6 +84,7 @@ class Config(object):
         'rs': '',
         'output_style': os.path.join(
             STYLE_PATH, 'BKG_Layerstil_nach_Trefferbewertung.qml'),
+        'result_fields': []
     }
 
     _config = {}
