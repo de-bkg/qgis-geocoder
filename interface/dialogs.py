@@ -109,7 +109,8 @@ class InspectResultsDialog(Dialog):
     def __init__(self, feature: QgsFeature, results: List[dict],
                  canvas: QgsMapCanvas, review_fields: List[str] = [],
                  preselect: int = -1, crs: str = 'EPSG:4326', label: str = '',
-                 parent: QWidget = None, show_score: bool = True):
+                 parent: QWidget = None, show_score: bool = True,
+                 text_field: str = 'text'):
         '''
         Parameters
         ----------
@@ -149,6 +150,7 @@ class InspectResultsDialog(Dialog):
         self.i = -1
         self.show_score = show_score
         self.crs = crs
+        self.text_field = text_field
 
         self.title_label.setText(str(label))
 
@@ -187,7 +189,7 @@ class InspectResultsDialog(Dialog):
         font.setUnderline(True)
         headline.setFont(font)
         self.review_layout.addWidget(headline)
-        bkg_text = self.feature.attribute('bkg_text')
+        bkg_text = self.feature.attribute(self.text_field)
         self.review_layout.addWidget(QLabel(bkg_text))
 
     def _setup_preview_layer(self):
@@ -344,7 +346,8 @@ class ReverseResultsDialog(InspectResultsDialog):
     def __init__(self, feature: QgsFeature, results: List[dict],
                  canvas: QgsMapCanvas, review_fields: List[str] = [],
                  crs: str = 'EPSG:4326', label: str = '',
-                 parent: QWidget = None, show_score: bool = False):
+                 parent: QWidget = None, show_score: bool = False,
+                 text_field: str = 'text'):
         '''
         Parameters
         ----------
@@ -370,10 +373,13 @@ class ReverseResultsDialog(InspectResultsDialog):
         show_score : bool, optional
             show the score of the results in the ui, defaults to not showing the
             scores
+        text_field : str, optional
+            name of the field that holds information about complete result
+            address, defaults to "text"
         '''
         super().__init__(feature, results, canvas, crs=crs, label=label,
                          review_fields=review_fields, parent=parent,
-                         show_score=show_score)
+                         show_score=show_score, text_field=text_field)
         # ui file was designed for the inspection of geocoding results,
         # replace labels to match reverse geocoding
         self.results_label.setText('Nächstgelegene Adressen')
