@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>370</width>
-    <height>469</height>
+    <height>590</height>
    </rect>
   </property>
   <property name="layoutDirection">
@@ -325,7 +325,7 @@ padding: 2px;
                 <x>0</x>
                 <y>0</y>
                 <width>326</width>
-                <height>252</height>
+                <height>373</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -738,7 +738,7 @@ Objekte nutzen</string>
         <item>
          <widget class="QgsCollapsibleGroupBox" name="output_fields_group">
           <property name="toolTip">
-           <string/>
+           <string>&lt;p&gt;Hier können zusätzlich zu den Standardergebnissen weitere Ergebnisfelder ausgewählt werden, die dem Ergebnislayer hinzugefügt werden.&lt;/p&gt;&lt;p&gt;Die Änderungen werden erst ab der nächsten Anfrage gültig.&lt;/p&gt;</string>
           </property>
           <property name="title">
            <string>Zusätzliche Ergebnisfelder</string>
@@ -755,7 +755,7 @@ Objekte nutzen</string>
         <item>
          <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nehmen Sie hier erweiterte Einstellungen vor.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;p&gt;Nehmen Sie hier erweiterte Einstellungen vor.&lt;/p&gt;</string>
           </property>
           <property name="autoFillBackground">
            <bool>false</bool>
@@ -1365,7 +1365,7 @@ Objekte nutzen</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starten Sie die Anfrage mit den getroffenen Konfigurationen. &lt;/p&gt;&lt;p&gt;Ihre ausgewählten Daten werden hierbei dem BKG übermittelt. Bitte beachten Sie, dass diese – abhängig von Ihrer Auswahl – auch personenbezogene Daten umfassen können.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;p&gt;Starten Sie die Anfrage mit den getroffenen Konfigurationen. &lt;/p&gt;&lt;p&gt;Ihre ausgewählten Daten werden hierbei dem BKG übermittelt. Bitte beachten Sie, dass diese – abhängig von Ihrer Auswahl – auch personenbezogene Daten umfassen können.&lt;/p&gt;</string>
         </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
@@ -1391,7 +1391,7 @@ Objekte nutzen</string>
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stoppen Sie die Anfrage.&lt;/p&gt;&lt;p&gt;Bereits erzielte Ergebnisse bleiben dabei erhalten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;p&gt;Stoppen Sie die Anfrage.&lt;/p&gt;&lt;p&gt;Bereits erzielte Ergebnisse bleiben dabei erhalten.&lt;/p&gt;</string>
         </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
