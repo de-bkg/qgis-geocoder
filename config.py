@@ -39,7 +39,7 @@ STYLE_PATH = os.path.join(path, 'interface', 'styles')
 
 # url to help website, left out trailing 'file://', other wise webbrowser won't
 # open tags or pass query params whyever
-HELP_URL = f'{path}/help/Benutzerhandbuch.html'
+HELP_URL = f'{path}/help/Benutzerhandbuch.html'.replace('\\', '/')
 
 # path to config file location
 DEFAULT_FILE = os.path.join(expanduser("~"), "bkg_geocoder.cfg")
