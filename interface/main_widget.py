@@ -41,6 +41,7 @@ from qgis.core import (QgsPointXY, QgsGeometry, QgsMapLayerProxyModel,
                        QgsCoordinateReferenceSystem)
 from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QMessageBox,
                                  QDockWidget, QWidget, QFileDialog)
+from qgis.PyQt.QtGui import QTextCursor
 
 from .dialogs import ReverseResultsDialog, InspectResultsDialog, Dialog
 from .map_tools import FeaturePicker, FeatureDragger
@@ -721,13 +722,14 @@ class MainWidget(QDockWidget):
             if level == Qgis.Critical else 'orange'
         # don't show debug messages in log section
         if not debug_only:
+            self.log_edit.moveCursor(QTextCursor.End)
             self.log_edit.insertHtml(
                 f'<span style="color: {color}">{text}</span><br>')
+            scrollbar = self.log_edit.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
         # always show critical messages in debug log, others only in debug mode
         if level == Qgis.Critical or config.debug:
             QgsMessageLog.logMessage(text, 'BKG Geocoder', level=level)
-        scrollbar = self.log_edit.verticalScrollBar()
-        scrollbar.setValue(scrollbar.maximum())
 
     def change_layer(self, layer: QgsVectorLayer):
         '''
