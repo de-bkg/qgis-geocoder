@@ -151,9 +151,13 @@ class MainWidget(QDockWidget):
         self.request_start_button.clicked.connect(self.bkg_geocode)
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
-        self.help_button.clicked.connect(self.show_help)
-        self.rsinfo_button.clicked.connect(
-            lambda: self.show_help(tag='regionalschluessel'))
+
+        # temporarily disabled help buttons
+        self.help_button.setVisible(False)
+        self.rsinfo_button.setVisible(False)
+        #self.help_button.clicked.connect(self.show_help)
+        #self.rsinfo_button.clicked.connect(
+            #lambda: self.show_help(tag='regionalschluessel'))
         self.about_button.clicked.connect(self.show_about)
 
         # only vector layers as input
