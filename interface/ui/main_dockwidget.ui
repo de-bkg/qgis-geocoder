@@ -551,19 +551,6 @@ padding: 2px;
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="spatial_error_label">
-             <property name="styleSheet">
-              <string notr="true">color: red;</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="wordWrap">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <property name="topMargin">
               <number>0</number>

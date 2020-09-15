@@ -26,6 +26,7 @@ __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 from typing import List, Tuple, Union
 import re
+from qgis.PyQt.QtCore import QUrlQuery, QUrl
 from html.parser import HTMLParser
 from json.decoder import JSONDecodeError
 
@@ -36,8 +37,6 @@ requests = Request()
 
 # default url to the BKG geocoding service, key has to be replaced
 URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
-
-BKG_MAX_WKT_LENGTH = 1500
 
 # fields added to the input layer containing the properties of the results
 prefix = 'bkg'
@@ -413,8 +412,6 @@ class BKGGeocoder(Geocoder):
         '''
         self.params = {}
         retries = 0
-        if self.area_wkt:
-            self.params['geometry'] = self.area_wkt
         if self.rs:
             self.params['filter'] = f'rs:{self.rs}'
         self.params['srsname'] = self.crs
@@ -422,9 +419,22 @@ class BKGGeocoder(Geocoder):
         if not query:
             raise RuntimeError('keine Suchparameter gefunden')
         self.params['query'] = query
+        do_post = self.area_wkt is not None
+        if self.area_wkt:
+            self.params['geometry'] = self.area_wkt
         while True:
             try:
-                self.reply = requests.get(self.url, params=self.params)
+                if not do_post:
+                    self.reply = requests.get(self.url, params=self.params)
+                else:
+                    content_type = 'application/x-www-form-urlencoded'
+                    data = QUrlQuery()
+                    for k, v in self.params.items():
+                        data.addQueryItem(k, v)
+                    self.reply = requests.post(
+                        self.url, data=data.query().encode('utf-8'),
+                        content_type=content_type
+                    )
             except ConnectionError:
                 if retries >= max_retries:
                     raise RuntimeError(
