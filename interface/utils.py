@@ -618,7 +618,7 @@ class Reply:
         str
             the requested URL
         '''
-        return self.reply.url().url()
+        return self.reply.request().url().url()
 
     @property
     def status_code(self) -> int:
@@ -750,7 +750,7 @@ class Request(QObject):
         return self._get_async(qurl)
 
     def post(self, url, params: dict = None, data: bytes = b'',
-             timeout: int = 10000, **kwargs) -> Reply:
+             timeout: int = 10000, content_type: str = None, **kwargs) -> Reply:
         '''
         posts data to given url (POST)
 
@@ -768,6 +768,9 @@ class Request(QObject):
         timeout : int, optional
             the timeout of synchronous requests in milliseconds, will be ignored
             when making asynchronous requests, defaults to 10000 ms
+        content_type : str, optional
+            the content type of the data, puts content type into header of
+            request
         **kwargs :
             additional parameters matching the requests-interface will
             be ignored (e.g. verify is not supported)
@@ -788,9 +791,10 @@ class Request(QObject):
             qurl.setQuery(query.query())
 
         if self.synchronous:
-            return self._post_sync(qurl, timeout=timeout, data=data)
+            return self._post_sync(qurl, timeout=timeout, data=data,
+                                   content_type=content_type)
 
-        return self._post_async(qurl)
+        return self._post_async(qurl, content_type=content_type)
 
 
     def _get_sync(self, qurl: QUrl, timeout: int = 10000) -> Reply:
@@ -847,11 +851,14 @@ class Request(QObject):
         #self.reply.readyRead.connect(ready_read)
         #return 0
 
-    def _post_sync(self, qurl: QUrl, timeout: int = 10000, data: bytes = b''):
+    def _post_sync(self, qurl: QUrl, timeout: int = 10000, data: bytes = b'',
+                   content_type=None):
         '''
         synchronous POST-request
         '''
         request = QNetworkRequest(qurl)
+        if content_type:
+            request.setHeader(QNetworkRequest.ContentTypeHeader, content_type)
         # newer versions of QGIS (3.6+) support synchronous requests
         if hasattr(self._manager, 'blockingPost'):
             reply = self._manager.blockingPost(request, data, forceRefresh=True)
@@ -882,7 +889,7 @@ class Request(QObject):
         self.finished.emit(res)
         return res
 
-    def _post_async(self, qurl: QUrl):
+    def _post_async(self, qurl: QUrl, content_type=None):
         '''
         asynchronous POST-request
 
