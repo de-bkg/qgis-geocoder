@@ -870,7 +870,7 @@ class MainWidget(QDockWidget):
         layer = self.input.layer if self.input else None
         if not layer:
             return
-
+        self.progress_bar.setStyleSheet('')
         self.reverse_picker_button.setEnabled(False)
         self.inspect_picker_button.setEnabled(False)
         self.export_csv_button.setEnabled(False)
@@ -1024,6 +1024,9 @@ class MainWidget(QDockWidget):
         self.output.layer.setReadOnly(False)
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
+        else:
+            self.progress_bar.setStyleSheet(
+                'QProgressBar::chunk {background-color: red; }')
         # select output layer as current layer
         self.layer_combo.setLayer(self.output.layer)
         # zoom to extent of results
