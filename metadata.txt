@@ -17,6 +17,9 @@ repository=https://github.com/ChrFr/qgis-geocoder
       Neue Features
       - unlimitierte Länge der Filtergeometrien
 
+      Bugfixes
+      - Probleme beim Verschieben der Punkte mit der Nachbaradresssuche behoben
+
       1.1
       ---------
       Neue Features

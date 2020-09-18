@@ -483,6 +483,7 @@ class MainWidget(QDockWidget):
         layer = self.output.layer if self.output else None
         if not layer:
             return
+        layer.startEditing()
 
         dragged_feature = layer.getFeature(feature_id)
         prev_dragged_id = (self._dragged_feature.id()
@@ -1026,7 +1027,7 @@ class MainWidget(QDockWidget):
             self.log('Geokodierung erfolgreich abgeschlossen')
         else:
             self.progress_bar.setStyleSheet(
-                'QProgressBar::chunk {background-color: red; }')
+                'QProgressBar::chunk {background-color: red;}')
         # select output layer as current layer
         self.layer_combo.setLayer(self.output.layer)
         # zoom to extent of results
