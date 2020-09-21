@@ -417,7 +417,7 @@ class BKGGeocoder(Geocoder):
         self.params['srsname'] = self.crs
         query = self._build_params(*args, **kwargs)
         if not query:
-            raise RuntimeError('keine Suchparameter gefunden')
+            raise ValueError('keine Suchparameter gefunden')
         self.params['query'] = query
         do_post = self.area_wkt is not None
         if self.area_wkt:
