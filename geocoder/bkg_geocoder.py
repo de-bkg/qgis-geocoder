@@ -51,6 +51,8 @@ BKG_RESULT_FIELDS = [
     # optional fields
     ResField('qualitaet', 'text', alias='Qualität', prefix=prefix,
              optional=True),
+    ResField('qkz', 'text', alias='Qualitätskennzeichen',
+             prefix=prefix, optional=True),
     ResField('ags', 'text', alias='AGS laut Dienst', prefix=prefix,
              optional=True),
     ResField('rs', 'text', alias='RS laut Dienst', prefix=prefix,
@@ -363,9 +365,9 @@ class BKGGeocoder(Geocoder):
     def _build_params(self, *args: object, **kwargs: object) -> str:
         '''builds a query string from given parameters'''
         logic = f' {self.logic_link} '
-        query = logic.join(
-            [f'"{self._add_fuzzy(self._escape_special_chars(a))}"'
-             for a in args if a]) or ''
+        p_args = [self._add_fuzzy(self._escape_special_chars(str(a)))
+                  for a in args]
+        query = logic.join([f'"{a}"' for a in p_args if a]) or ''
         if args and kwargs:
             query += logic
         # pop and process the special keywords
@@ -373,9 +375,9 @@ class BKGGeocoder(Geocoder):
         for k in special:
             value = kwargs.pop(k)
             kwargs.update(self.special_keywords[k].__func__(value, kwargs))
-        query += logic.join(
-            (f'{k}:({self._add_fuzzy(self._escape_special_chars(v))})'
-             for k, v in kwargs.items() if v))
+        p_kwargs = {k: self._add_fuzzy(self._escape_special_chars(v))
+                    for k, v in kwargs.items()}
+        query += logic.join((f'{k}:({v})' for k, v in p_kwargs.items() if v))
         return query
 
     def query(self, *args: object, max_retries: int = 2, **kwargs: object
@@ -417,7 +419,7 @@ class BKGGeocoder(Geocoder):
         self.params['srsname'] = self.crs
         query = self._build_params(*args, **kwargs)
         if not query:
-            raise RuntimeError('keine Suchparameter gefunden')
+            raise ValueError('keine Suchparameter gefunden')
         self.params['query'] = query
         do_post = self.area_wkt is not None
         if self.area_wkt:

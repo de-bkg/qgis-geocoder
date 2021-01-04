@@ -483,6 +483,7 @@ class MainWidget(QDockWidget):
         layer = self.output.layer if self.output else None
         if not layer:
             return
+        layer.startEditing()
 
         dragged_feature = layer.getFeature(feature_id)
         prev_dragged_id = (self._dragged_feature.id()
@@ -870,7 +871,7 @@ class MainWidget(QDockWidget):
         layer = self.input.layer if self.input else None
         if not layer:
             return
-
+        self.progress_bar.setStyleSheet('')
         self.reverse_picker_button.setEnabled(False)
         self.inspect_picker_button.setEnabled(False)
         self.export_csv_button.setEnabled(False)
@@ -1024,6 +1025,9 @@ class MainWidget(QDockWidget):
         self.output.layer.setReadOnly(False)
         if success:
             self.log('Geokodierung erfolgreich abgeschlossen')
+        else:
+            self.progress_bar.setStyleSheet(
+                'QProgressBar::chunk {background-color: red;}')
         # select output layer as current layer
         self.layer_combo.setLayer(self.output.layer)
         # zoom to extent of results
@@ -1121,8 +1125,10 @@ class MainWidget(QDockWidget):
                         layer, feat_id, value)
             self.result_fields['i'][0].set_value(layer, feat_id, i)
         else:
-            self.result_fields['typ'][0].set_value(layer, feat_id, '')
-            self.result_fields['score'][0].set_value(layer, feat_id, 0)
+            for rf, active in self.result_fields.values():
+                if active:
+                    rf.set_value(layer, feat_id, None)
+            layer.changeGeometry(feat_id, QgsGeometry())
         self.result_fields['manuell_bearbeitet'][0].set_value(
             layer, feat_id, set_edited)
         layer.commitChanges()
