@@ -86,6 +86,7 @@ class MainWidget(QDockWidget):
         self.output_layer_ids = []
 
         self.input = None
+        self.valid_bkg_key = False
         self.label_field_name = None
         # cache all results for a layer, (layer-id, feature-id) as keys,
         # geojson features as values
@@ -124,19 +125,6 @@ class MainWidget(QDockWidget):
         self.setupUi()
         self.setup_config()
 
-        # load background maps on start
-        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
-                              crs='EPSG:25832')#config.projection)
-        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
-        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
-                             crs='EPSG:25832')#crs=config.projection)
-        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
-        for layer in [bg_osm, bg_grey]:
-            layer.layer.setTitle(
-                '© Bundesamt für Kartographie und Geodäsie 2020, '
-                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
-                'Datenquellen_TopPlus_Open.pdf')
-
     def setupUi(self):
         '''
         set up the ui, fill it with dynamic content and connect all interactive
@@ -166,6 +154,8 @@ class MainWidget(QDockWidget):
         for encoding in QgsVectorDataProvider.availableEncodings():
             self.encoding_combo.addItem(encoding)
         self.encoding_combo.currentTextChanged.connect(self.set_encoding)
+
+        self.setup_crs()
 
         # initially set the first layer in the combobox as input
         self.change_layer(self.layer_combo.currentLayer())
@@ -211,8 +201,6 @@ class MainWidget(QDockWidget):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer)
         self._dragged_feature = None
-
-        self.setup_crs()
 
         # unregister layers from plugin when they are removed from QGIS
         # avoids errors when user is messing around in the QGIS UI
@@ -380,6 +368,15 @@ class MainWidget(QDockWidget):
         layer.setLabeling(labeling)
         layer.reload()
 
+    def toggle_start_button(self):
+        '''
+        enable start button if all inputs are made and valid, else disable
+        '''
+        enable = (self.input is not None and self.valid_bkg_key and
+                  self.field_map is not None and
+                  self.field_map.count_active() > 0)
+        self.request_start_button.setEnabled(enable)
+
     def check_rs(self, rs: str) -> bool:
         '''
         validate the given "Regionalschlüssel"
@@ -414,7 +411,8 @@ class MainWidget(QDockWidget):
                                                           url=url)
         self.key_error_label.setText(msg)
         self.key_error_label.setVisible(not success)
-        self.request_start_button.setEnabled(success)
+        self.valid_bkg_key = success
+        self.toggle_start_button()
         for code, name in available_crs:
             self.output_projection_combo.addItem(f'{name} ({code})', code)
         if current_crs:
@@ -624,6 +622,8 @@ class MainWidget(QDockWidget):
             if self.input and layer_id == self.input.id:
                 self.input = None
                 io_removed = True
+                self.field_map = None
+                clear_layout(self.parameter_grid)
         if io_removed and self.geocoding:
             self.geocoding.kill()
             self.log('Eingabe-/Ausgabelayer wurden während des '
@@ -690,6 +690,19 @@ class MainWidget(QDockWidget):
         # dock widget has to start docked
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
 
+        # load background maps on start
+        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
+                              crs='EPSG:25832')#config.projection)
+        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
+        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
+                             crs='EPSG:25832')#crs=config.projection)
+        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
+        for layer in [bg_osm, bg_grey]:
+            layer.layer.setTitle(
+                '© Bundesamt für Kartographie und Geodäsie 2020, '
+                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
+                'Datenquellen_TopPlus_Open.pdf')
+
         # undock it immediately and resize to content
         self.setFloating(True)
         # switch to config tab to update min size of dock widget
@@ -740,6 +753,7 @@ class MainWidget(QDockWidget):
         layer : QgsVectorLayer
             the layer to change the UI to
         '''
+        self.request_start_button.setEnabled(False)
         if not layer:
             return
         # set layer combo to given layer if it is not set to it
@@ -800,6 +814,7 @@ class MainWidget(QDockWidget):
                 checked = state != 0
                 self.field_map.set_active(field_name, checked)
                 combo.setEnabled(checked)
+                self.toggle_start_button()
             # apply changes to field map and combobox on check-state change
             checkbox.stateChanged.connect(
                 lambda s, c=combo, f=field_name : checkbox_changed(s, c, f))
@@ -846,6 +861,8 @@ class MainWidget(QDockWidget):
             label_field = self.label_cache.get(self.output.id)
         idx = self.label_field_combo.findData(label_field)
         self.label_field_combo.setCurrentIndex(max(idx, 0))
+
+        self.toggle_start_button()
 
     def set_encoding(self, encoding: str):
         '''
