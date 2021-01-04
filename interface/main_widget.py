@@ -1125,8 +1125,10 @@ class MainWidget(QDockWidget):
                         layer, feat_id, value)
             self.result_fields['i'][0].set_value(layer, feat_id, i)
         else:
-            self.result_fields['typ'][0].set_value(layer, feat_id, '')
-            self.result_fields['score'][0].set_value(layer, feat_id, 0)
+            for rf, active in self.result_fields.values():
+                if active:
+                    rf.set_value(layer, feat_id, None)
+            layer.changeGeometry(feat_id, QgsGeometry())
         self.result_fields['manuell_bearbeitet'][0].set_value(
             layer, feat_id, set_edited)
         layer.commitChanges()
