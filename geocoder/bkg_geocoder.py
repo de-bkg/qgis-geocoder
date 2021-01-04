@@ -51,6 +51,8 @@ BKG_RESULT_FIELDS = [
     # optional fields
     ResField('qualitaet', 'text', alias='Qualität', prefix=prefix,
              optional=True),
+    ResField('qkz', 'text', alias='Qualitätskennzeichen',
+             prefix=prefix, optional=True),
     ResField('ags', 'text', alias='AGS laut Dienst', prefix=prefix,
              optional=True),
     ResField('rs', 'text', alias='RS laut Dienst', prefix=prefix,
