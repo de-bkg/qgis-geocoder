@@ -125,19 +125,6 @@ class MainWidget(QDockWidget):
         self.setupUi()
         self.setup_config()
 
-        # load background maps on start
-        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
-                              crs='EPSG:25832')#config.projection)
-        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
-        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
-                             crs='EPSG:25832')#crs=config.projection)
-        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
-        for layer in [bg_osm, bg_grey]:
-            layer.layer.setTitle(
-                '© Bundesamt für Kartographie und Geodäsie 2020, '
-                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
-                'Datenquellen_TopPlus_Open.pdf')
-
     def setupUi(self):
         '''
         set up the ui, fill it with dynamic content and connect all interactive
@@ -635,6 +622,8 @@ class MainWidget(QDockWidget):
             if self.input and layer_id == self.input.id:
                 self.input = None
                 io_removed = True
+                self.field_map = None
+                clear_layout(self.parameter_grid)
         if io_removed and self.geocoding:
             self.geocoding.kill()
             self.log('Eingabe-/Ausgabelayer wurden während des '
@@ -700,6 +689,19 @@ class MainWidget(QDockWidget):
         '''
         # dock widget has to start docked
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
+
+        # load background maps on start
+        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
+                              crs='EPSG:25832')#config.projection)
+        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
+        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
+                             crs='EPSG:25832')#crs=config.projection)
+        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
+        for layer in [bg_osm, bg_grey]:
+            layer.layer.setTitle(
+                '© Bundesamt für Kartographie und Geodäsie 2020, '
+                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
+                'Datenquellen_TopPlus_Open.pdf')
 
         # undock it immediately and resize to content
         self.setFloating(True)
