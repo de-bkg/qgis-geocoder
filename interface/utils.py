@@ -711,7 +711,7 @@ class Request(QObject):
         return QgsNetworkAccessManager.instance()
 
     def get(self, url: str, params: dict = None,
-            timeout: int = 10000, **kwargs) -> Reply:
+            timeout: int = 20000, **kwargs) -> Reply:
         '''
         queries given url (GET)
 
@@ -724,7 +724,7 @@ class Request(QObject):
             values, defaults to no query parameters
         timeout : int, optional
             the timeout of synchronous requests in milliseconds, will be ignored
-            when making asynchronous requests, defaults to 10000 ms
+            when making asynchronous requests, defaults to 20000 ms
         **kwargs :
             additional parameters matching the requests interface will
             be ignored (e.g. verify is not supported)
@@ -750,7 +750,7 @@ class Request(QObject):
         return self._get_async(qurl)
 
     def post(self, url, params: dict = None, data: bytes = b'',
-             timeout: int = 10000, content_type: str = None, **kwargs) -> Reply:
+             timeout: int = 20000, content_type: str = None, **kwargs) -> Reply:
         '''
         posts data to given url (POST)
 
@@ -767,7 +767,7 @@ class Request(QObject):
             the data to post as a byte-string, defaults to no data posted
         timeout : int, optional
             the timeout of synchronous requests in milliseconds, will be ignored
-            when making asynchronous requests, defaults to 10000 ms
+            when making asynchronous requests, defaults to 20000 ms
         content_type : str, optional
             the content type of the data, puts content type into header of
             request
@@ -797,7 +797,7 @@ class Request(QObject):
         return self._post_async(qurl, content_type=content_type)
 
 
-    def _get_sync(self, qurl: QUrl, timeout: int = 10000) -> Reply:
+    def _get_sync(self, qurl: QUrl, timeout: int = 20000) -> Reply:
         '''
         synchronous GET-request
         '''
@@ -851,7 +851,7 @@ class Request(QObject):
         #self.reply.readyRead.connect(ready_read)
         #return 0
 
-    def _post_sync(self, qurl: QUrl, timeout: int = 10000, data: bytes = b'',
+    def _post_sync(self, qurl: QUrl, timeout: int = 20000, data: bytes = b'',
                    content_type=None):
         '''
         synchronous POST-request
