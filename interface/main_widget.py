@@ -806,7 +806,7 @@ class MainWidget(QDockWidget):
             # combobox for user-selection of a API-keyword matching the field
             combo = QComboBox()
             combo.addItem('Volltextsuche', None)
-            for key, text in BKGGeocoder.keywords.items():
+            for key, (text, regex) in BKGGeocoder.keywords.items():
                 combo.addItem(text, key)
 
             def checkbox_changed(state: bool, combo: QComboBox,

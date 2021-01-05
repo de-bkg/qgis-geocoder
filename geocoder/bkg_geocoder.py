@@ -41,7 +41,6 @@ URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
 # fields added to the input layer containing the properties of the results
 prefix = 'bkg'
 
-# ['text', 'typ', 'score', 'bbox', 'ags', 'rs', 'schluessel', 'bundesland', 'regbezirk', 'kreis', 'verwgem', 'gemeinde', 'plz', 'ort', 'ortsteil', 'strasse', 'haus', 'qualitaet', 'treffer']
 BKG_RESULT_FIELDS = [
     # required by UI
     ResField('typ', 'text', alias='Klassifizierung', prefix=prefix),
@@ -65,7 +64,7 @@ BKG_RESULT_FIELDS = [
              prefix=prefix, optional=True),
     ResField('kreis', 'text', alias='Kreis laut Dienst',
              prefix=prefix, optional=True),
-    ResField('verwgem', 'text', alias='Verwaltungsgemeinde laut Dienst',
+    ResField('verwgem', 'text', alias='Verwaltungsgemeinschaft laut Dienst',
              prefix=prefix, optional=True),
     ResField('gemeinde', 'text', alias='Gemeinde laut Dienst',
              prefix=prefix, optional=True),
@@ -156,7 +155,8 @@ class BKGGeocoder(Geocoder):
     Attributes
     ----------
     keywords : dict
-        search paramaters of the API as keys and pretty names as values
+        search paramaters of the API as keys and tuples of pretty name, regex
+        as values
     special_keywords : dict
         keywords that are not directly supported by the API but
         can be used by splitting the input into seperate supported keywords
@@ -168,19 +168,20 @@ class BKGGeocoder(Geocoder):
     '''
 
     keywords = {
-        'ort': 'Ort',
-        'ortsteil': 'Ortsteil',
-        'strasse': 'Straße',
-        'haus': 'Hausnummer',
-        'plz': 'Postleitzahl',
-        'strasse_haus': 'Straße + Hausnummer',
-        'plz_ort': 'Postleitzahl + Ort',
-        'gemeinde': 'Gemeinde',
-        'kreis': 'Kreis',
-        'verwgem': 'Verwaltungsgemeinde',
-        'bundesland': 'Bundesland',
-        'ortsteil': 'Ortsteil',
-        'zusatz': 'Zusatz (zu Hausnummer)'
+        'ort': ('Ort', 'Stadt'),
+        'ortsteil': ('Ortsteil', r'(Stadtteil)|(Gemeindeteil)'),
+        'strasse': ('Straße', r'^str(\.?|a[s|ß]+e)$'),
+        'haus': ('Hausnummer', r'^H(a?u?s?Nu?m?m?e?r)$'),
+        'plz': ('Postleitzahl', r'^P(o?s?t?le?i?t?za?h?l?)$'),
+        'strasse_haus': ('Straße + Hausnummer',
+                         r'^str(\.?|a[s|ß]+e).*(Ha?u?s?Nu?m?m?e?r)$'),
+        'plz_ort': ('Postleitzahl + Ort', r'^(Po?s?t?le?i?t?za?h?l?).*(Ort)$'),
+        'gemeinde': ('Gemeinde', None),
+        'kreis': ('Kreis', r'(L?a?n?d?kreis)$'),
+        'verwgem': ('Verwaltungsgemeinschaft',
+                    r'(^Amt)|(^Verwaltungsgem)|(^Samtgem)'),
+        'bundesland': ('Bundesland', r'(land)$'),
+        'zusatz': ('Zusatz (zu Hausnummer)', r'Ha?u?s?Nu?m?m?e?r.*Zusatz$'),
     }
 
     exception_codes = {

@@ -29,6 +29,12 @@ import re
 import math
 import copy
 
+def check_val(value, p2k):
+    for pattern, key in p2k.items():
+        if re.search(pattern, value):
+            return key
+    return False
+
 
 class FieldMap:
     '''
@@ -52,8 +58,8 @@ class FieldMap:
             field names to ignore (will not be mappable)
         keywords : dict, optional
             dictionary of available parameters for the geocoder,
-            pretty names (as displayed in UI) as keys and parameter names as
-            values (as used for geocoding).
+            pretty names (as displayed in UI) as keys and tuples of parameter
+            name (as used for geocoding), regex as values.
             fields of layers matching either the keys or the values will be
             automatically be assigned and set active (all other fields are not
             active by default)
@@ -62,21 +68,23 @@ class FieldMap:
         self._mapping = {}
         self.layer = layer
         items = keywords.items()
-        keys = [i[0] for i in items]
-        kv_flat = [item.lower() for sublist in items for item in sublist]
+        k2k = {k.lower(): k for k in keywords}
+        v2k = {v[0].lower(): k for k, v in items}
+        p2k = {re.compile(v[1], re.I): k for k, v in items if v[1]}
         # put all fields of the layer into the map dict
         for field in layer.fields():
             name = field.name()
             if name in ignore:
                 continue
-            # automatically assign fields to matching keywords (either the
-            # pretty name or the actual parameter name) and set them
+            # automatically assign fields to matching keywords (pretty name,
+            # the actual parameter name or regex) and set them
             # active if matched, all other fields are not active by default
-            idx = kv_flat.index(name.lower()) // 2 if name.lower() in kv_flat \
-                else -1
-            keyword = keys[idx] if idx >= 0 else None
-            active = True if idx >= 0 else False
-            self._mapping[name] = [active, keyword]
+            v = name.lower()
+            key = k2k.get(v, v2k.get(v, None))
+            if not key:
+                key = check_val(v, p2k)
+            active = True if key else False
+            self._mapping[name] = [active, key]
 
     def valid(self, layer: QgsVectorLayer) -> bool:
         '''
