@@ -1052,7 +1052,7 @@ class MainWidget(QDockWidget):
         self.output.layer.setReadOnly(False)
         if success:
             self.log(f'Geokodierung von {self.feat_count} '
-                     'Features abgeschlossen.')
+                     'Feature(s) abgeschlossen.')
             fail_count = self.feat_count - self.success_count
             if fail_count:
                 self.log(f'{fail_count} Feature(s) lieferten keine Ergebnisse',
