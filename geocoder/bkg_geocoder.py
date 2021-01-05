@@ -65,7 +65,7 @@ BKG_RESULT_FIELDS = [
              prefix=prefix, optional=True),
     ResField('kreis', 'text', alias='Kreis laut Dienst',
              prefix=prefix, optional=True),
-    ResField('verwgem', 'text', alias='Verwaltungsgemeinde laut Dienst',
+    ResField('verwgem', 'text', alias='Verwaltungsgemeinschaft laut Dienst',
              prefix=prefix, optional=True),
     ResField('gemeinde', 'text', alias='Gemeinde laut Dienst',
              prefix=prefix, optional=True),
@@ -177,7 +177,7 @@ class BKGGeocoder(Geocoder):
         'plz_ort': 'Postleitzahl + Ort',
         'gemeinde': 'Gemeinde',
         'kreis': 'Kreis',
-        'verwgem': 'Verwaltungsgemeinde',
+        'verwgem': 'Verwaltungsgemeinschaft',
         'bundesland': 'Bundesland',
         'ortsteil': 'Ortsteil',
         'zusatz': 'Zusatz (zu Hausnummer)'
