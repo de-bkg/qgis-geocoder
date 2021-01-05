@@ -127,7 +127,7 @@ class ResField:
         '''return compatible field name depending on data provider '''
         provider_type = layer.dataProvider().storageType()
         if provider_type == 'ESRI Shapefile':
-            self.field_name[:10]
+            return self.field_name[:10]
         return self.field_name
 
     @staticmethod

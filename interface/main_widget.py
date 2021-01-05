@@ -689,22 +689,9 @@ class MainWidget(QDockWidget):
         '''
         # dock widget has to start docked
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
-
-        # load background maps on start
-        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
-                              crs='EPSG:25832')#config.projection)
-        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
-        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
-                             crs='EPSG:25832')#crs=config.projection)
-        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
-        for layer in [bg_osm, bg_grey]:
-            layer.layer.setTitle(
-                '© Bundesamt für Kartographie und Geodäsie 2020, '
-                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
-                'Datenquellen_TopPlus_Open.pdf')
-
         # undock it immediately and resize to content
         self.setFloating(True)
+
         # switch to config tab to update min size of dock widget
         # otherwise widget tends to be have a very high height (as if all
         # config groups are expanded)
@@ -717,6 +704,19 @@ class MainWidget(QDockWidget):
         # for some reason the height is ignored when setting geometry when
         # calling show() the first time
         self.resize(self.sizeHint().width(), height + 100)
+
+        # load background maps on opening plugin
+        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
+                              crs='EPSG:25832')#config.projection)
+        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
+        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
+                             crs='EPSG:25832')#crs=config.projection)
+        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
+        for layer in [bg_osm, bg_grey]:
+            layer.layer.setTitle(
+                '© Bundesamt für Kartographie und Geodäsie 2020, '
+                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
+                'Datenquellen_TopPlus_Open.pdf')
 
     def log(self, text: str, level: int = Qgis.Info, debug_only=False):
         '''
