@@ -689,22 +689,9 @@ class MainWidget(QDockWidget):
         '''
         # dock widget has to start docked
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
-
-        # load background maps on start
-        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
-                              crs='EPSG:25832')#config.projection)
-        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
-        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
-                             crs='EPSG:25832')#crs=config.projection)
-        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
-        for layer in [bg_osm, bg_grey]:
-            layer.layer.setTitle(
-                '© Bundesamt für Kartographie und Geodäsie 2020, '
-                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
-                'Datenquellen_TopPlus_Open.pdf')
-
         # undock it immediately and resize to content
         self.setFloating(True)
+
         # switch to config tab to update min size of dock widget
         # otherwise widget tends to be have a very high height (as if all
         # config groups are expanded)
@@ -717,6 +704,19 @@ class MainWidget(QDockWidget):
         # for some reason the height is ignored when setting geometry when
         # calling show() the first time
         self.resize(self.sizeHint().width(), height + 100)
+
+        # load background maps on opening plugin
+        bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
+                              crs='EPSG:25832')#config.projection)
+        bg_grey.draw('TopPlusOpen Graustufen (bkg.bund.de)', checked=True)
+        bg_osm = TopPlusOpen(groupname='Hintergrundkarten',
+                             crs='EPSG:25832')#crs=config.projection)
+        bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
+        for layer in [bg_osm, bg_grey]:
+            layer.layer.setTitle(
+                '© Bundesamt für Kartographie und Geodäsie 2020, '
+                'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
+                'Datenquellen_TopPlus_Open.pdf')
 
     def log(self, text: str, level: int = Qgis.Info, debug_only=False):
         '''
@@ -911,8 +911,12 @@ class MainWidget(QDockWidget):
             else:
                 rs = config.rs
 
-        features = layer.selectedFeatures() \
-            if config.selected_features_only else layer.getFeatures()
+        if config.selected_features_only:
+            features = layer.selectedFeatures()
+        # if no features are selected (or all should be taken in first place)
+        # -> take all features
+        if not config.selected_features_only or len(features) == 0:
+            features = list(layer.getFeatures())
 
         # input layer is flagged as output layer
         if self.update_input_layer_check.isChecked():
@@ -948,7 +952,10 @@ class MainWidget(QDockWidget):
                 self.label_cache.get(layer.id())
             # take features of output layer as input to match the ids of the
             # geocoding
-            features = [f for f in self.output.layer.getFeatures()]
+            features = list(self.output.layer.getFeatures())
+
+        self.success_count = 0
+        self.feat_count = len(features)
 
         self.apply_label()
 
@@ -984,7 +991,10 @@ class MainWidget(QDockWidget):
                 if (self.label_field_name) else f'Feature {f.id()}'
             results = r.json()['features']
             message = (f'{label} -> <b>{len(results)} </b> Ergebnis(se)')
-            self.log(message, level=Qgis.Info)
+            if len(results) > 0:
+                self.success_count += 1
+            self.log(
+                message, level=Qgis.Info if len(results) > 0 else Qgis.Warning)
             self.output.layer.setReadOnly(False)
             self.store_bkg_results(f, results)
             self.output.layer.setReadOnly(True)
@@ -1041,7 +1051,13 @@ class MainWidget(QDockWidget):
         self.input.layer.setReadOnly(False)
         self.output.layer.setReadOnly(False)
         if success:
-            self.log('Geokodierung erfolgreich abgeschlossen')
+            self.log(f'Geokodierung von {self.feat_count} '
+                     'Features abgeschlossen.')
+            fail_count = self.feat_count - self.success_count
+            if fail_count:
+                self.log(f'{fail_count} Feature(s) lieferten keine Ergebnisse',
+                         level=Qgis.Warning if fail_count < self.feat_count
+                         else Qgis.Critical)
         else:
             self.progress_bar.setStyleSheet(
                 'QProgressBar::chunk {background-color: red;}')
