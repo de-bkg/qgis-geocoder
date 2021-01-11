@@ -180,6 +180,8 @@ class MainWidget(QDockWidget):
         self.use_rs_check.toggled.connect(
             lambda: set_rs(self.rs_edit.text()))
 
+        self.background_check
+
         # spatial filter
         # only polygons can be used as a spatial filter
         self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
@@ -220,6 +222,10 @@ class MainWidget(QDockWidget):
         self.fuzzy_check.setChecked(config.fuzzy)
         self.fuzzy_check.toggled.connect(
             lambda checked: setattr(config, 'fuzzy', checked))
+
+        self.background_check.setChecked(config.load_background)
+        self.background_check.toggled.connect(
+            lambda checked: setattr(config, 'load_background', checked))
 
         # API key and url
         self.api_key_edit.setText(config.api_key)
@@ -705,6 +711,7 @@ class MainWidget(QDockWidget):
         # calling show() the first time
         self.resize(self.sizeHint().width(), height + 100)
 
+    def add_background(self):
         # load background maps on opening plugin
         bg_grey = TopPlusOpen(groupname='Hintergrundkarten', greyscale=True,
                               crs='EPSG:25832')#config.projection)
@@ -1024,6 +1031,9 @@ class MainWidget(QDockWidget):
         self.log(f'<br>Starte Geokodierung <b>{layer.name()}</b>')
         self.start_time = datetime.datetime.now()
         self.timer.start(1000)
+
+        if config.load_background:
+            self.add_background()
         self.geocoding.start()
 
     def update_timer(self):

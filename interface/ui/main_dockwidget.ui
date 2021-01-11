@@ -955,6 +955,31 @@ Objekte nutzen</string>
             </spacer>
            </item>
            <item>
+            <widget class="QCheckBox" name="background_check">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>180</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>&lt;p&gt;Lädt Hintergrundkarten automatisch beim Start der Geokodierung.&lt;/p&gt;</string>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="text">
+              <string>automatisches Laden der Hintergrundkarten</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
               <string>Anzeigestil der Ergebnislayer</string>

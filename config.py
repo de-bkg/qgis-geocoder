@@ -85,7 +85,8 @@ class Config(object):
         'fuzzy': False,
         'rs': '',
         'output_style': DEFAULT_STYLE,
-        'result_fields': []
+        'result_fields': [],
+        'load_background': True
     }
 
     _config = {}
