@@ -2,7 +2,7 @@
 name=BKG Geocoder
 qgisMinimumVersion=3.6
 description=Geokodierung mit dem BKG Geokodierungsdienst
-version=1.2
+version=1.3
 author=Bundesamt für Kartographie und Geodäsie
 email=gis@ggr-planung.de
 
@@ -12,6 +12,20 @@ tracker=https://github.com/ChrFr/qgis-geocoder/issues
 repository=https://github.com/ChrFr/qgis-geocoder
 
 # changelog=
+      1.3
+      ---------
+      Sonstiges
+      - präzisere automatische Feldzuweisung
+      - Möglichkeit zur Deaktivierung des automatischen Ladens der Hintergrundkarten
+      - Geokodierung nicht mehr durchführbar, wenn nicht alle nötigen Einstellungen vorgenommen wurden
+      - zusätzliche Ergebnisfelder
+      - Timeout bei Anfragen erhöht
+      - detaillierteres Ergebnislog
+
+      Bugfixes
+      - Fehler bei Aktualisierung von Shape-Dateien behoben
+      - Feldzuweisung bei Entfernung des Eingangslayers wird jetzt korrekt zurückgesetzt
+
       1.2
       ---------
       Sonstiges
