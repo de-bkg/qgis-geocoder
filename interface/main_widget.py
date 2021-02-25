@@ -180,8 +180,6 @@ class MainWidget(QDockWidget):
         self.use_rs_check.toggled.connect(
             lambda: set_rs(self.rs_edit.text()))
 
-        self.background_check
-
         # spatial filter
         # only polygons can be used as a spatial filter
         self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
@@ -1165,7 +1163,7 @@ class MainWidget(QDockWidget):
                         rf.set_value(layer, feat_id, value)
                 if n_results:
                     self.result_fields['n_results'][0].set_value(
-                        layer, feat_id, value)
+                        layer, feat_id, n_results)
             self.result_fields['i'][0].set_value(layer, feat_id, i)
         else:
             for rf, active in self.result_fields.values():
