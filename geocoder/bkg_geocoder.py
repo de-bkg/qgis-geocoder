@@ -36,7 +36,7 @@ from bkggeocoder.interface.utils import Request, Reply, ResField
 requests = Request()
 
 # default url to the BKG geocoding service, key has to be replaced
-URL = 'http://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
+URL = 'https://sg.geodatenzentrum.de/gdz_geokodierung__{key}'
 
 # fields added to the input layer containing the properties of the results
 prefix = 'bkg'
@@ -68,7 +68,7 @@ BKG_RESULT_FIELDS = [
              prefix=prefix, optional=True),
     ResField('gemeinde', 'text', alias='Gemeinde laut Dienst',
              prefix=prefix, optional=True),
-    ResField('plz', 'text', alias='Posleitzahl laut Dienst',
+    ResField('plz', 'text', alias='Postleitzahl laut Dienst',
              prefix=prefix, optional=True),
     ResField('ort', 'text', alias='Ort laut Dienst',
              prefix=prefix, optional=True),
@@ -322,7 +322,8 @@ class BKGGeocoder(Geocoder):
         url = url.replace('geosearch', '')
         url += '/index.xml'
         default = [('EPSG:25832', 'ETRS89 / UTM zone 32N')]
-        con_msg = 'Der Dienst ist zur Zeit nicht erreichbar.'
+        con_msg = ('Der Dienst ist zur Zeit nicht erreichbar bzw. '
+                   'die angegebene URL ist nicht gültig.')
         try:
             res = requests.get(url)
         except ConnectionError:
@@ -330,7 +331,8 @@ class BKGGeocoder(Geocoder):
         if res.status_code == None:
             return False, con_msg, default
         if res.status_code != 200:
-            msg = 'Der eingegebene Schlüssel bzw. die URL ist nicht gültig'
+            msg = ('Der eingegebene Schlüssel bzw. '
+                   'die angegebene URL ist nicht gültig')
             return False, msg, default
         parser = CRSParser()
         parser.feed(res.content.decode("utf-8"))
