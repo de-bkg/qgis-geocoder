@@ -30,16 +30,16 @@ from .geocoder.bkg_geocoder import URL
 
 path = os.path.dirname(__file__)
 
-VERSION = '1.4'
+VERSION = '1.3.1'
 
 # data paths
 UI_PATH = os.path.join(path, 'interface', 'ui')
 ICON_PATH = os.path.join(path, 'interface', 'ui', 'icons')
 STYLE_PATH = os.path.join(path, 'interface', 'styles')
 
-# url to help website, left out trailing 'file://', other wise webbrowser won't
-# open tags or pass query params whyever
-HELP_URL = f'{path}/help/Benutzerhandbuch.html'.replace('\\', '/')
+# url to help website
+BASE_HELP_URL = 'https://sg.geodatenzentrum.de/web_public/gdz/dokumentation/deu/'
+HELP_URL = BASE_HELP_URL + 'qgis_geocoder_v1.3.pdf'
 
 # path to config file location
 DEFAULT_FILE = os.path.join(expanduser("~"), "bkg_geocoder.cfg")
@@ -83,6 +83,7 @@ class Config(object):
         'use_rs': False,
         'debug': False,
         'fuzzy': False,
+        'show_encoding': False,
         'rs': '',
         'output_style': DEFAULT_STYLE,
         'result_fields': [],

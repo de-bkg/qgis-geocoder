@@ -138,12 +138,7 @@ class MainWidget(QDockWidget):
         self.request_stop_button.clicked.connect(lambda: self.geocoding.kill())
         self.request_stop_button.setVisible(False)
 
-        # temporarily disabled help buttons
-        self.help_button.setVisible(False)
-        self.rsinfo_button.setVisible(False)
-        #self.help_button.clicked.connect(self.show_help)
-        #self.rsinfo_button.clicked.connect(
-            #lambda: self.show_help(tag='regionalschluessel'))
+        self.help_button.clicked.connect(self.show_help)
         self.about_button.clicked.connect(self.show_about)
 
         # only vector layers as input
@@ -247,6 +242,14 @@ class MainWidget(QDockWidget):
             self.api_key_check.setChecked(True)
         self.api_key_check.toggled.connect(
             lambda checked: setattr(config, 'use_api_url', not checked))
+
+        def toggle_encoding(enabled):
+            config.show_encoding = enabled # lazy
+            self.encoding_label.setVisible(enabled)
+            self.encoding_combo.setVisible(enabled)
+        self.encoding_check.setChecked(config.show_encoding)
+        self.encoding_check.toggled.connect(toggle_encoding)
+        toggle_encoding(config.show_encoding)
 
         # crs config
         idx = self.output_projection_combo.findData(config.projection)
