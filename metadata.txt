@@ -17,6 +17,7 @@ repository=https://github.com/ChrFr/qgis-geocoder
       Bugfixes
       - sporadischer Fehler beim Speichern der Anzahl der Ergebnisse behoben
       - Verlinkung Hilfe-PDF
+      - Encoding standardmäßig ausgeblendet, kann in der Konfiguration > Expertenmodus wieder eingeblendet werden
 
       1.3
       ---------
