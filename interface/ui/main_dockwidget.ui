@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>370</width>
-    <height>441</height>
+    <width>428</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="layoutDirection">
@@ -324,8 +324,8 @@ padding: 2px;
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>326</width>
-                <height>224</height>
+                <width>366</width>
+                <height>276</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -379,705 +379,724 @@ padding: 2px;
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="title">
-           <string>Koordinatenbezugssystem:</string>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-          <property name="checkable">
-           <bool>false</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
-           <item>
-            <widget class="QComboBox" name="output_projection_combo">
-             <property name="toolTip">
-              <string>&lt;p&gt;Hier können Sie das gewünschte Ziel-Koordinatensystem angeben, in welches geokodiert werden soll.&lt;/p&gt;</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Filter</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QCheckBox" name="use_rs_check">
-             <property name="toolTip">
-              <string>Aktivierung/Deaktivierung des Filters über den Regionalschlüssel</string>
-             </property>
-             <property name="text">
-              <string>Regionalschlüssel:</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="rs_error_label">
-             <property name="styleSheet">
-              <string notr="true">color: red;</string>
-             </property>
-             <property name="text">
-              <string>Der eingegebene Regionalschlüssel ist nicht gültig</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <property name="spacing">
-              <number>6</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLineEdit" name="rs_edit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>150</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;p&gt;In diesem Feld kann der Regionalschlüssel als Filter zur regionalen Eingrenzung des Suchgebietes eingegeben werden.&lt;/p&gt;&lt;p&gt;Dies führt in der Folge dazu, dass nur Treffer innerhalb des gewählten Verwaltungsgebietes (z.B. Bundesland, Kreis, Gemeinde) gefunden werden können.&lt;/p&gt;</string>
-               </property>
-               <property name="clearButtonEnabled">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="rs_combo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>140</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtern Sie die Suche nach Bundesländern. &lt;/p&gt;&lt;p&gt;Die Auswahl fügt die Kennzahl des gewählten Bundeslandes in nebenstehendes Textfeld ein.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="editable">
-                <bool>false</bool>
-               </property>
-               <property name="currentIndex">
-                <number>-1</number>
-               </property>
-               <property name="maxVisibleItems">
-                <number>17</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="Line" name="line_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="use_spatial_filter_check">
-             <property name="toolTip">
-              <string>Aktivierung/Deaktivierung des räumlichen Filters</string>
-             </property>
-             <property name="text">
-              <string>Räumlicher Filter:</string>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QgsMapLayerComboBox" name="spatial_filter_combo">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wählen Sie einen Polygonlayer, auf dessen Grenzen die Suche beschränkt werden soll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="frame">
-                <bool>true</bool>
-               </property>
-               <property name="showCrs">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="spatial_selected_only_check">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beschränken Sie die Suche weiter auf lediglich die selektierten Objekte des gewählten Layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>nur selektierte 
-Objekte nutzen</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="n_spatial_selected_label">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="reload_spatial_button">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>&lt;p&gt;Überprüfung des räumlichen Filters.&lt;/p&gt;</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QgsCollapsibleGroupBox" name="uuid_group">
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="title">
-           <string>Zugangsdaten</string>
-          </property>
-          <property name="collapsed">
-           <bool>false</bool>
-          </property>
-          <property name="saveCollapsedState">
+         <widget class="QScrollArea" name="scrollArea_2">
+          <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_11">
-           <item>
-            <widget class="QLabel" name="key_error_label">
-             <property name="styleSheet">
-              <string notr="true">color: red;</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_10">
-             <item>
-              <layout class="QGridLayout" name="gridLayout_2">
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="api_key_edit">
+          <widget class="QWidget" name="scrollAreaWidgetContents_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>384</width>
+             <height>416</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_12">
+            <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="title">
+               <string>Koordinatenbezugssystem:</string>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <item>
+                <widget class="QComboBox" name="output_projection_combo">
                  <property name="toolTip">
-                  <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
+                  <string>&lt;p&gt;Hier können Sie das gewünschte Ziel-Koordinatensystem angeben, in welches geokodiert werden soll.&lt;/p&gt;</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="api_key_check">
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Filter</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <widget class="QCheckBox" name="use_rs_check">
                  <property name="toolTip">
-                  <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
+                  <string>Aktivierung/Deaktivierung des Filters über den Regionalschlüssel</string>
                  </property>
                  <property name="text">
-                  <string>BKG UUID</string>
+                  <string>Regionalschlüssel:</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="api_url_check">
-                 <property name="toolTip">
-                  <string>&lt;p&gt;Hier können Sie die URL des Geokodierungsdienstes manuell angeben. Nutzen Sie diese Option, wenn Sie sich per IP-Adresse authentifizieren oder nicht den Geokodierungsdienst für Adressen der AdV nutzen wollen.&lt;/p&gt;</string>
+               <item>
+                <widget class="QLabel" name="rs_error_label">
+                 <property name="styleSheet">
+                  <string notr="true">color: red;</string>
                  </property>
                  <property name="text">
-                  <string>Manuelle URL Eingabe</string>
+                  <string>Der eingegebene Regionalschlüssel ist nicht gültig</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="api_url_edit">
-                 <property name="enabled">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <property name="spacing">
+                  <number>6</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLineEdit" name="rs_edit">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>150</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;p&gt;In diesem Feld kann der Regionalschlüssel als Filter zur regionalen Eingrenzung des Suchgebietes eingegeben werden.&lt;/p&gt;&lt;p&gt;Dies führt in der Folge dazu, dass nur Treffer innerhalb des gewählten Verwaltungsgebietes (z.B. Bundesland, Kreis, Gemeinde) gefunden werden können.&lt;/p&gt;</string>
+                   </property>
+                   <property name="clearButtonEnabled">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="rs_combo">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filtern Sie die Suche nach Bundesländern. &lt;/p&gt;&lt;p&gt;Die Auswahl fügt die Kennzahl des gewählten Bundeslandes in nebenstehendes Textfeld ein.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="editable">
+                    <bool>false</bool>
+                   </property>
+                   <property name="currentIndex">
+                    <number>-1</number>
+                   </property>
+                   <property name="maxVisibleItems">
+                    <number>17</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="Line" name="line_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="use_spatial_filter_check">
+                 <property name="toolTip">
+                  <string>Aktivierung/Deaktivierung des räumlichen Filters</string>
+                 </property>
+                 <property name="text">
+                  <string>Räumlicher Filter:</string>
+                 </property>
+                 <property name="checked">
                   <bool>false</bool>
                  </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QgsMapLayerComboBox" name="spatial_filter_combo">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wählen Sie einen Polygonlayer, auf dessen Grenzen die Suche beschränkt werden soll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="frame">
+                    <bool>true</bool>
+                   </property>
+                   <property name="showCrs">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="spatial_selected_only_check">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beschränken Sie die Suche weiter auf lediglich die selektierten Objekte des gewählten Layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>nur selektierte 
+Objekte nutzen</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="n_spatial_selected_label">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="reload_spatial_button">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;p&gt;Überprüfung des räumlichen Filters.&lt;/p&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QgsCollapsibleGroupBox" name="uuid_group">
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="title">
+               <string>Zugangsdaten</string>
+              </property>
+              <property name="collapsed">
+               <bool>false</bool>
+              </property>
+              <property name="saveCollapsedState">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_11">
+               <item>
+                <widget class="QLabel" name="key_error_label">
+                 <property name="styleSheet">
+                  <string notr="true">color: red;</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_10">
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_2">
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="api_key_edit">
+                     <property name="toolTip">
+                      <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QRadioButton" name="api_key_check">
+                     <property name="toolTip">
+                      <string>&lt;p&gt;Zur Geokodierung mit dem Plugin BKGGeocoder benötigen sie einen gültigen Nutzer/-innen Identifikator (UUID).&lt;/p&gt;&lt;p&gt;Geben Sie hier die UUID an.&lt;/p&gt;</string>
+                     </property>
+                     <property name="text">
+                      <string>BKG UUID</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QRadioButton" name="api_url_check">
+                     <property name="toolTip">
+                      <string>&lt;p&gt;Hier können Sie die URL des Geokodierungsdienstes manuell angeben. Nutzen Sie diese Option, wenn Sie sich per IP-Adresse authentifizieren oder nicht den Geokodierungsdienst für Adressen der AdV nutzen wollen.&lt;/p&gt;</string>
+                     </property>
+                     <property name="text">
+                      <string>Manuelle URL Eingabe</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="api_url_edit">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;p&gt;Hier können Sie die URL des Geokodierungsdienstes manuell angeben. Nutzen Sie diese Option, wenn Sie sich per IP-Adresse authentifizieren oder nicht den Geokodierungsdienst für Adressen der AdV nutzen wollen.&lt;/p&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="reload_UUID_button">
+                   <property name="toolTip">
+                    <string>&lt;p&gt;Überprüfung der aktuell eingestellten UUID/Dienst-URL.&lt;/p&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QgsCollapsibleGroupBox" name="output_fields_group">
+              <property name="toolTip">
+               <string>&lt;p&gt;Hier können zusätzlich zu den Standardergebnissen weitere Ergebnisfelder ausgewählt werden, die dem Ergebnislayer hinzugefügt werden.&lt;/p&gt;&lt;p&gt;Die Änderungen werden erst ab der nächsten Anfrage gültig.&lt;/p&gt;</string>
+              </property>
+              <property name="title">
+               <string>Zusätzliche Ergebnisfelder</string>
+              </property>
+              <property name="collapsed">
+               <bool>true</bool>
+              </property>
+              <property name="saveCollapsedState">
+               <bool>true</bool>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_3"/>
+             </widget>
+            </item>
+            <item>
+             <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>&lt;p&gt;Nehmen Sie hier erweiterte Einstellungen vor.&lt;/p&gt;</string>
+              </property>
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="title">
+               <string>Expertenmodus</string>
+              </property>
+              <property name="collapsed">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QCheckBox" name="selected_features_only_check">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>180</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;p&gt;Geokodieren Sie lediglich die ausgewählten Objekte des Quelllayers&lt;/p&gt;</string>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string>nur selektierte Features nutzen</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="fuzzy_check">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Eine unscharfe Suche erlaubt eine tolerante Suche basierend auf dem Levenshtein (Edit) Distanz Algorithmus.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>unscharfe Suche</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_8">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_13">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QCheckBox" name="update_input_layer_check">
+                   <property name="minimumSize">
+                    <size>
+                     <width>180</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;p&gt;Die Option ist nur verfügbar, wenn der gewählte Layer eine Punktgeometrie enthält.&lt;/p&gt;</string>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string>Ausgangslayer aktualisieren</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_14">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_8">
+                   <property name="minimumSize">
+                    <size>
+                     <width>180</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>Verknüpfung der Suchterme:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="search_and_check">
+                   <property name="minimumSize">
+                    <size>
+                     <width>50</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>AND</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="search_or_check">
+                   <property name="minimumSize">
+                    <size>
+                     <width>47</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>OR</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_6">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>5</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="background_check">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>180</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="toolTip">
-                  <string>&lt;p&gt;Hier können Sie die URL des Geokodierungsdienstes manuell angeben. Nutzen Sie diese Option, wenn Sie sich per IP-Adresse authentifizieren oder nicht den Geokodierungsdienst für Adressen der AdV nutzen wollen.&lt;/p&gt;</string>
+                  <string>&lt;p&gt;Lädt Hintergrundkarten automatisch beim Start der Geokodierung.&lt;/p&gt;</string>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>automatisches Laden der Hintergrundkarten</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="encoding_check">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>180</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>&lt;p&gt;Einblendung der Wahl des Encodings des Eingangslayers im Reiter Eingabedaten.&lt;/p&gt;</string>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Wahl des Eingangs-Encodings einblenden</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Anzeigestil der Ergebnislayer</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <item>
+                  <widget class="QLineEdit" name="layer_style_edit">
+                   <property name="toolTip">
+                    <string>&lt;p&gt;Wählen Sie hier einen Stil aus, der die Darstellung der Ergebnisse auf der Karte und in der Attributtabelle bestimmt.&lt;/p&gt; &lt;p&gt; Bei den Stilen handelt es sich aus QGIS exportierte qml-Dateien. Sie können auch eigene Stile auf Basis der vorgegebenen Stile erstellen und nutzen.&lt;/p&gt;</string>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="style_browse_button">
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;p&gt;Wählen Sie hier einen Stil aus, der die Darstellung der Ergebnisse auf der Karte und in der Attributtabelle bestimmt.&lt;/p&gt; &lt;p&gt; Bei den Stilen handelt es sich aus QGIS exportierte qml-Dateien. Sie können auch eigene Stile auf Basis der vorgegebenen Stile erstellen und nutzen.&lt;/p&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>icons/20190619_iconset_mob_wborders_load_1.png</normaloff>icons/20190619_iconset_mob_wborders_load_1.png</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>5</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="debug_check">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>180</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>&lt;p&gt;Bei aktiviertem Debugmodus werden zusätzliche Nachrichten im QGIS-Protokoll angezeigt. (Knopf &quot;Meldungen&quot; ganz rechts unten im QGIS-Interface)&lt;/p&gt;</string>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Debugmodus</string>
                  </property>
                 </widget>
                </item>
               </layout>
-             </item>
-             <item>
-              <widget class="QPushButton" name="reload_UUID_button">
-               <property name="toolTip">
-                <string>&lt;p&gt;Überprüfung der aktuell eingestellten UUID/Dienst-URL.&lt;/p&gt;</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</normaloff>icons/20190619_iconset_mob_wborders_refresh_1.png</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </widget>
-        </item>
-        <item>
-         <widget class="QgsCollapsibleGroupBox" name="output_fields_group">
-          <property name="toolTip">
-           <string>&lt;p&gt;Hier können zusätzlich zu den Standardergebnissen weitere Ergebnisfelder ausgewählt werden, die dem Ergebnislayer hinzugefügt werden.&lt;/p&gt;&lt;p&gt;Die Änderungen werden erst ab der nächsten Anfrage gültig.&lt;/p&gt;</string>
-          </property>
-          <property name="title">
-           <string>Zusätzliche Ergebnisfelder</string>
-          </property>
-          <property name="collapsed">
-           <bool>true</bool>
-          </property>
-          <property name="saveCollapsedState">
-           <bool>true</bool>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_3"/>
-         </widget>
-        </item>
-        <item>
-         <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="toolTip">
-           <string>&lt;p&gt;Nehmen Sie hier erweiterte Einstellungen vor.&lt;/p&gt;</string>
-          </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="title">
-           <string>Expertenmodus</string>
-          </property>
-          <property name="collapsed">
-           <bool>true</bool>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_9">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QCheckBox" name="selected_features_only_check">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>180</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;p&gt;Geokodieren Sie lediglich die ausgewählten Objekte des Quelllayers&lt;/p&gt;</string>
-               </property>
-               <property name="layoutDirection">
-                <enum>Qt::LeftToRight</enum>
-               </property>
-               <property name="text">
-                <string>nur selektierte Features nutzen</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="fuzzy_check">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Eine unscharfe Suche erlaubt eine tolerante Suche basierend auf dem Levenshtein (Edit) Distanz Algorithmus.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>unscharfe Suche</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_8">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_13">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QCheckBox" name="update_input_layer_check">
-               <property name="minimumSize">
-                <size>
-                 <width>180</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;p&gt;Dies bietet Ihnen die Möglichkeit, die Ergebnisse direkt in den Ausgangslayer zu schreiben. &lt;/p&gt;&lt;p&gt;Bei Treffern werden hierbei die Quellfeatures überschrieben.&lt;/p&gt;&lt;p&gt;Die Option ist nur verfügbar, wenn der gewählte Layer eine Punktgeometrie enthält.&lt;/p&gt;</string>
-               </property>
-               <property name="layoutDirection">
-                <enum>Qt::LeftToRight</enum>
-               </property>
-               <property name="text">
-                <string>Ausgangslayer aktualisieren</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_14">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_8">
-               <property name="minimumSize">
-                <size>
-                 <width>180</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Verknüpfung der Suchterme:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="search_and_check">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>AND</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="search_or_check">
-               <property name="minimumSize">
-                <size>
-                 <width>47</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verknüpfung der Suchterme mittels der logischen Operatoren AND oder OR. &lt;/p&gt;&lt;p&gt;Bei AND müssen alle Suchbegriffe gefunden werden&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt; font-style:italic;&quot;&gt;, bei OR mindestens einer der Suchbegriffe&lt;/span&gt;. &lt;/p&gt;&lt;p&gt;Der Standard ist OR.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>OR</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_6">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>5</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="background_check">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>180</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>&lt;p&gt;Lädt Hintergrundkarten automatisch beim Start der Geokodierung.&lt;/p&gt;</string>
-             </property>
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="text">
-              <string>automatisches Laden der Hintergrundkarten</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="encoding_check">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>180</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>&lt;p&gt;Einblendung der Wahl des Encodings des Eingangslayers im Reiter Eingabedaten.&lt;/p&gt;</string>
-             </property>
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="text">
-              <string>Wahl des Eingangs-Encodings einblenden</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Anzeigestil der Ergebnislayer</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QLineEdit" name="layer_style_edit">
-               <property name="toolTip">
-                <string>&lt;p&gt;Wählen Sie hier einen Stil aus, der die Darstellung der Ergebnisse auf der Karte und in der Attributtabelle bestimmt.&lt;/p&gt; &lt;p&gt; Bei den Stilen handelt es sich aus QGIS exportierte qml-Dateien. Sie können auch eigene Stile auf Basis der vorgegebenen Stile erstellen und nutzen.&lt;/p&gt;</string>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="style_browse_button">
-               <property name="maximumSize">
-                <size>
-                 <width>30</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>&lt;p&gt;Wählen Sie hier einen Stil aus, der die Darstellung der Ergebnisse auf der Karte und in der Attributtabelle bestimmt.&lt;/p&gt; &lt;p&gt; Bei den Stilen handelt es sich aus QGIS exportierte qml-Dateien. Sie können auch eigene Stile auf Basis der vorgegebenen Stile erstellen und nutzen.&lt;/p&gt;</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>icons/20190619_iconset_mob_wborders_load_1.png</normaloff>icons/20190619_iconset_mob_wborders_load_1.png</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>5</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="debug_check">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>180</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>&lt;p&gt;Bei aktiviertem Debugmodus werden zusätzliche Nachrichten im QGIS-Protokoll angezeigt. (Knopf &quot;Meldungen&quot; ganz rechts unten im QGIS-Interface)&lt;/p&gt;</string>
-             </property>
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="text">
-              <string>Debugmodus</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </widget>

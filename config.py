@@ -30,7 +30,7 @@ from .geocoder.bkg_geocoder import URL
 
 path = os.path.dirname(__file__)
 
-VERSION = '1.3.1'
+VERSION = '1.3.2'
 
 # data paths
 UI_PATH = os.path.join(path, 'interface', 'ui')

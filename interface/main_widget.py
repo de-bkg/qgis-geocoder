@@ -710,7 +710,7 @@ class MainWidget(QDockWidget):
         self.tab_widget.setCurrentIndex(0)
         # for some reason the height is ignored when setting geometry when
         # calling show() the first time
-        self.resize(self.sizeHint().width(), height + 100)
+        self.resize(self.sizeHint().width(), max(height + 100, 500))
 
     def add_background(self):
         # load background maps on opening plugin
