@@ -6,7 +6,7 @@ version=1.3.2
 author=Bundesamt für Kartographie und Geodäsie
 email=gis@ggr-planung.de
 
-about=Plugin für die Geokodierung von Adressen mit Hilfe des Geokodierungsdienstes des Bundesamtes für Kartographie und Geodäsie (BKG). Zur Nutzung des Geokodierungsdienstes ist ein Schlüssel notwendig, der vom BKG bezogen werden kann (www.bkg.bund.de).
+about=Plugin für die Geokodierung von Adressen mit Hilfe des Geokodierungsdienstes des Bundesamtes für Kartographie und Geodäsie (BKG). Die Voraussetzung für die Nutzung des BKG Geocoders ist der Erwerb einer Lizenz für einen der Dienste gdz_geokodierung bzw. gdz_geokodierung_bund. Die Nutzung des Dienstes erfordert eine Authentifizierung. Beratung und Lizenzerwerb über das Dienstleistungszentrum des BKG (E-Mail: DLZ@bkg.bund.de)
 
 tracker=http://github.com/de-bkg/qgis-geocoder/issues
 repository=http://github.com/de-bkg/qgis-geocoder
