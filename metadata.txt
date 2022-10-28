@@ -2,7 +2,7 @@
 name=BKG Geocoder
 qgisMinimumVersion=3.6
 description=Geokodierung mit dem BKG Geokodierungsdienst
-version=1.3.2
+version=1.3.3
 author=Bundesamt für Kartographie und Geodäsie
 email=gis@ggr-planung.de
 
@@ -12,6 +12,10 @@ tracker=http://github.com/de-bkg/qgis-geocoder/issues
 repository=http://github.com/de-bkg/qgis-geocoder
 
 # changelog=
+	  1.3.3
+      ---------
+	  Icons passend zur GeocoderPlus Anwendung ausgetauscht
+		
       1.3.2
       ---------
       Bugfixes
