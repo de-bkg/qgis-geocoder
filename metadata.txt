@@ -1,6 +1,7 @@
 [general]
 name=BKG Geocoder
 qgisMinimumVersion=3.6
+supportsQt6=True
 description=Geokodierung mit dem BKG Geokodierungsdienst
 version=1.3.3
 author=Bundesamt für Kartographie und Geodäsie

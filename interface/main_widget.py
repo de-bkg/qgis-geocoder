@@ -121,7 +121,7 @@ class MainWidget(QDockWidget):
         ui_file = self.ui_file if os.path.exists(self.ui_file) \
             else os.path.join(UI_PATH, self.ui_file)
         uic.loadUi(ui_file, self)
-        self.setAllowedAreas(Qt.RightDockWidgetArea | Qt.LeftDockWidgetArea)
+        self.setAllowedAreas(Qt.DockWidgetArea.RightDockWidgetArea | Qt.DockWidgetArea.LeftDockWidgetArea)
         self.setupUi()
         self.setup_config()
 
@@ -142,7 +142,7 @@ class MainWidget(QDockWidget):
         self.about_button.clicked.connect(self.show_about)
 
         # only vector layers as input
-        self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.layer_combo.setFilters(QgsMapLayerProxyModel.Filter.VectorLayer)
         self.layer_combo.layerChanged.connect(self.change_layer)
 
         # input layer encodings
@@ -177,7 +177,7 @@ class MainWidget(QDockWidget):
 
         # spatial filter
         # only polygons can be used as a spatial filter
-        self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+        self.spatial_filter_combo.setFilters(QgsMapLayerProxyModel.Filter.PolygonLayer)
 
         # connect map tools
         self.inspect_picker = FeaturePicker(
@@ -530,8 +530,8 @@ class MainWidget(QDockWidget):
         def error(msg, level):
             self.log(msg, debug_only=True, level=level)
             QMessageBox.information(self, 'Fehler', msg)
-        rev_geocoding.error.connect(lambda msg: error(msg, Qgis.Critical))
-        rev_geocoding.warning.connect(lambda msg: error(msg, Qgis.Warning))
+        rev_geocoding.error.connect(lambda msg: error(msg, Qgis.MessageLevel.Critical))
+        rev_geocoding.warning.connect(lambda msg: error(msg, Qgis.MessageLevel.Warning))
         rev_geocoding.message.connect(
             lambda msg: self.log(msg, debug_only=True))
 
@@ -625,7 +625,7 @@ class MainWidget(QDockWidget):
                 self.reset_output()
                 io_removed = True
                 self.log('Ergebnisse wurden zurückgesetzt, da der '
-                         'Ergebnislayer entfernt wurde.', level=Qgis.Warning)
+                         'Ergebnislayer entfernt wurde.', level=Qgis.MessageLevel.Warning)
             if self.input and layer_id == self.input.id:
                 self.input = None
                 io_removed = True
@@ -634,7 +634,7 @@ class MainWidget(QDockWidget):
         if io_removed and self.geocoding:
             self.geocoding.kill()
             self.log('Eingabe-/Ausgabelayer wurden während des '
-                     'Geocodings gelöscht. Breche ab...', level=Qgis.Critical)
+                     'Geocodings gelöscht. Breche ab...', level=Qgis.MessageLevel.Critical)
 
     def reset_output(self):
         '''
@@ -695,7 +695,7 @@ class MainWidget(QDockWidget):
         open this widget
         '''
         # dock widget has to start docked
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self)
+        self.iface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self)
         # undock it immediately and resize to content
         self.setFloating(True)
 
@@ -726,7 +726,7 @@ class MainWidget(QDockWidget):
                 'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
                 'Datenquellen_TopPlus_Open.pdf')
 
-    def log(self, text: str, level: int = Qgis.Info, debug_only=False):
+    def log(self, text: str, level: int = Qgis.MessageLevel.Info, debug_only=False):
         '''
         display given text in the log section
 
@@ -737,17 +737,17 @@ class MainWidget(QDockWidget):
         color : int, optional
             the qgis message level, defaults to Info
         '''
-        color = 'black' if level == Qgis.Info else 'red' \
-            if level == Qgis.Critical else 'orange'
+        color = 'black' if level == Qgis.MessageLevel.Info else 'red' \
+            if level == Qgis.MessageLevel.Critical else 'orange'
         # don't show debug messages in log section
         if not debug_only:
-            self.log_edit.moveCursor(QTextCursor.End)
+            self.log_edit.moveCursor(QTextCursor.MoveOperation.End)
             self.log_edit.insertHtml(
                 f'<span style="color: {color}">{text}</span><br>')
             scrollbar = self.log_edit.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
         # always show critical messages in debug log, others only in debug mode
-        if level == Qgis.Critical or config.debug:
+        if level == Qgis.MessageLevel.Critical or config.debug:
             QgsMessageLog.logMessage(text, 'BKG Geocoder', level=level)
 
     def change_layer(self, layer: QgsVectorLayer):
@@ -775,7 +775,7 @@ class MainWidget(QDockWidget):
         self.input = LayerWrapper(layer)
 
         # layer can only be updated in place if it has a point geometry
-        if layer.wkbType() != QgsWkbTypes.Point:
+        if layer.wkbType() != QgsWkbTypes.Type.Point:
             self.update_input_layer_check.setChecked(False)
             self.update_input_layer_check.setEnabled(False)
         else:
@@ -915,7 +915,7 @@ class MainWidget(QDockWidget):
             valid = self.check_rs(config.rs)
             if not valid:
                 self.log('Der Regionalschlüssel ist ungültig und wird '
-                         'ignoriert.', level=Qgis.Warning)
+                         'ignoriert.', level=Qgis.MessageLevel.Warning)
             else:
                 rs = config.rs
 
@@ -928,7 +928,7 @@ class MainWidget(QDockWidget):
 
         # input layer is flagged as output layer
         if self.update_input_layer_check.isChecked():
-            if layer.wkbType() != QgsWkbTypes.Point:
+            if layer.wkbType() != QgsWkbTypes.Type.Point:
                 QMessageBox.information(
                     self, 'Fehler',
                     (u'Der Layer enthält keine Punktgeometrie. Daher können '
@@ -1002,7 +1002,7 @@ class MainWidget(QDockWidget):
             if len(results) > 0:
                 self.success_count += 1
             self.log(
-                message, level=Qgis.Info if len(results) > 0 else Qgis.Warning)
+                message, level=Qgis.MessageLevel.Info if len(results) > 0 else Qgis.MessageLevel.Warning)
             self.output.layer.setReadOnly(False)
             self.store_bkg_results(f, results)
             self.output.layer.setReadOnly(True)
@@ -1010,9 +1010,9 @@ class MainWidget(QDockWidget):
         self.geocoding.progress.connect(self.progress_bar.setValue)
         self.geocoding.feature_done.connect(feature_done)
         self.geocoding.error.connect(
-            lambda msg: self.log(msg, level=Qgis.Critical))
+            lambda msg: self.log(msg, level=Qgis.MessageLevel.Critical))
         self.geocoding.warning.connect(
-            lambda msg: self.log(msg, level=Qgis.Warning))
+            lambda msg: self.log(msg, level=Qgis.MessageLevel.Warning))
         self.geocoding.finished.connect(self.geocoding_done)
 
         self.inspect_picker.set_layer(self.output.layer)
@@ -1067,8 +1067,8 @@ class MainWidget(QDockWidget):
             fail_count = self.feat_count - self.success_count
             if fail_count:
                 self.log(f'{fail_count} Feature(s) lieferten keine Ergebnisse',
-                         level=Qgis.Warning if fail_count < self.feat_count
-                         else Qgis.Critical)
+                         level=Qgis.MessageLevel.Warning if fail_count < self.feat_count
+                         else Qgis.MessageLevel.Critical)
         else:
             self.progress_bar.setStyleSheet(
                 'QProgressBar::chunk {background-color: red;}')

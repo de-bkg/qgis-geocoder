@@ -78,7 +78,7 @@ class BKGGeocoderPlugin:
         )
 
         self.iface.addCustomActionForLayerType(
-            self.legend_action, "", QgsMapLayer.VectorLayer, True)
+            self.legend_action, "", QgsMapLayer.LayerType.VectorLayer, True)
 
     def onClosePlugin(self):
         '''

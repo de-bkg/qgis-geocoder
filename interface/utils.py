@@ -628,7 +628,7 @@ class Reply:
         int
             the HTML status code returned by the requested server
         '''
-        return self.reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
+        return self.reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
 
     @property
     def content(self) -> str:
@@ -858,7 +858,7 @@ class Request(QObject):
         '''
         request = QNetworkRequest(qurl)
         if content_type:
-            request.setHeader(QNetworkRequest.ContentTypeHeader, content_type)
+            request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, content_type)
         # newer versions of QGIS (3.6+) support synchronous requests
         if hasattr(self._manager, 'blockingPost'):
             reply = self._manager.blockingPost(request, data, forceRefresh=True)

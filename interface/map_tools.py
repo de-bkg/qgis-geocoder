@@ -25,7 +25,7 @@ from qgis import utils
 from typing import List
 from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis.PyQt.QtGui import QCursor, QColor
-from qgis.PyQt.Qt import QWidget
+from qgis.PyQt.QtWidgets import QWidget
 from qgis.gui import (QgsMapToolEmitPoint, QgsMapToolIdentify, QgsVertexMarker,
                       QgsMapCanvas)
 from qgis.core import (QgsPointXY, QgsVectorLayer)
@@ -41,7 +41,7 @@ class MapTool:
         the appearance of the cursor when hovering the map canvas while tool is
         active
     '''
-    cursor = QCursor(Qt.CrossCursor)
+    cursor = QCursor(Qt.CursorShape.CrossCursor)
 
     def __init__(self, ui_element: QWidget, canvas: QgsMapCanvas = None):
         '''
@@ -154,7 +154,7 @@ class FeaturePicker(MapTool, QgsMapToolEmitPoint):
             return
         features = QgsMapToolIdentify(self.canvas).identify(
             mouseEvent.x(), mouseEvent.y(), self._layers,
-            QgsMapToolIdentify.TopDownStopAtFirst)
+            QgsMapToolIdentify.IdentifyMode.TopDownStopAtFirst)
         if len(features) > 0:
             self.feature_picked.emit(features[0].mFeature.id())
 
@@ -174,7 +174,7 @@ class FeatureDragger(FeaturePicker):
         the appearance of the cursor while dragging a feature
     '''
     feature_dragged = pyqtSignal(int, QgsPointXY)
-    drag_cursor = QCursor(Qt.DragMoveCursor)
+    drag_cursor = QCursor(Qt.CursorShape.DragMoveCursor)
 
     def __init__(self, ui_element: QWidget, layers: List[QgsVectorLayer] = [],
                  canvas: QgsMapCanvas = None):
@@ -220,7 +220,7 @@ class FeatureDragger(FeaturePicker):
         if self._picked_feature is None:
             features = QgsMapToolIdentify(self.canvas).identify(
                 e.pos().x(), e.pos().y(), self._layers,
-                QgsMapToolIdentify.TopDownStopAtFirst)
+                QgsMapToolIdentify.IdentifyMode.TopDownStopAtFirst)
             if len(features) == 0:
                 return
             feature = features[0].mFeature
@@ -235,7 +235,7 @@ class FeatureDragger(FeaturePicker):
             self._marker = QgsVertexMarker(self.canvas)
             self._marker.setColor(color)
             self._marker.setIconSize(10)
-            self._marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+            self._marker.setIconType(QgsVertexMarker.IconType.ICON_CIRCLE)
             self._marker.setPenWidth(10)
         point = self.toMapCoordinates(e.pos())
         self._marker.setCenter(point)

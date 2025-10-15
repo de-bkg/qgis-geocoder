@@ -202,7 +202,7 @@ class BKGGeocoder(Geocoder):
         '''extract zip-code and city from a string'''
         res = {}
         # all letters and '-', rejoin them with spaces
-        re_city = '([a-zA-ZäöüßÄÖÜ\-]+)'
+        re_city = r'([a-zA-ZäöüßÄÖÜ\-]+)'
         f = re.findall(re_city, value)
         if f:
             res['ort'] = ' '.join(f)
