@@ -400,7 +400,7 @@ class MainWidget(QDockWidget):
         '''
         if not rs:
             return False
-        regex = '^[01]\d{0,11}\*?$'
+        regex = r'^[01]\d{0,11}\*?$'
         return re.match(regex, rs) is not None
 
     def setup_crs(self):
