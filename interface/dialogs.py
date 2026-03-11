@@ -24,10 +24,9 @@ __date__ = '30/10/2018'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
 from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QGridLayout,
-                                 QFrame)
-from qgis.PyQt.Qt import QWidget
+                                 QFrame, QWidget)
 from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtCore import Qt, QMetaType
 from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
                        QgsField, QgsProject, QgsCategorizedSymbolRenderer,
@@ -87,7 +86,7 @@ class Dialog(QDialog):
         '''
         override, show the dialog
         '''
-        return self.exec_()
+        return self.exec()
 
 
 class InspectResultsDialog(Dialog):
@@ -180,8 +179,8 @@ class InspectResultsDialog(Dialog):
             self.review_layout.addLayout(grid)
             # horizontal line
             line = QFrame()
-            line.setFrameShape(QFrame.HLine)
-            line.setFrameShadow(QFrame.Sunken)
+            line.setFrameShape(QFrame.Shape.HLine)
+            line.setFrameShadow(QFrame.Shadow.Sunken)
             self.review_layout.addWidget(line)
 
         headline = QLabel('Anschrift laut Dienst')
@@ -217,8 +216,8 @@ class InspectResultsDialog(Dialog):
         self.preview_layer.layer.startEditing()
         provider = self.preview_layer.layer.dataProvider()
         provider.addAttributes([
-            QgsField('i',  QVariant.Int),
-            QgsField('text', QVariant.String)
+            QgsField('i', QMetaType.Int),
+            QgsField('text', QMetaType.QString)
         ])
         project = QgsProject.instance()
         project.addMapLayer(self.preview_layer.layer, False)
@@ -255,8 +254,8 @@ class InspectResultsDialog(Dialog):
             if os.path.exists(img_path):
                 pixmap = QPixmap(img_path)
                 preview.setPixmap(pixmap.scaled(
-                    preview.size(), Qt.KeepAspectRatio,
-                    Qt.SmoothTransformation))
+                    preview.size(), Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation))
 
             #  results clicked in the dialog are highlighted on the map
             radio.toggled.connect(

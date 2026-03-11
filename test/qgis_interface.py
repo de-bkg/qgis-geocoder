@@ -24,7 +24,7 @@ __copyright__ = (
 )
 
 import logging
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSlot, pyqtSignal
 from qgis.core import QgsProject, QgsMapLayer
 LOGGER = logging.getLogger('QGIS')
 

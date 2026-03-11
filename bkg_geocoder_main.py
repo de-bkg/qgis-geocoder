@@ -23,13 +23,12 @@ __author__ = 'Christoph Franke'
 __date__ = '30/10/2018'
 __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 
+import os
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsMapLayer, QgsVectorLayer
 from qgis.gui import QgisInterface
 
-# init resources
-from .resources import *
 from .interface.main_widget import MainWidget
 
 
@@ -60,7 +59,7 @@ class BKGGeocoderPlugin:
         override, add entry points (actions) for the plugin
         '''
         # toolbar icon
-        icon_path = ':/plugins/bkg_geocoder/icon.png'
+        icon_path = os.path.join(os.path.dirname(__file__), 'interface', 'ui', 'icons', 'toolbar_icon.png')
         icon = QIcon(icon_path)
         self.action = QAction(icon, 'BKG Geocoder', self.iface.mainWindow())
         self.action.triggered.connect(lambda: self.run())
@@ -78,7 +77,7 @@ class BKGGeocoderPlugin:
         )
 
         self.iface.addCustomActionForLayerType(
-            self.legend_action, "", QgsMapLayer.VectorLayer, True)
+            self.legend_action, "", QgsMapLayer.LayerType.VectorLayer, True)
 
     def onClosePlugin(self):
         '''
