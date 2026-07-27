@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/bkg_geocoder" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>
