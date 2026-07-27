@@ -59,7 +59,7 @@ class BKGGeocoderPlugin:
         override, add entry points (actions) for the plugin
         '''
         # toolbar icon
-        icon_path = os.path.join(os.path.dirname(__file__), 'icon.png')
+        icon_path = os.path.join(os.path.dirname(__file__), 'interface', 'ui', 'icons', 'toolbar_icon.png')
         icon = QIcon(icon_path)
         self.action = QAction(icon, 'BKG Geocoder', self.iface.mainWindow())
         self.action.triggered.connect(lambda: self.run())

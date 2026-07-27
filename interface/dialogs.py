@@ -26,7 +26,7 @@ __copyright__ = 'Copyright 2020, Bundesamt für Kartographie und Geodäsie'
 from qgis.PyQt.QtWidgets import (QDialog, QLabel, QRadioButton, QGridLayout,
                                  QFrame, QWidget)
 from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtCore import Qt, QMetaType
 from qgis.PyQt import uic
 from qgis.core import (QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFeature,
                        QgsField, QgsProject, QgsCategorizedSymbolRenderer,
@@ -216,8 +216,8 @@ class InspectResultsDialog(Dialog):
         self.preview_layer.layer.startEditing()
         provider = self.preview_layer.layer.dataProvider()
         provider.addAttributes([
-            QgsField('i',  QVariant.Int),
-            QgsField('text', QVariant.String)
+            QgsField('i', QMetaType.Int),
+            QgsField('text', QMetaType.QString)
         ])
         project = QgsProject.instance()
         project.addMapLayer(self.preview_layer.layer, False)

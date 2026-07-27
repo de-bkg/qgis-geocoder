@@ -30,7 +30,7 @@ from qgis.utils import iface
 from qgis.PyQt.QtWidgets import QLayout
 from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.PyQt.QtCore import (QUrl, QEventLoop, QTimer, QUrlQuery,
-                              QObject, pyqtSignal, QVariant)
+                              QObject, pyqtSignal, QMetaType)
 import json
 
 
@@ -40,7 +40,7 @@ class ResField:
     anything else)
     '''
     def __init__(self, name: str, field_type: str,
-                 field_variant: QVariant = None,
+                 field_variant: QMetaType = None,
                  prefix: str = '', alias: str = None,  optional: bool = False):
         '''
         Parameters
@@ -133,12 +133,12 @@ class ResField:
     @staticmethod
     def _get_variant(field_type):
         if field_type == 'bool':
-            return QVariant.Bool
+            return QMetaType.Bool
         if 'int' in field_type:
-            return QVariant.Int
+            return QMetaType.Int
         if 'float' in field_type:
-            return QVariant.Double
-        return QVariant.String
+            return QMetaType.Double
+        return QMetaType.QString
 
 
 class LayerWrapper():
