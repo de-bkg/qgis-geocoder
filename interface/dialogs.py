@@ -216,8 +216,8 @@ class InspectResultsDialog(Dialog):
         self.preview_layer.layer.startEditing()
         provider = self.preview_layer.layer.dataProvider()
         provider.addAttributes([
-            QgsField('i', QMetaType.Int),
-            QgsField('text', QMetaType.QString)
+            QgsField('i', QMetaType.Type.Int),
+            QgsField('text', QMetaType.Type.QString)
         ])
         project = QgsProject.instance()
         project.addMapLayer(self.preview_layer.layer, False)

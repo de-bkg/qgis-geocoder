@@ -133,12 +133,12 @@ class ResField:
     @staticmethod
     def _get_variant(field_type):
         if field_type == 'bool':
-            return QMetaType.Bool
+            return QMetaType.Type.Bool
         if 'int' in field_type:
-            return QMetaType.Int
+            return QMetaType.Type.Int
         if 'float' in field_type:
-            return QMetaType.Double
-        return QMetaType.QString
+            return QMetaType.Type.Double
+        return QMetaType.Type.QString
 
 
 class LayerWrapper():
@@ -273,6 +273,7 @@ class Layer:
     wrapper of a vector layer in the QGIS layer tree with some
     convenient functions. Can be grouped and addressed by its name.
     '''
+    _group_cache = {}
 
     def __init__(self, layername: str, data_path: str, groupname: str = '',
                  prepend: bool = True):
@@ -366,10 +367,22 @@ class Layer:
         '''recursively nests groups in order of groupnames'''
         if len(groupnames) == 0:
             return parent
+        cache_key = (id(parent), groupnames[0])
         next_parent = parent.findGroup(groupnames[0])
+        if not next_parent:
+            # check cache - findGroup may not find recently created groups
+            # in QGIS 4 due to deferred tree model updates
+            cached = cls._group_cache.get(cache_key)
+            if cached is not None:
+                try:
+                    cached.name()
+                    next_parent = cached
+                except RuntimeError:
+                    pass
         if not next_parent:
             next_parent = (parent.insertGroup(0, groupnames[0])
                            if prepend else parent.addGroup(groupnames[0]))
+            cls._group_cache[cache_key] = next_parent
         return cls._nest_groups(next_parent, groupnames[1:], prepend=prepend)
 
     @classmethod
@@ -460,10 +473,11 @@ class Layer:
                 self.layer.setName(label)
             QgsProject.instance().addMapLayer(self.layer, False)
             self.layer.loadNamedStyle(style_path)
-        tree_layer = self._tree_layer
+        parent = self.parent
+        tree_layer = parent.findLayer(self.layer) if self.layer else None
         if not tree_layer:
-            tree_layer = self.parent.insertLayer(0, self.layer) if prepend else\
-                self.parent.addLayer(self.layer)
+            tree_layer = parent.insertLayer(0, self.layer) if prepend else\
+                parent.addLayer(self.layer)
         tree_layer.setItemVisibilityChecked(checked)
         tree_layer.setExpanded(expanded)
         if filter is not None:
@@ -544,18 +558,19 @@ class TileLayer(Layer):
         checked: bool, optional
             set check state of layer in layer tree, defaults to being checked
         '''
+        parent = self.parent
         self.layer = None
-        for child in self.parent.children():
+        for child in parent.children():
             if child.name() == label:
                 self.layer = child.layer()
                 break
         if not self.layer:
             self.layer = QgsRasterLayer(self.url, label, 'wms')
             QgsProject.instance().addMapLayer(self.layer, False)
-            l = self.parent.insertLayer(0, self.layer) if self.prepend \
-                else self.parent.addLayer(self.layer)
-            l.setItemVisibilityChecked(checked)
-            l.setExpanded(expanded)
+            layer = parent.insertLayer(0, self.layer) if self.prepend \
+                else parent.addLayer(self.layer)
+            layer.setItemVisibilityChecked(checked)
+            layer.setExpanded(expanded)
 
 
 class TopPlusOpen(TileLayer):
@@ -882,7 +897,7 @@ class Request(QObject):
                 raise ConnectionError('Timeout')
 
             timer.stop()
-        if reply.error():
+        if reply.error() != QNetworkReply.NetworkError.NoError:
             self.error.emit(reply.errorString())
             raise ConnectionError(reply.errorString())
         res = Reply(reply)

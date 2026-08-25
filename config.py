@@ -129,7 +129,7 @@ class Config(object):
         try:
             with open(config_file, 'r') as f:
                 self._config = json.load(f)
-        except:
+        except (FileNotFoundError, json.JSONDecodeError):
             self._config = self.default.copy()
             print('Error while loading config. Using default values.')
 

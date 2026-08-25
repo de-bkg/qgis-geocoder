@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis styleCategories="Symbology|Labeling" version="3.12.3-București" labelsEnabled="1">
+<qgis styleCategories="Symbology|Labeling|AttributeTable" version="3.12.3-București" labelsEnabled="1">
   <renderer-v2 attr="IF (&quot;manuell_bearbeitet&quot; IS TRUE , 'manuell bearbeitet', &quot;bkg_treffer&quot;)" forceraster="0" type="categorizedSymbol" enableorderby="0" symbollevels="0">
     <categories>
       <category label="Manuell bearbeitet" render="true" symbol="0" value="manuell bearbeitet"/>

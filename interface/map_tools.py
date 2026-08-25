@@ -152,9 +152,7 @@ class FeaturePicker(MapTool, QgsMapToolEmitPoint):
         '''
         if not self._layers:
             return
-        features = QgsMapToolIdentify(self.canvas).identify(
-            mouseEvent.x(), mouseEvent.y(), self._layers,
-            QgsMapToolIdentify.IdentifyMode.TopDownStopAtFirst)
+        features = QgsMapToolIdentify(self.canvas).identify(mouseEvent.pos().x(), mouseEvent.pos().y(), self._layers, QgsMapToolIdentify.IdentifyMode.TopDownStopAtFirst)
         if len(features) > 0:
             self.feature_picked.emit(features[0].mFeature.id())
 

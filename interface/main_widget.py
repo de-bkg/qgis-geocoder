@@ -721,7 +721,7 @@ class MainWidget(QDockWidget):
                              crs='EPSG:25832')#crs=config.projection)
         bg_osm.draw('TopPlusOpen (bkg.bund.de)', checked=False)
         for layer in [bg_osm, bg_grey]:
-            layer.layer.setTitle(
+            layer.layer.serverProperties().setTitle(
                 '© Bundesamt für Kartographie und Geodäsie 2020, '
                 'Datenquellen: https://sg.geodatenzentrum.de/web_public/'
                 'Datenquellen_TopPlus_Open.pdf')

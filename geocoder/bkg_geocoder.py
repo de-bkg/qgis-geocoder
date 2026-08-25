@@ -325,10 +325,10 @@ class BKGGeocoder(Geocoder):
         con_msg = ('Der Dienst ist zur Zeit nicht erreichbar bzw. '
                    'die angegebene URL ist nicht gültig.')
         try:
-            res = requests.get(url)
+            res = requests.get(url, timeout=30000)
         except ConnectionError:
             return False, con_msg, default
-        if res.status_code == None:
+        if res.status_code is None:
             return False, con_msg, default
         if res.status_code != 200:
             msg = ('Der eingegebene Schlüssel bzw. '
@@ -430,7 +430,7 @@ class BKGGeocoder(Geocoder):
         while True:
             try:
                 if not do_post:
-                    self.reply = requests.get(self.url, params=self.params)
+                    self.reply = requests.get(self.url, params=self.params, timeout=30000)
                 else:
                     content_type = 'application/x-www-form-urlencoded'
                     data = QUrlQuery()
@@ -438,7 +438,7 @@ class BKGGeocoder(Geocoder):
                         data.addQueryItem(k, v)
                     self.reply = requests.post(
                         self.url, data=data.query().encode('utf-8'),
-                        content_type=content_type
+                        content_type=content_type, timeout=30000
                     )
             except ConnectionError:
                 if retries >= max_retries:
@@ -484,7 +484,7 @@ class BKGGeocoder(Geocoder):
                 raise RuntimeError(message)
         if reply.status_code == 500:
             raise ValueError('500 - interner Serverfehler')
-        if reply.status_code == None:
+        if reply.status_code is None:
             raise RuntimeError(f'Service "{reply.url[:30] + "..."}" nicht '
                                'erreichbar. Bitte überprüfen Sie die '
                                'eingegebene Dienst-URL und ihre '
@@ -526,7 +526,7 @@ class BKGGeocoder(Geocoder):
             'lon': x,
             'srsname': self.crs
         }
-        self.reply = requests.get(self.url, params=params)
+        self.reply = requests.get(self.url, params=params, timeout=30000)
         self.raise_on_error(self.reply)
         return self.reply
 

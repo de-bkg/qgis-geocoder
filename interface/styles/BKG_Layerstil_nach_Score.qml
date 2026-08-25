@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis styleCategories="Symbology|Labeling" version="3.12.3-București" labelsEnabled="1">
+<qgis styleCategories="Symbology|Labeling|AttributeTable" version="3.12.3-București" labelsEnabled="1">
   <renderer-v2 attr="IF (&quot;manuell_bearbeitet&quot; IS TRUE , -1, &quot;bkg_score&quot;)" forceraster="0" type="graduatedSymbol" enableorderby="0" graduatedMethod="GraduatedColor" symbollevels="1">
     <ranges>
       <range label="Manuell bearbeitet" lower="-1.000000000000000" render="true" symbol="0" upper="0.000000000000000"/>

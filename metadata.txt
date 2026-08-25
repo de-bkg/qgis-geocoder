@@ -1,18 +1,18 @@
 [general]
 name=BKG Geocoder
 qgisMinimumVersion=3.6
-supportsQt6=True
+qgisMaximumVersion=4.99
 description=Geokodierung mit dem BKG Geokodierungsdienst
 version=1.4.0
 author=Bundesamt für Kartographie und Geodäsie
-email=gis@ggr-planung.de
+email=dlz@bkg.bund.de
 
-about=Plugin für die Geokodierung von Adressen mit Hilfe des Geokodierungsdienstes des Bundesamtes für Kartographie und Geodäsie (BKG). Die Voraussetzung für die Nutzung des BKG Geocoders ist der Erwerb einer Lizenz für einen der Dienste gdz_geokodierung bzw. gdz_geokodierung_bund. Die Nutzung des Dienstes erfordert eine Authentifizierung. Beratung und Lizenzerwerb über das Dienstleistungszentrum des BKG (E-Mail: DLZ@bkg.bund.de)
+about=Plugin for geocoding addresses using the geocoding service provided by the Federal Agency for Cartography and Geodesy (BKG). A license for one of the gdz_geokodierung or gdz_geokodierung_bund services is required to use the BKG Geocoder Plugin. For consultation and license acquisition, please contact the BKG Service Center (email: dlz@bkg.bund.de).
 
 tracker=http://github.com/de-bkg/qgis-geocoder/issues
 repository=http://github.com/de-bkg/qgis-geocoder
 
-# changelog=
+changelog=
       1.4.0
       ---------
       Qt6-Kompatibilität
